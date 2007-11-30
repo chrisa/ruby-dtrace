@@ -1,0 +1,11 @@
+<div id="dtrace-report">
+  <p>...dtrace report...</p>
+  <table>
+    <% controller.dtrace_report.sort {|a,b| b[1] <=> a[1] }.each do |e| %>
+    <tr>
+      <td><%= e[0] %></td>
+      <td><%= e[1] %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>

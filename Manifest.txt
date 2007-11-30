@@ -1,0 +1,8 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+lib/dtrace.rb
+test/test_dtrace.rb
+ext/extconf.rb
+ext/dtrace_api.c

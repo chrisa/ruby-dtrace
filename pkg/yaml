@@ -1,0 +1,47 @@
+--- !ruby/object:Gem::Cache
+gems:
+  ruby-dtrace-0.0.1: !ruby/object:Gem::Specification 
+    rubygems_version: 0.9.4
+    specification_version: 1
+    name: ruby-dtrace
+    version: !ruby/object:Gem::Version 
+      version: "0.0.1"
+    date: 2007-11-23 07:00:00 -00:00
+    summary: Ruby bindings for Dtrace
+    require_paths: 
+    - lib
+    email: chris@nodnol.org
+    homepage: http://sourcefarce.net/projects/rails/wiki/RubyDtrace
+    rubyforge_project: 
+    description: 
+    autorequire:
+    default_executable: 
+    bindir: 
+    has_rdoc: false
+    required_ruby_version: !ruby/object:Gem::Version::Requirement 
+      requirements: 
+      - - ">"
+        - !ruby/object:Gem::Version 
+          version: 0.0.0
+      version: 
+    platform:
+    signing_key: 
+    cert_chain: []
+    
+    post_install_message: 
+    authors: []
+    
+    files: []
+    
+    test_files: []
+    
+    rdoc_options: []
+    
+    extra_rdoc_files: []
+    
+    executables: 
+    extensions: []
+    
+    requirements: 
+    dependencies: 
+    

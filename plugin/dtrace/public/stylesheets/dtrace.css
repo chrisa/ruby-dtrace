@@ -1,0 +1,48 @@
+body {
+  margin-bottom:25px;
+}
+
+#dtrace {
+  width:100%;
+}
+
+#dtrace td, #dtrace th, #dtrace div, #dtrace p {
+  text-align:left;
+}
+
+#dtrace a,
+#dtrace a:visited {
+  color:#005;
+  text-decoration:none;
+}
+
+#dtrace a:hover,
+#dtrace a:active {
+  text-decoration:underline;
+}
+
+#dtrace .dtrace-tab {
+  background-color:#fff;
+  padding:1em;
+  margin:0;
+}
+
+#dtrace-tabs {
+  width:100%;
+  height:25px;
+  margin:0; padding:0;
+  list-style-type:none;
+  background:#000;
+}
+
+#dtrace-tabs li {
+  float:left;
+}
+
+#dtrace-tabs li a,
+#dtrace-tabs li a:visited {
+  display:block;
+  line-height:25px;
+  margin:0 1em;
+  color:#fff;
+}
