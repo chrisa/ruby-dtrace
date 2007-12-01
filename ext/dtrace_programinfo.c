@@ -4,6 +4,7 @@
 
 #include "dtrace_api.h"
 
+/* :nodoc: */
 VALUE dtraceprograminfo_init(VALUE self)
 {
   dtrace_proginfo_t *proginfo;

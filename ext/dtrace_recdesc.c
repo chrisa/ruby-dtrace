@@ -4,6 +4,7 @@
 
 #include "dtrace_api.h"
 
+/* :nodoc: */
 VALUE dtracerecdesc_init(VALUE self)
 {
   dtrace_recdesc_t *recdesc;

@@ -7,6 +7,7 @@
 RUBY_EXTERN VALUE eDtraceException;
 RUBY_EXTERN VALUE cDtraceProgramInfo;
 
+/* :nodoc: */
 VALUE dtraceprogram_init(VALUE self)
 {
   dtrace_prog_t *prog;

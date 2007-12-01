@@ -7,6 +7,7 @@
 RUBY_EXTERN VALUE cDtraceProbe;
 RUBY_EXTERN VALUE cDtraceRecDesc;
 
+/* :nodoc: */
 VALUE dtraceaggdata_init(VALUE self)
 {
   dtrace_aggdata_t *aggdata;

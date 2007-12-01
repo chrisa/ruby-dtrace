@@ -31,6 +31,7 @@ VALUE dtrace_hdl_alloc(VALUE klass)
   }
 }
 
+/* :nodoc: */
 VALUE dtrace_init(VALUE self)
 {
   dtrace_hdl_t *handle;

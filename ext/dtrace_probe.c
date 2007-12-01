@@ -4,6 +4,7 @@
 
 #include "dtrace_api.h"
 
+/* :nodoc: */
 VALUE dtraceprobe_init(VALUE self)
 {
   dtrace_probedesc_t *pdp;

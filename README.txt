@@ -1,19 +1,13 @@
-ruby-dtrace
-    by Chris Andrews <chris@nodnol.org>
-    http://sourcefarce.net/projects/rails/wiki/RubyDtrace
-
-== DESCRIPTION
-  
-This is Ruby bindings for Dtrace, which lets you write D-based
+ruby-dtrace is Ruby bindings for Dtrace, which lets you write D-based
 programs in Ruby. It doesn't provide D probes for Ruby, but you can
 use it with the probes found in the Joyent and Apple builds of Ruby.
 
 == FEATURES
   
- * Access to the D API
- * Probe metadata
- * Run D programs
- * Access aggregates
+* Access to the D API
+* Probe metadata
+* Run D programs
+* Access aggregates
 
 == SYNOPSIS
 
@@ -35,11 +29,8 @@ use it with the probes found in the Joyent and Apple builds of Ruby.
 
 == REQUIREMENTS
 
- * A platform with Dtrace support
-   (OpenSolaris, Mac OS X 10.5 Leopard tested, possibly also FreeBSD)
-
- * root, or some/all of the dtrace privileges on Solaris: dtrace_user,
-   dtrace_proc and dtrace_kernel.
+* A platform with Dtrace support (OpenSolaris, Mac OS X 10.5 Leopard tested, possibly also FreeBSD).
+* root, or some/all of the dtrace privileges on Solaris: dtrace_user, dtrace_proc and dtrace_kernel.
 
 == INSTALL
 
