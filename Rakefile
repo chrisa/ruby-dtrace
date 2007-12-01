@@ -2,8 +2,9 @@
 
 require 'rubygems'
 require 'hoe'
+require './lib/dtrace'
 
-Hoe.new('ruby-dtrace', '0.0.1') do |p|
+Hoe.new('ruby-dtrace', Dtrace::VERSION) do |p|
   p.rubyforge_name = 'ruby-dtrace'
   p.author = 'Chris Andrews'
   p.email = 'chris@nodnol.org'
@@ -15,6 +16,7 @@ use it with the probes found in the Joyent and Apple builds of Ruby.
 EOD
   p.spec_extras = {:extensions => ['ext/extconf.rb']}
   p.url = "http://ruby-dtrace.rubyforge.org/"
+  p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
 end
 
 desc "Uses extconf.rb and make to build the extension"
