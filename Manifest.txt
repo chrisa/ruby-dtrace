@@ -4,6 +4,7 @@ README.txt
 Rakefile
 ext/dtrace_aggregate.c
 ext/dtrace_api.c
+ext/dtrace_api.h
 ext/dtrace_hdl.c
 ext/dtrace_probe.c
 ext/dtrace_program.c
