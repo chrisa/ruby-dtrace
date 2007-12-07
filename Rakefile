@@ -2,7 +2,9 @@
 
 require 'rubygems'
 require 'hoe'
-require './lib/dtrace'
+
+$: << './lib'
+require 'dtrace'
 
 Hoe.new('ruby-dtrace', Dtrace::VERSION) do |p|
   p.rubyforge_name = 'ruby-dtrace'

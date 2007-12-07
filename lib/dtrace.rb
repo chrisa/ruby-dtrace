@@ -4,8 +4,13 @@
 #
 
 require 'dtrace_api'
+require 'dtracerecord'
+require 'dtraceconsumer'
+require 'dtraceaggregate'
+require 'dtraceprobedata'
+require 'dtraceprobe'
 
 class Dtrace
-  VERSION = '0.0.1'
+  VERSION = '0.0.2'
 end
 

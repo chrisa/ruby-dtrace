@@ -3,7 +3,7 @@ require 'dtrace'
 class Dtracer
   
   def start_dtrace(pid)
-    progtext = 'ruby$1:::function-entry{ @[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); }'
+    progtext = 'ruby$1:::function-entry{ @a[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); } END { printa(@a); }'
 
     begin
       @d = Dtrace.new
@@ -28,11 +28,12 @@ class Dtracer
     return {} unless @d
 
     begin
-      @d.stop
-      @d.aggregate_snap
       dtrace_report = Hash.new
-      @d.each_aggregate do |agg|
-        dtrace_report[agg[1].data] = agg[2].data
+      c = DtraceConsumer.new(@d)
+      c.consume_once do |e|
+        if e.respond_to? :tuple
+          dtrace_report[e.tuple.first] = e.value
+        end
       end
     rescue DtraceException => e
       puts "end: #{e.message}"

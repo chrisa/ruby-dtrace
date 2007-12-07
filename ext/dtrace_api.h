@@ -8,14 +8,11 @@
 #include "/usr/include/dtrace.h"
 #include "ruby.h"
 
+VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
+
 VALUE dtraceaggdata_init(VALUE self);
-VALUE dtraceaggdata_desc(VALUE self);
 VALUE dtraceaggdata_value(VALUE self);
-VALUE dtraceaggdata_size(VALUE self);
-VALUE dtraceaggdata_each_record(VALUE self);
-VALUE dtraceaggdata_num_records(VALUE self);
-VALUE dtraceaggdata_record(VALUE self, VALUE index);
-VALUE dtraceaggdata_probe(VALUE self);
+VALUE dtraceaggdata_aggtype(VALUE self);
 
 void  dtrace_hdl_free (void *handle);
 VALUE dtrace_hdl_alloc(VALUE klass);
@@ -31,6 +28,11 @@ VALUE dtrace_hdl_aggregate_print(VALUE self);
 VALUE dtrace_hdl_aggregate_snap(VALUE self);
 VALUE dtrace_hdl_aggregate_clear(VALUE self);
 VALUE dtrace_hdl_error(VALUE self);
+VALUE dtrace_hdl_sleep(VALUE self);
+VALUE dtrace_hdl_work(VALUE self, 
+		      VALUE probe_consumer_proc, 
+		      VALUE rec_consumer_proc);
+VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer_proc);
 
 VALUE dtraceprobe_init(VALUE self);
 VALUE dtraceprobe_probe_id(VALUE self);
@@ -38,6 +40,13 @@ VALUE dtraceprobe_provider(VALUE self);
 VALUE dtraceprobe_mod(VALUE self);
 VALUE dtraceprobe_func(VALUE self);
 VALUE dtraceprobe_name(VALUE self);
+
+VALUE dtraceprobedata_init(VALUE self);
+VALUE dtraceprobedata_probedesc(VALUE self);
+VALUE dtraceprobedata_each_record(VALUE self);
+
+VALUE dtracebufdata_init(VALUE self);
+VALUE dtracebufdata_record(VALUE self);
 
 VALUE dtraceprogram_init(VALUE self);
 VALUE dtraceprogram_exec(VALUE self);
@@ -50,4 +59,3 @@ VALUE dtraceprograminfo_matches_count(VALUE self);
 VALUE dtraceprograminfo_speculations_count(VALUE self);
 
 VALUE dtracerecdesc_init(VALUE self);
-VALUE dtracerecdesc_data(VALUE self);

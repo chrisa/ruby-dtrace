@@ -8,6 +8,9 @@ RUBY_EXTERN VALUE eDtraceException;
 RUBY_EXTERN VALUE cDtraceProbe;
 RUBY_EXTERN VALUE cDtraceProgram;
 RUBY_EXTERN VALUE cDtraceAggData;
+RUBY_EXTERN VALUE cDtraceRecDesc;
+RUBY_EXTERN VALUE cDtraceProbeData;
+RUBY_EXTERN VALUE cDtraceBufData;
 
 void dtrace_hdl_free (void *handle)
 {
@@ -278,3 +281,101 @@ VALUE dtrace_hdl_error(VALUE self)
   return rb_str_new2(error_string);
 }
 
+/*
+ * Sleep until we need to wake up to honour D options controlling
+ * consumption rates.
+ */
+VALUE dtrace_hdl_sleep(VALUE self)
+{
+  dtrace_hdl_t *handle;
+
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+  dtrace_sleep(handle);
+  return Qnil;
+}
+
+typedef struct dtrace_work_handlers {
+  VALUE probe;
+  VALUE rec;
+} dtrace_work_handlers_t;
+
+static int _probe_consumer(const dtrace_probedata_t *data, void *arg)
+{
+  VALUE proc;
+  dtrace_work_handlers_t handlers;
+  VALUE probedata;
+
+  handlers = *(dtrace_work_handlers_t *) arg;
+  proc = handlers.probe;
+
+  probedata = Data_Wrap_Struct(cDtraceProbeData, 0, NULL, (dtrace_probedata_t *)data);
+  rb_funcall(proc, rb_intern("call"), 1, probedata);
+  
+  return (DTRACE_CONSUME_THIS);
+}
+
+static int _rec_consumer(const dtrace_probedata_t *data, const dtrace_recdesc_t *rec, void *arg)
+{
+  VALUE proc;
+  dtrace_work_handlers_t handlers;
+  VALUE recdesc;
+
+  handlers = *(dtrace_work_handlers_t *) arg;
+  proc = handlers.rec;
+
+  recdesc = Data_Wrap_Struct(cDtraceRecDesc, 0, NULL, (dtrace_recdesc_t *)rec);
+  rb_funcall(proc, rb_intern("call"), 1, recdesc);
+
+  return (DTRACE_CONSUME_THIS);
+}
+
+static int _buf_consumer(const dtrace_bufdata_t *bufdata, void *arg)
+{
+  VALUE proc;
+  VALUE dtracebufdata;
+
+  proc = (VALUE)arg;
+
+  dtracebufdata = Data_Wrap_Struct(cDtraceBufData, 0, NULL, (dtrace_bufdata_t *)bufdata);
+  rb_funcall(proc, rb_intern("call"), 1, dtracebufdata);
+
+  return (DTRACE_HANDLE_OK);
+}
+
+/*
+ * Process any data waiting from the D program.
+ */
+VALUE dtrace_hdl_work(VALUE self, 
+		      VALUE probe_consumer_proc, 
+		      VALUE rec_consumer_proc)
+{
+  dtrace_hdl_t *handle;
+  dtrace_workstatus_t status;
+  dtrace_work_handlers_t handlers;
+  
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  /* fill out the handlers struct */
+  handlers.probe = probe_consumer_proc;
+  handlers.rec   = rec_consumer_proc;
+
+  status = dtrace_work(handle, NULL, _probe_consumer, _rec_consumer, &handlers);
+
+  return INT2FIX(status);
+}  
+
+/*
+ * Set up the buffered output handler for this handle.
+ */
+VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer)
+{
+  dtrace_hdl_t *handle;
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  /* attach the buffered output handler */
+  if (dtrace_handle_buffered(handle, &_buf_consumer, (void *)buf_consumer) == -1) {
+    rb_raise(eDtraceException, "failed to establish buffered handler");
+  }
+
+  return Qnil;
+}
