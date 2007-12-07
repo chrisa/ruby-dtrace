@@ -33,6 +33,5 @@ plugin/dtrace/public/stylesheets/dtrace.css
 plugin/dtrace/tasks/dtrace.rake
 plugin/dtrace/test/dtrace_test.rb
 plugin/dtrace/views/dtrace/_report.rhtml
-test/agg.d
 test/test_dtrace.rb
 test/test_dtrace_workapi.rb
