@@ -8,24 +8,23 @@ use it with the probes found in the Joyent and Apple builds of Ruby.
 * Probe metadata
 * Run D programs
 * Access aggregates
+* Consume output from D programs
 
 == SYNOPSIS
 
-    t = Dtrace.new
-    dprog = "ruby*:::function-entry{ @[copyinstr(arg1)] = count(); }"
-    prog = t.compile dprog
+    t = Dtrace.new 
+    progtext = 'ruby$1:::function-entry{ @a[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); } END { printa(@a); }'
+    prog = t.compile progtext
     prog.execute
+
     t.go
 
     [...]
-
-    t.stop
-    t.aggregate_snap
-    t.each_aggregate do |agg|
-      (0..(agg.num_records - 1)).each do |i|
-        rec = agg[i]
-      end
-    end        
+    
+    c = DtraceConsumer.new(t)
+    c.consume_once do |e|
+      # e.tuple, e.value
+    end
 
 == REQUIREMENTS
 
