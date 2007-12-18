@@ -9,6 +9,7 @@ require 'dtraceconsumer'
 require 'dtraceaggregate'
 require 'dtraceprobedata'
 require 'dtraceprobe'
+require 'dtracestackrecord'
 
 class Dtrace
   VERSION = '0.0.2'

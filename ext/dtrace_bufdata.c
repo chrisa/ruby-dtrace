@@ -27,6 +27,7 @@ VALUE dtracebufdata_record(VALUE self)
   VALUE dtracerecord;
   VALUE dtraceaggdata;
   VALUE dtracerecdesc;
+  VALUE dtracestack;
 
   Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
   
@@ -58,6 +59,9 @@ VALUE dtracebufdata_record(VALUE self)
   case DTRACEACT_JSTACK:
     /* stand-alone stack(), ustack(), or jstack() action */
     v = rb_str_new2(s);
+    dtracestack = rb_class_new_instance(0, NULL, rb_path2class("DtraceStackRecord"));
+    rb_funcall(dtracestack, rb_intern("parse"), 1, v);
+    return (dtracestack);
     break;
   case DTRACEACT_USYM:
   case DTRACEACT_UADDR:

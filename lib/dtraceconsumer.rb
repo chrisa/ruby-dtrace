@@ -25,6 +25,8 @@ class DtraceConsumer
       # buf records can be empty (trace();)
       if r 
         case r.class.to_s
+        when DtraceStackRecord.to_s
+          yield r
         when DtraceRecord.to_s
           yield r
         when DtraceAggData.to_s
