@@ -13,7 +13,7 @@ class TestDtrace < Test::Unit::TestCase
     t = Dtrace.new 
     assert t
 
-    progtext = "syscall::select:entry { trace(probefunc); trace(execname); }"
+    progtext = "syscall::write:entry { trace(probefunc); trace(execname); }"
 
     prog = t.compile progtext
     assert prog
@@ -138,5 +138,45 @@ EOD
       end
     end
   end
-  
+
+  def test_work_stacks
+    t = Dtrace.new 
+    t.setopt("bufsize", "8m")
+    t.setopt("aggsize", "4m")
+    t.setopt("stackframes", "5")
+    t.setopt("strsize", "131072")
+
+    progtext = "syscall:::entry { trace(execname); stack(); }"
+    prog = t.compile progtext
+    prog.execute
+    c = DtraceConsumer.new(t)
+    i = 0
+    c.consume do |e|
+      assert e
+      i = i + 1
+      if i > 10
+        break
+      end
+    end
+
+    t = Dtrace.new 
+    t.setopt("bufsize", "8m")
+    t.setopt("aggsize", "4m")
+    t.setopt("stackframes", "5")
+    t.setopt("strsize", "131072")
+
+    progtext = "syscall:::entry { trace(execname); ustack(); }"
+    prog = t.compile progtext
+    prog.execute
+    c = DtraceConsumer.new(t)
+    i = 0
+    c.consume do |e|
+      assert e
+      i = i + 1
+      if i > 10
+        break
+      end
+    end
+  end
+
 end

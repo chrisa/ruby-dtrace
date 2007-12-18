@@ -13,4 +13,9 @@ class DtraceProbeData
     records
   end
 
+  def to_s
+    rs = self.records
+    rs.map {|r| r.value }.join ', '
+  end
+
 end

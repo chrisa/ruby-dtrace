@@ -30,54 +30,81 @@ VALUE dtraceprobedata_probedesc(VALUE self)
   return probe;
 }
 
-static VALUE _handle_stack_record(const caddr_t addr, const dtrace_recdesc_t *rec)
+static VALUE _handle_ustack_record(dtrace_hdl_t *handle, caddr_t addr, const dtrace_recdesc_t *rec)
 {
-  dtrace_actkind_t act;
-  uint64_t *pc;
-  pid_t pid = -1;
-  int size; /* size of raw bytes not including trailing zeros */
-  int i; /* index of last non-zero byte */
-  VALUE raw;
+  VALUE stack;
+  stack = rb_ary_new();
 
-  for (i = rec->dtrd_size - 1; (i >= 0) && !addr[i]; --i) {
-  }
-  size = (i + 1);
-
-  raw = rb_ary_new();
-  for (i = 0; i < size; i++)
-    rb_ary_push(raw, INT2FIX(addr[i]));
-
-  act = rec->dtrd_action;
-  switch (act) {
-  case DTRACEACT_STACK:
-    break;
-  case DTRACEACT_USTACK:
-  case DTRACEACT_JSTACK:
-    /* Get pid of user process */
-    pc = (uint64_t *)(uintptr_t)addr;
-    pid = (pid_t)*pc;
-    break;
-  default:
-    rb_raise(eDtraceException, "Expected stack action, got %d\n", act);
-  }
-
-  return raw;
+  /* TODO, apple and solaris ustack */
+  return stack;
 }
 
-static int
-_is_stack_action(dtrace_actkind_t act)
+static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtrace_recdesc_t *rec)
 {
-  int stack_action;
-  switch (act) {
-  case DTRACEACT_STACK:
-  case DTRACEACT_USTACK:
-  case DTRACEACT_JSTACK:
-    stack_action = 1;
-    break;
-  default:
-    stack_action = 0;
+  VALUE stack = Qnil;
+  int size, i;
+  int depth;
+  uint64_t pc;
+  dtrace_syminfo_t dts;
+  char c[PATH_MAX * 2];
+
+#ifdef __APPLE__
+  __GElf_Sym sym;
+#else
+  GElf_Sym sym;
+#endif
+
+  size = rec->dtrd_size / rec->dtrd_arg;
+  depth = rec->dtrd_arg;
+
+  stack = rb_ary_new();
+
+  for (i = 0; i < depth; i++) {
+    
+    switch (size) {
+    case sizeof (uint32_t):
+      pc = *((uint32_t *)addr);
+      break;
+
+    case sizeof (uint64_t):
+      pc = *((uint64_t *)addr);
+      break;
+
+    default:
+      rb_raise(eDtraceException, "bad stack pc");
+      return Qnil;
+    }
+
+    if (pc == (uint64_t)NULL)
+      break;
+
+    addr += size;
+
+    if (dtrace_lookup_by_addr(handle, pc, &sym, &dts) == 0) {
+      if (pc > sym.st_value) {
+	(void) snprintf(c, sizeof (c), "%s`%s+0x%llx",
+			dts.dts_object, dts.dts_name,
+			pc - sym.st_value);
+      }
+      else {
+	(void) snprintf(c, sizeof (c), "%s`%s",
+			dts.dts_object, dts.dts_name);
+      }
+    } 
+    else {
+      if (dtrace_lookup_by_addr(handle, pc, NULL, &dts) == 0) {
+	(void) snprintf(c, sizeof (c), "%s`0x%llx",
+			dts.dts_object, pc);
+      }
+      else {
+	(void) snprintf(c, sizeof (c), "0x%llx", pc);
+      }
+    }
+
+    rb_ary_push(stack, rb_str_new2(c));
   }
-  return (stack_action);
+
+  return stack;
 }
 
 VALUE dtraceprobedata_each_record(VALUE self)
@@ -85,21 +112,31 @@ VALUE dtraceprobedata_each_record(VALUE self)
   dtrace_probedata_t *data;
   dtrace_eprobedesc_t *eprobe;
   dtrace_recdesc_t *rec;
+  dtrace_hdl_t *handle;
+  dtrace_actkind_t act;
   int i;
   VALUE dtracerecord;
+  VALUE dtracehandle;
   VALUE v;
   caddr_t addr;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
+  dtracehandle = rb_iv_get(self, "@handle");
+  Data_Get_Struct(dtracehandle, dtrace_hdl_t, handle);
+
   eprobe = data->dtpda_edesc;
   
   for (i = 0; i < eprobe->dtepd_nrecs; i++) {
     rec = &eprobe->dtepd_rec[i];
     if (rec->dtrd_size > 0) {
+      act = rec->dtrd_action;
       addr = data->dtpda_data + rec->dtrd_offset;
 	
-      if (_is_stack_action(rec->dtrd_action)) {
-	v = _handle_stack_record(addr, rec);
+      if (act == DTRACEACT_STACK) {
+	v = _handle_stack_record(handle, addr, rec);
+      }
+      else if (act == DTRACEACT_USTACK || act == DTRACEACT_JSTACK) {
+	v = _handle_ustack_record(handle, addr, rec);
       }
       else {
 	switch (rec->dtrd_size) {

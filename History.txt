@@ -1,3 +1,10 @@
+== 0.0.2 / 2007-12-07
+
+ * Implement the dtrace_work-based API
+ * Add a "Consumer" class
+ * Update Rails plugin to use new API
+
 == 0.0.1 / 2007-12-01
 
  * Initial public release.
+

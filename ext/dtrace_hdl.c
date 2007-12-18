@@ -26,6 +26,14 @@ VALUE dtrace_hdl_alloc(VALUE klass)
   handle = dtrace_open(DTRACE_VERSION, 0, &err);
   
   if (handle) {
+    /*
+     * Leopard's DTrace requires symbol resolution to be 
+     * switched on explicitly 
+     */ 
+#ifdef __APPLE__
+    (void) dtrace_setopt(handle, "stacksymbols", "enabled");
+#endif
+
     obj = Data_Wrap_Struct(klass, 0, dtrace_hdl_free, handle);
     return obj;
   }
@@ -295,6 +303,7 @@ VALUE dtrace_hdl_sleep(VALUE self)
 }
 
 typedef struct dtrace_work_handlers {
+  VALUE handle;
   VALUE probe;
   VALUE rec;
 } dtrace_work_handlers_t;
@@ -309,6 +318,7 @@ static int _probe_consumer(const dtrace_probedata_t *data, void *arg)
   proc = handlers.probe;
 
   probedata = Data_Wrap_Struct(cDtraceProbeData, 0, NULL, (dtrace_probedata_t *)data);
+  rb_iv_set(probedata, "@handle", handlers.handle);
   rb_funcall(proc, rb_intern("call"), 1, probedata);
   
   return (DTRACE_CONSUME_THIS);
@@ -324,6 +334,7 @@ static int _rec_consumer(const dtrace_probedata_t *data, const dtrace_recdesc_t 
   proc = handlers.rec;
 
   recdesc = Data_Wrap_Struct(cDtraceRecDesc, 0, NULL, (dtrace_recdesc_t *)rec);
+  rb_iv_set(recdesc, "@handle", handlers.handle);
   rb_funcall(proc, rb_intern("call"), 1, recdesc);
 
   return (DTRACE_CONSUME_THIS);
@@ -356,8 +367,9 @@ VALUE dtrace_hdl_work(VALUE self,
   Data_Get_Struct(self, dtrace_hdl_t, handle);
 
   /* fill out the handlers struct */
-  handlers.probe = probe_consumer_proc;
-  handlers.rec   = rec_consumer_proc;
+  handlers.probe  = probe_consumer_proc;
+  handlers.rec    = rec_consumer_proc;
+  handlers.handle = self;
 
   status = dtrace_work(handle, NULL, _probe_consumer, _rec_consumer, &handlers);
 

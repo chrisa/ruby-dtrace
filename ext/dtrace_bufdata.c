@@ -50,10 +50,7 @@ VALUE dtracebufdata_record(VALUE self)
     /* trace() action */
     break;
   case DTRACEACT_PRINTF:
-    /*
-     * Only the formatted string was not available to dtj_chewrec(),
-     * so we attach that now.
-     */
+    /* printf action, not available in probedata */
     v = rb_str_new2(s);
     break;
   case DTRACEACT_STACK:
