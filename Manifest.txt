@@ -20,6 +20,7 @@ lib/dtraceconsumer.rb
 lib/dtraceprobe.rb
 lib/dtraceprobedata.rb
 lib/dtracerecord.rb
+lib/dtracestackrecord.rb
 plugin/dtrace/README
 plugin/dtrace/Rakefile
 plugin/dtrace/bin/dtracer.rb
