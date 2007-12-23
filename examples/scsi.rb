@@ -299,6 +299,9 @@ fbt:scsi:scsi_destroy_pkt:entry
         trace(this->devinfo->devi_instance);
 
         /* scsi cdb */
+
+        /* TODO: return the struct with: trace(*(scsi_pkt *)(this->cdb)) or similar */
+
         trace(this->cdb);
         trace(this->group);
         trace(this->cdb[0]);
