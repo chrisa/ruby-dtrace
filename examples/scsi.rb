@@ -256,6 +256,10 @@ t.setopt("aggsize", "4m")
 
 progtext =<<EOD
 
+struct scsi_cdb {
+  uint8_t bytes[32];
+};
+
 BEGIN
 {
         script_start_time = timestamp
@@ -299,43 +303,9 @@ fbt:scsi:scsi_destroy_pkt:entry
         trace(this->devinfo->devi_instance);
 
         /* scsi cdb */
-
-        /* TODO: return the struct with: trace(*(scsi_pkt *)(this->cdb)) or similar */
-
         trace(this->cdb);
         trace(this->group);
-        trace(this->cdb[0]);
-        trace(this->cdb[1]);
-        trace(this->cdb[2]);
-        trace(this->cdb[3]);
-        trace(this->cdb[4]);
-        trace(this->cdb[5]);
-        trace(this->cdb[6]);
-        trace(this->cdb[7]);
-        trace(this->cdb[8]);
-        trace(this->cdb[9]);
-        trace(this->cdb[10]);
-        trace(this->cdb[11]);
-        trace(this->cdb[12]);
-        trace(this->cdb[13]);
-        trace(this->cdb[14]);
-        trace(this->cdb[15]);
-        trace(this->cdb[16]);
-        trace(this->cdb[17]);
-        trace(this->cdb[18]);
-        trace(this->cdb[19]);
-        trace(this->cdb[20]);
-        trace(this->cdb[21]);
-        trace(this->cdb[22]);
-        trace(this->cdb[23]);
-        trace(this->cdb[24]);
-        trace(this->cdb[25]);
-        trace(this->cdb[26]);
-        trace(this->cdb[27]);
-        trace(this->cdb[28]);
-        trace(this->cdb[29]);
-        trace(this->cdb[30]);
-        trace(this->cdb[31]);
+        trace(*(struct scsi_cdb *)(this->cdb));
 
         trace(this->name);
 
@@ -375,7 +345,7 @@ begin
     # next is CBDP, group, then 32 bytes of CDB
     cdbp = records.shift.value
     group = records.shift.value
-    cdb_bytes = records.slice!(0, 32).map {|r| r.value}
+    cdb_bytes = records.shift.value
     
     # then dir flag
     dir = (records.shift.value == 1) ? '->' : '<-'
