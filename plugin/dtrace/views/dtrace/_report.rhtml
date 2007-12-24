@@ -1,11 +1,56 @@
+<style type="text/css">
+
+</style>
+
 <div id="dtrace-report">
-  <p>...dtrace report...</p>
-  <table>
-    <% controller.dtrace_report.sort {|a,b| b[1] <=> a[1] }.each do |e| %>
+  <h2>DTrace Report</h2>
+
+  <% if controller.dtrace_report['queries'] %>
+  <h3>MySQL queries</h3>
+  <table class="report">
+    <% controller.dtrace_report['queries'].sort {|a,b| b[1] <=> a[1] }.each do |e| %>
     <tr>
       <td><%= e[0] %></td>
       <td><%= e[1] %></td>
     </tr>
     <% end %>
   </table>
+  <% end %>
+
+  <% if controller.dtrace_report['syscalls'] %>
+  <h3>System calls</h3>
+  <table class="report">
+    <% controller.dtrace_report['syscalls'].sort {|a,b| b[1] <=> a[1] }.each do |e| %>
+    <tr>
+      <td><%= e[0] %></td>
+      <td><%= e[1] %></td>
+    </tr>
+    <% end %>
+  </table>
+  <% end %>
+
+  <% if controller.dtrace_report['rbclasses'] %>
+  <h3>Ruby classes instantiated</h3>
+  <table class="report">
+    <% controller.dtrace_report['rbclasses'].sort {|a,b| b[1] <=> a[1] }.each do |e| %>
+    <tr>
+      <td><%= e[0] %></td>
+      <td><%= e[1] %></td>
+    </tr>
+    <% end %>
+  </table>
+  <% end %>
+
+  <% if controller.dtrace_report['rbmethods'] %>
+  <h3>Ruby methods called</h3>
+  <table class="report">
+    <% controller.dtrace_report['rbmethods'].sort {|a,b| b[1] <=> a[1] }.each do |e| %>
+    <tr>
+      <td><%= e[0] %></td>
+      <td><%= e[1] %></td>
+    </tr>
+    <% end %>
+  </table>
+  <% end %>
+
 </div>
