@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'dtrace'
+require 'getoptlong'
 
 # scsi.rb: part of ruby-dtrace, (c) Chris Andrews, 2007
 #
@@ -250,11 +251,26 @@ def scsi_reason(code)
   return scsi_reasons[code]
 end
 
-t = Dtrace.new 
-t.setopt("bufsize", "4m")
-t.setopt("aggsize", "4m")
+timeout = 0
+opts = GetoptLong.new([ '-T', GetoptLong::REQUIRED_ARGUMENT ])
+opts.each do |opt, arg|
+  if opt == '-T'
+    timeout = arg
+  end
+end
 
-progtext =<<EOD
+devname = ARGV.shift
+devinst = ARGV.shift
+
+if devname && devinst
+  matchdev = "/this->devname == \"#{devname}\" && this->devinst == #{devinst}/"
+elsif devname
+  matchdev = "/this->devname == \"#{devname}\"/"
+else
+  matchdev = ""
+end
+
+progtext =<<"EOD"
 
 struct scsi_cdb {
   uint8_t bytes[32];
@@ -262,7 +278,16 @@ struct scsi_cdb {
 
 BEGIN
 {
-        script_start_time = timestamp
+        script_start_time = timestamp;
+        timeout = #{timeout};
+	end_time = timestamp + (timeout * 1000000000);
+}
+
+fbt:scsi:scsi_transport:entry,
+fbt:scsi:scsi_destroy_pkt:entry
+/timeout != 0 && end_time < timestamp/
+{
+	exit(0);
 }
 
 fbt:scsi:scsi_transport:entry,
@@ -270,25 +295,40 @@ fbt:scsi:scsi_destroy_pkt:entry
 {
 	this->pkt = (struct scsi_pkt *)arg0;
 	this->scb = (uchar_t *)this->pkt->pkt_scbp;
+
+        this->devinfo = ((struct dev_info *)((this->pkt->pkt_address.a_hba_tran)->tran_hba_dip));
+        this->devname = stringof(`devnamesp[this->devinfo->devi_major].dn_name);
+        this->devinst = this->devinfo->devi_instance;
+
+        relevant[this->scb] = 0;
+}
+
+fbt:scsi:scsi_transport:entry,
+fbt:scsi:scsi_destroy_pkt:entry
+#{matchdev}
+{
+        relevant[this->scb] = 1;
 }
 
 fbt:scsi:scsi_transport:entry
+/relevant[this->scb] == 1/
 {
 	start_time[this->scb] = timestamp;
-	this->name = 1;
+	this->dir = 1;
 }
 
 fbt:scsi:scsi_destroy_pkt:entry
+/relevant[this->scb] == 1/
 {
 	req_time[this->scb] = start_time[this->scb] != 0 ?
 		    (timestamp - start_time[this->scb])/1000 : 0;
         start_time[this->scb] = 0;
-	this->name = 0;
+	this->dir = 0;
 }
-
 
 fbt:scsi:scsi_transport:entry,
 fbt:scsi:scsi_destroy_pkt:entry
+/relevant[this->scb] == 1/
 {
 	this->cdb = (uchar_t *)this->pkt->pkt_cdbp;
 	this->group = ((this->cdb[0] & 0xe0) >> 5);
@@ -298,35 +338,44 @@ fbt:scsi:scsi_destroy_pkt:entry
         trace((timestamp - script_start_time)%1000000000);
 
         /* devname, devinst */
-        this->devinfo = ((struct dev_info *)((this->pkt->pkt_address.a_hba_tran)->tran_hba_dip));
-        trace(stringof(`devnamesp[this->devinfo->devi_major].dn_name));
-        trace(this->devinfo->devi_instance);
+        trace(this->devname);
+        trace(this->devinst);
 
         /* scsi cdb */
         trace(this->cdb);
         trace(this->group);
         trace(*(struct scsi_cdb *)(this->cdb));
 
-        trace(this->name);
+        /* command or response? */
+        trace(this->dir);
 
+        /* target and LUN */
         trace(this->pkt->pkt_address.a_target);
 	trace(this->pkt->pkt_address.a_lun);
 
+        /* timeout */
         trace(this->pkt->pkt_time);
 
+        /* executable and pid, for commands */
         trace(execname);
         trace(pid);
 
+        /* reason and state, for responses */
         trace(this->pkt->pkt_reason);
         trace(this->pkt->pkt_state);
 
+        /* elapsed time for this command/response */
         trace(req_time[this->scb]);
         req_time[this->scb] = 0;
+
+        relevant[this->scb] = 0;
 }
 
 EOD
 #`
 
+t = Dtrace.new 
+t.setopt("bufsize", "4m")
 prog = t.compile progtext
 prog.execute
 
@@ -335,6 +384,11 @@ begin
   
   c.consume do |e|
     records = e.records
+    
+    # D exit at timeout
+    if records.length == 1 && records[0].value == 0
+      exit 0
+    end
     
     # first two elements are timestamp
     t = sprintf("%05.5d.%09.9d", records.shift.value, records.shift.value)
