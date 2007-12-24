@@ -24,10 +24,6 @@ void Init_dtrace_api() {
   rb_define_method(cDtrace, "stop",            dtrace_hdl_stop,            0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "status",          dtrace_hdl_status,          0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "go",              dtrace_hdl_go,              0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "each_aggregate",  dtrace_hdl_each_aggregate,  0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "aggregate_print", dtrace_hdl_aggregate_print, 0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "aggregate_snap",  dtrace_hdl_aggregate_snap,  0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "aggregate_clear", dtrace_hdl_aggregate_clear, 0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "error",           dtrace_hdl_error,           0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "setopt",          dtrace_hdl_setopt,          2); // in dtrace_hdl.c
   rb_define_method(cDtrace, "sleep",           dtrace_hdl_sleep,           0); // in dtrace_hdl.c

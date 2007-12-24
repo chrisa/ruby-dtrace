@@ -2,28 +2,6 @@ require 'dtrace'
 require 'test/unit'
 
 class TestDtrace < Test::Unit::TestCase
-  def test_dtrace
-    t = Dtrace.new
-    assert t
-    assert_equal Object, Dtrace.superclass
-    assert_equal Dtrace, t.class
-  end
-
-  def test_work_dprogram_compile
-    t = Dtrace.new 
-    assert t
-
-    progtext = "syscall::write:entry { trace(probefunc); trace(execname); }"
-
-    prog = t.compile progtext
-    assert prog
-    prog.execute
-
-    info = prog.info
-    assert info
-    assert_equal 1, info.matches_count
-  end
-
   def test_work_dprogram_run
     t = Dtrace.new 
     t.setopt("bufsize", "4m")

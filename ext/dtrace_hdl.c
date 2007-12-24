@@ -7,7 +7,6 @@
 RUBY_EXTERN VALUE eDtraceException;
 RUBY_EXTERN VALUE cDtraceProbe;
 RUBY_EXTERN VALUE cDtraceProgram;
-RUBY_EXTERN VALUE cDtraceAggData;
 RUBY_EXTERN VALUE cDtraceRecDesc;
 RUBY_EXTERN VALUE cDtraceProbeData;
 RUBY_EXTERN VALUE cDtraceBufData;
@@ -207,72 +206,6 @@ VALUE dtrace_hdl_stop(VALUE self)
   if (dtrace_stop(handle) < 0) 
     rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
     
-  return Qnil;
-}
-
-int _agg_walk_yield(const dtrace_aggdata_t *data, void *arg)
-{
-  VALUE aggdata;
-
-  aggdata = Data_Wrap_Struct(cDtraceAggData, 0, NULL, (dtrace_aggdata_t *)data);
-
-  rb_yield(aggdata);
-  return (DTRACE_AGGWALK_NEXT);
-}
-
-/*
- * Yields each aggregate in turn. 
- * 
- * Aggregates are represented by a DtraceAggregate object.
- */
-VALUE dtrace_hdl_each_aggregate(VALUE self)
-{
-  dtrace_hdl_t *handle;
-
-  Data_Get_Struct(self, dtrace_hdl_t, handle);
-  if (dtrace_aggregate_walk_keyvarsorted(handle, _agg_walk_yield, NULL) < 0)
-    rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
-    
-  return Qnil;    
-}
-
-/* 
- * Uses libdtrace to print a summary of aggregates to STDERR.
- */
-VALUE dtrace_hdl_aggregate_print(VALUE self)
-{
-  dtrace_hdl_t *handle;
-
-  Data_Get_Struct(self, dtrace_hdl_t, handle);
-  if (dtrace_aggregate_print(handle, stderr, NULL) < 0)
-    rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
-    
-  return Qnil;
-}
-
-/*
- * Take a snapshot of the current aggregate values.
- */
-VALUE dtrace_hdl_aggregate_snap(VALUE self)
-{
-  dtrace_hdl_t *handle;
-
-  Data_Get_Struct(self, dtrace_hdl_t, handle);
-  if (dtrace_aggregate_snap(handle) < 0) 
-    rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
-    
-  return Qnil;
-}
-
-/*
- * Clear the current aggregate snapshot.
- */
-VALUE dtrace_hdl_aggregate_clear(VALUE self)
-{
-  dtrace_hdl_t *handle;
-
-  Data_Get_Struct(self, dtrace_hdl_t, handle);
-  dtrace_aggregate_clear(handle);
   return Qnil;
 }
 

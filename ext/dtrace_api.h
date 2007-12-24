@@ -23,10 +23,6 @@ VALUE dtrace_hdl_go(VALUE self);
 VALUE dtrace_hdl_status(VALUE self);
 VALUE dtrace_hdl_setopt(VALUE self, VALUE key, VALUE value);
 VALUE dtrace_hdl_stop(VALUE self);
-VALUE dtrace_hdl_each_aggregate(VALUE self);
-VALUE dtrace_hdl_aggregate_print(VALUE self);
-VALUE dtrace_hdl_aggregate_snap(VALUE self);
-VALUE dtrace_hdl_aggregate_clear(VALUE self);
 VALUE dtrace_hdl_error(VALUE self);
 VALUE dtrace_hdl_sleep(VALUE self);
 VALUE dtrace_hdl_work(VALUE self, 
