@@ -11,22 +11,16 @@ class TestDtrace < Test::Unit::TestCase
     
     prog = t.compile progtext
     prog.execute
+    t.go
 
     c = DtraceConsumer.new(t)
     assert c
 
     begin
       i = 0
-      c.consume do |e|
-        assert e
-        assert e.probedesc
-        assert_equal 'syscall', e.probedesc.provider
-        assert_equal 'entry', e.probedesc.name
-        records = e.records
-        assert records
-        assert_equal 2, records.length
-        assert_equal DtraceRecord, records[0].class
-        assert_equal DtraceRecord, records[1].class
+      c.consume do |r|
+        assert r
+        assert_equal DtraceRecord, r.class
 
         i = i + 1
         if i > 10
@@ -58,6 +52,7 @@ EOD
 
     prog = t.compile progtext
     prog.execute
+    t.go
     
     c = DtraceConsumer.new(t)
 
@@ -175,6 +170,8 @@ EOD
     progtext = "syscall:::entry { trace(execname); stack(); }"
     prog = t.compile progtext
     prog.execute
+    t.go
+
     c = DtraceConsumer.new(t)
     i = 0
     c.consume do |e|
@@ -194,6 +191,8 @@ EOD
     progtext = "syscall:::entry { trace(execname); ustack(); }"
     prog = t.compile progtext
     prog.execute
+    t.go
+
     c = DtraceConsumer.new(t)
     i = 0
     c.consume do |e|
