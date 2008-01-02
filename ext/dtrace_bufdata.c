@@ -17,6 +17,11 @@ VALUE dtracebufdata_init(VALUE self)
   return self;
 }
 
+/* 
+ * Returns the record in this DtraceBufdata. Records are returned as
+ * either DtraceRecords or DtraceStackRecords as appropriate for the
+ * type of action.
+ */
 VALUE dtracebufdata_record(VALUE self)
 {
   dtrace_bufdata_t *bufdata;

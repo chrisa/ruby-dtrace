@@ -27,7 +27,7 @@ void Init_dtrace_api() {
   rb_define_method(cDtrace, "error",           dtrace_hdl_error,           0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "setopt",          dtrace_hdl_setopt,          2); // in dtrace_hdl.c
   rb_define_method(cDtrace, "sleep",           dtrace_hdl_sleep,           0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "work",            dtrace_hdl_work,            2); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "work",            dtrace_hdl_work,           -1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "buf_consumer",    dtrace_hdl_buf_consumer,    1); // in dtrace_hdl.c
   rb_define_alloc_func(cDtrace, dtrace_hdl_alloc);
 

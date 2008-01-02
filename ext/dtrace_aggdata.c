@@ -15,7 +15,8 @@ VALUE dtraceaggdata_init(VALUE self)
   return self;
 }
 
-
+/* Returns the value of this aggregate, be it the aggregation value,
+   or a member of an aggregation key tuple. */
 VALUE dtraceaggdata_value(VALUE self)
 {
   dtrace_bufdata_t *bufdata;
@@ -118,6 +119,8 @@ VALUE dtraceaggdata_value(VALUE self)
   return v;
 }
 
+/* Return the type of this DtraceAggData: tuple, value or last. Used
+   to form tuples and values into DtraceAggregate objects. */
 VALUE dtraceaggdata_aggtype(VALUE self)
 {
   dtrace_bufdata_t *bufdata;

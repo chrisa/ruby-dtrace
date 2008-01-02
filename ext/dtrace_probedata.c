@@ -16,6 +16,7 @@ VALUE dtraceprobedata_init(VALUE self)
   return self;
 }
 
+/* Returns the DtraceProbe object corresponding to the probe which generated this record. */
 VALUE dtraceprobedata_probedesc(VALUE self)
 {
   dtrace_probedata_t *data;
@@ -107,6 +108,11 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
   return stack;
 }
 
+/* 
+ * Yields each record in this DtraceProbedata in turn. Records are
+ * yielded as either DtraceRecords or DtraceStackRecords as
+ * appropriate for the type of action.
+ */
 VALUE dtraceprobedata_each_record(VALUE self)
 {
   dtrace_probedata_t *data;

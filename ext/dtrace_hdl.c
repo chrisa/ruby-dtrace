@@ -235,12 +235,6 @@ VALUE dtrace_hdl_sleep(VALUE self)
   return Qnil;
 }
 
-typedef struct dtrace_work_handlers {
-  VALUE handle;
-  VALUE probe;
-  VALUE rec;
-} dtrace_work_handlers_t;
-
 static int _probe_consumer(const dtrace_probedata_t *data, void *arg)
 {
   VALUE proc;
@@ -250,10 +244,12 @@ static int _probe_consumer(const dtrace_probedata_t *data, void *arg)
   handlers = *(dtrace_work_handlers_t *) arg;
   proc = handlers.probe;
 
-  probedata = Data_Wrap_Struct(cDtraceProbeData, 0, NULL, (dtrace_probedata_t *)data);
-  rb_iv_set(probedata, "@handle", handlers.handle);
-  rb_funcall(proc, rb_intern("call"), 1, probedata);
-  
+  if (!NIL_P(proc)) {
+    probedata = Data_Wrap_Struct(cDtraceProbeData, 0, NULL, (dtrace_probedata_t *)data);
+    rb_iv_set(probedata, "@handle", handlers.handle);
+    rb_funcall(proc, rb_intern("call"), 1, probedata);
+  }
+
   return (DTRACE_CONSUME_THIS);
 }
 
@@ -263,13 +259,27 @@ static int _rec_consumer(const dtrace_probedata_t *data, const dtrace_recdesc_t 
   dtrace_work_handlers_t handlers;
   VALUE recdesc;
 
+  dtrace_actkind_t act;
+  uintptr_t addr;
+
+  if (rec == NULL)
+    return (DTRACE_CONSUME_NEXT);
+
   handlers = *(dtrace_work_handlers_t *) arg;
   proc = handlers.rec;
 
-  recdesc = Data_Wrap_Struct(cDtraceRecDesc, 0, NULL, (dtrace_recdesc_t *)rec);
-  rb_iv_set(recdesc, "@handle", handlers.handle);
-  rb_funcall(proc, rb_intern("call"), 1, recdesc);
-
+  if (!NIL_P(proc)) {
+    recdesc = Data_Wrap_Struct(cDtraceRecDesc, 0, NULL, (dtrace_recdesc_t *)rec);
+    rb_iv_set(recdesc, "@handle", handlers.handle);
+    rb_funcall(proc, rb_intern("call"), 1, recdesc);
+  }
+  
+  act = rec->dtrd_action;
+  addr = (uintptr_t)data->dtpda_data;
+  
+  if (act == DTRACEACT_EXIT)
+    return (DTRACE_CONSUME_NEXT);
+  
   return (DTRACE_CONSUME_THIS);
 }
 
@@ -280,24 +290,35 @@ static int _buf_consumer(const dtrace_bufdata_t *bufdata, void *arg)
 
   proc = (VALUE)arg;
 
-  dtracebufdata = Data_Wrap_Struct(cDtraceBufData, 0, NULL, (dtrace_bufdata_t *)bufdata);
-  rb_funcall(proc, rb_intern("call"), 1, dtracebufdata);
+  if (!NIL_P(proc)) {
+    dtracebufdata = Data_Wrap_Struct(cDtraceBufData, 0, NULL, (dtrace_bufdata_t *)bufdata);
+    rb_funcall(proc, rb_intern("call"), 1, dtracebufdata);
+  }
 
   return (DTRACE_HANDLE_OK);
 }
 
 /*
  * Process any data waiting from the D program.
+ * 
+ * Takes a Proc to which DtraceProbeData objects will be yielded, and
+ * an optional second Proc to which DtraceRecDesc objects will be
+ * yielded.
+ *
  */
-VALUE dtrace_hdl_work(VALUE self, 
-		      VALUE probe_consumer_proc, 
-		      VALUE rec_consumer_proc)
+VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self)
 {
   dtrace_hdl_t *handle;
   dtrace_workstatus_t status;
   dtrace_work_handlers_t handlers;
+  VALUE probe_consumer_proc;
+  VALUE rec_consumer_proc;
   
   Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  /* handle args - probe_consumer_proc is mandatory, rec_consumer_proc
+     is optional */
+  rb_scan_args(argc, argv, "11", &probe_consumer_proc, &rec_consumer_proc);
 
   /* fill out the handlers struct */
   handlers.probe  = probe_consumer_proc;

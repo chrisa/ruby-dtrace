@@ -8,6 +8,15 @@
 #include "/usr/include/dtrace.h"
 #include "ruby.h"
 
+/* Used pass three Ruby VALUEs as the void *arg of dtrace_work() to
+   its callbacks: the dtrace handle, a Proc for the probe callback,
+   and a Proc for the recdesc callback. */
+typedef struct dtrace_work_handlers {
+  VALUE handle;
+  VALUE probe;
+  VALUE rec;
+} dtrace_work_handlers_t;
+
 VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
 
 VALUE dtraceaggdata_init(VALUE self);
@@ -25,9 +34,7 @@ VALUE dtrace_hdl_setopt(VALUE self, VALUE key, VALUE value);
 VALUE dtrace_hdl_stop(VALUE self);
 VALUE dtrace_hdl_error(VALUE self);
 VALUE dtrace_hdl_sleep(VALUE self);
-VALUE dtrace_hdl_work(VALUE self, 
-		      VALUE probe_consumer_proc, 
-		      VALUE rec_consumer_proc);
+VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self);
 VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer_proc);
 
 VALUE dtraceprobe_init(VALUE self);
