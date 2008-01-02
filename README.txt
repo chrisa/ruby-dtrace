@@ -22,8 +22,8 @@ use it with the probes found in the Joyent and Apple builds of Ruby.
     [...]
     
     c = DtraceConsumer.new(t)
-    c.consume_once do |e|
-      # e.tuple, e.value
+    c.consume_once do |rec|
+      # handle records
     end
 
 == REQUIREMENTS
