@@ -378,6 +378,7 @@ t = Dtrace.new
 t.setopt("bufsize", "4m")
 prog = t.compile progtext
 prog.execute
+t.go
 
 begin
   c = DtraceConsumer.new(t)
