@@ -50,6 +50,6 @@ require 'dtracedata'
 #   d.work(proc {|probe| yield probe }, proc {|rec| yield rec })
 
 class Dtrace
-  VERSION = '0.0.2'
+  VERSION = '0.0.3'
 end
 

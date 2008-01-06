@@ -2,6 +2,7 @@ History.txt
 Manifest.txt
 README.txt
 Rakefile
+examples/scsi.rb
 ext/dtrace_aggdata.c
 ext/dtrace_api.c
 ext/dtrace_api.h
@@ -9,6 +10,7 @@ ext/dtrace_bufdata.c
 ext/dtrace_hdl.c
 ext/dtrace_probe.c
 ext/dtrace_probedata.c
+ext/dtrace_process.c
 ext/dtrace_program.c
 ext/dtrace_programinfo.c
 ext/dtrace_recdesc.c
@@ -17,6 +19,7 @@ ext/extconf.rb
 lib/dtrace.rb
 lib/dtraceaggregate.rb
 lib/dtraceconsumer.rb
+lib/dtracedata.rb
 lib/dtraceprobe.rb
 lib/dtraceprobedata.rb
 lib/dtracerecord.rb
