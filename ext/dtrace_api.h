@@ -8,7 +8,7 @@
 #include "/usr/include/dtrace.h"
 #include "ruby.h"
 
-/* Used pass three Ruby VALUEs as the void *arg of dtrace_work() to
+/* Used to pass three Ruby VALUEs as the void *arg of dtrace_work() to
    its callbacks: the dtrace handle, a Proc for the probe callback,
    and a Proc for the recdesc callback. */
 typedef struct dtrace_work_handlers {
@@ -16,6 +16,19 @@ typedef struct dtrace_work_handlers {
   VALUE probe;
   VALUE rec;
 } dtrace_work_handlers_t;
+
+/* Handle missing RARRAY_LEN etc */
+#ifdef RARRAY_LEN
+static inline long   rb_str_len(VALUE s) {return RSTRING_LEN(s);}
+static inline char  *rb_str_ptr(VALUE s) {return RSTRING_PTR(s);}
+static inline long   rb_ary_len(VALUE s) {return  RARRAY_LEN(s);}
+static inline VALUE *rb_ary_ptr(VALUE s) {return  RARRAY_PTR(s);}
+#else
+static inline long   rb_str_len(VALUE s) {return RSTRING(s)->len;}
+static inline char  *rb_str_ptr(VALUE s) {return RSTRING(s)->ptr;}
+static inline long   rb_ary_len(VALUE s) {return  RARRAY(s)->len;}
+static inline VALUE *rb_ary_ptr(VALUE s) {return  RARRAY(s)->ptr;}
+#endif // RARRAY_LEN
 
 VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
 

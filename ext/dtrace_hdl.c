@@ -107,7 +107,7 @@ VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self)
 
   rb_scan_args(argc, argv, "1*", &dtrace_text, &dtrace_argv_array);
 
-  dtrace_argc = RARRAY_LEN(dtrace_argv_array);
+  dtrace_argc = rb_ary_len(dtrace_argv_array);
   dtrace_argv = ALLOC_N(char *, dtrace_argc + 1);
   for (i = 0; i < dtrace_argc; i++) {
     dtrace_argv[i + 1] = STR2CSTR(rb_ary_entry(dtrace_argv_array, i));
@@ -373,7 +373,7 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
 
   Data_Get_Struct(self, dtrace_hdl_t, handle);
 
-  len = RARRAY_LEN(rb_argv);
+  len = rb_ary_len(rb_argv);
   argv = ALLOC_N(char *, len + 1);
 
   for (i = 0; i < len; i++) {
