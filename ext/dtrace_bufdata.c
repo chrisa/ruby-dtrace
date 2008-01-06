@@ -18,6 +18,9 @@ VALUE dtracebufdata_init(VALUE self)
   return self;
 }
 
+/*
+ * Returns the enabled probe id which generated this data
+ */
 VALUE dtracebufdata_epid(VALUE self)
 {
   dtrace_bufdata_t *bufdata;

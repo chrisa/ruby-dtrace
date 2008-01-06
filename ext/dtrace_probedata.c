@@ -93,6 +93,9 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
   return stack;
 }
 
+/*
+ * Returns the enabled probe id which generated this data
+ */
 VALUE dtraceprobedata_epid(VALUE self)
 {
   dtrace_probedata_t *data;
