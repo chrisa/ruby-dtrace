@@ -7,6 +7,7 @@
 RUBY_EXTERN VALUE eDtraceException;
 RUBY_EXTERN VALUE cDtraceAggData;
 RUBY_EXTERN VALUE cDtraceRecDesc;
+RUBY_EXTERN VALUE cDtraceProbe;
 
 /* :nodoc: */
 VALUE dtracebufdata_init(VALUE self)
@@ -15,6 +16,38 @@ VALUE dtracebufdata_init(VALUE self)
 
   Data_Get_Struct(self, dtrace_bufdata_t, data);
   return self;
+}
+
+VALUE dtracebufdata_epid(VALUE self)
+{
+  dtrace_bufdata_t *bufdata;
+
+  Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
+  
+  if (bufdata->dtbda_probe) {
+    return INT2FIX(bufdata->dtbda_probe->dtpda_edesc->dtepd_epid);
+  }
+
+  return Qnil;
+}
+
+
+/* 
+ * Returns the DtraceProbe for the probe which generated this data 
+ */
+VALUE dtracebufdata_probe(VALUE self)
+{
+  dtrace_bufdata_t *bufdata;
+  VALUE dtraceprobe;
+
+  Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
+  
+  if (bufdata->dtbda_probe) {
+    dtraceprobe = Data_Wrap_Struct(cDtraceProbe, 0, NULL, (dtrace_probedesc_t *)bufdata->dtbda_probe->dtpda_pdesc);
+    return dtraceprobe;
+  }
+
+  return Qnil;
 }
 
 /* 

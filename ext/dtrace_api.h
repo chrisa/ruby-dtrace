@@ -19,6 +19,9 @@ typedef struct dtrace_work_handlers {
 
 VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
 
+VALUE dtrace_process_init(VALUE self);
+VALUE dtrace_process_continue(VALUE self);
+
 VALUE dtraceaggdata_init(VALUE self);
 VALUE dtraceaggdata_value(VALUE self);
 VALUE dtraceaggdata_aggtype(VALUE self);
@@ -36,6 +39,8 @@ VALUE dtrace_hdl_error(VALUE self);
 VALUE dtrace_hdl_sleep(VALUE self);
 VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self);
 VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer_proc);
+VALUE dtrace_hdl_createprocess(VALUE self, VALUE argv);
+VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid);
 
 VALUE dtraceprobe_init(VALUE self);
 VALUE dtraceprobe_probe_id(VALUE self);
@@ -45,10 +50,17 @@ VALUE dtraceprobe_func(VALUE self);
 VALUE dtraceprobe_name(VALUE self);
 
 VALUE dtraceprobedata_init(VALUE self);
-VALUE dtraceprobedata_probedesc(VALUE self);
+VALUE dtraceprobedata_epid(VALUE self);
+VALUE dtraceprobedata_probe(VALUE self);
+VALUE dtraceprobedata_cpu(VALUE self);
+VALUE dtraceprobedata_indent(VALUE self);
+VALUE dtraceprobedata_prefix(VALUE self);
+VALUE dtraceprobedata_flow(VALUE self);
 VALUE dtraceprobedata_each_record(VALUE self);
 
 VALUE dtracebufdata_init(VALUE self);
+VALUE dtracebufdata_epid(VALUE self);
+VALUE dtracebufdata_probe(VALUE self);
 VALUE dtracebufdata_record(VALUE self);
 
 VALUE dtraceprogram_init(VALUE self);

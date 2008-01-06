@@ -10,6 +10,7 @@ RUBY_EXTERN VALUE cDtraceProgram;
 RUBY_EXTERN VALUE cDtraceRecDesc;
 RUBY_EXTERN VALUE cDtraceProbeData;
 RUBY_EXTERN VALUE cDtraceBufData;
+RUBY_EXTERN VALUE cDtraceProcess;
 
 void dtrace_hdl_free (void *handle)
 {
@@ -32,6 +33,9 @@ VALUE dtrace_hdl_alloc(VALUE klass)
 #ifdef __APPLE__
     (void) dtrace_setopt(handle, "stacksymbols", "enabled");
 #endif
+
+    /* always request flowindent information */
+    (void) dtrace_setopt(handle, "flowindent", 0);
 
     obj = Data_Wrap_Struct(klass, 0, dtrace_hdl_free, handle);
     return obj;
@@ -103,7 +107,7 @@ VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self)
 
   rb_scan_args(argc, argv, "1*", &dtrace_text, &dtrace_argv_array);
 
-  dtrace_argc = FIX2INT(rb_funcall(dtrace_argv_array, rb_intern("length"), 0));
+  dtrace_argc = RARRAY_LEN(dtrace_argv_array);
   dtrace_argv = ALLOC_N(char *, dtrace_argc + 1);
   for (i = 0; i < dtrace_argc; i++) {
     dtrace_argv[i + 1] = STR2CSTR(rb_ary_entry(dtrace_argv_array, i));
@@ -258,28 +262,30 @@ static int _rec_consumer(const dtrace_probedata_t *data, const dtrace_recdesc_t 
   VALUE proc;
   dtrace_work_handlers_t handlers;
   VALUE recdesc;
+  VALUE probedata;
 
   dtrace_actkind_t act;
-  uintptr_t addr;
-
-  if (rec == NULL)
-    return (DTRACE_CONSUME_NEXT);
 
   handlers = *(dtrace_work_handlers_t *) arg;
   proc = handlers.rec;
-
   if (!NIL_P(proc)) {
-    recdesc = Data_Wrap_Struct(cDtraceRecDesc, 0, NULL, (dtrace_recdesc_t *)rec);
-    rb_iv_set(recdesc, "@handle", handlers.handle);
-    rb_funcall(proc, rb_intern("call"), 1, recdesc);
+    if (rec) {
+      recdesc = Data_Wrap_Struct(cDtraceRecDesc, 0, NULL, (dtrace_recdesc_t *)rec);
+      rb_iv_set(recdesc, "@handle", handlers.handle);
+      rb_funcall(proc, rb_intern("call"), 1, recdesc);
+    }
+    else {
+      rb_funcall(proc, rb_intern("call"), 1, Qnil);
+      return (DTRACE_CONSUME_NEXT);
+    }
   }
-  
-  act = rec->dtrd_action;
-  addr = (uintptr_t)data->dtpda_data;
-  
-  if (act == DTRACEACT_EXIT)
-    return (DTRACE_CONSUME_NEXT);
-  
+
+  if (rec) {
+    act = rec->dtrd_action;
+    if (act == DTRACEACT_EXIT)
+      return (DTRACE_CONSUME_NEXT);
+  }
+
   return (DTRACE_CONSUME_THIS);
 }
 
@@ -344,4 +350,70 @@ VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer)
   }
 
   return Qnil;
+}
+
+/* 
+ * Start a process which will be traced. The pid of the started
+ * process will be available in D as $target.
+ * 
+ * Pass an array, where the first element is the full path to the
+ * program to start, and subsequent elements are its arguments.
+ * 
+ * Returns a DtraceProcess object which is used to start the process
+ * once tracing is set up.
+ */
+VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
+{
+  dtrace_hdl_t *handle;
+  struct ps_prochandle *P;
+  char **argv;
+  long len;
+  int i;
+  VALUE process;
+
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  len = RARRAY_LEN(rb_argv);
+  argv = ALLOC_N(char *, len + 1);
+
+  for (i = 0; i < len; i++) {
+    argv[i] = STR2CSTR(rb_ary_entry(rb_argv, i));
+  }
+  argv[len] = NULL;
+
+  P = dtrace_proc_create(handle, argv[0], argv);
+  free(argv);
+  
+  if (P == NULL) {
+    rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
+  }
+  
+  process = Data_Wrap_Struct(cDtraceProcess, 0, NULL, (struct ps_prochandle *)P);
+  rb_iv_set(process, "@dtrace", self);
+  return process;
+}
+
+/* 
+ * Grab a currently-running process by pid. 
+ *
+ * Returns a DtraceProcess object which is used to start the process
+ * once tracing is set up.
+ */
+VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
+{
+  dtrace_hdl_t *handle;
+  struct ps_prochandle *P;
+  VALUE process;
+
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  P = dtrace_proc_grab(handle, FIX2INT(pid), 0);
+  
+  if (P == NULL) {
+    rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
+  }
+  
+  process = Data_Wrap_Struct(cDtraceProcess, 0, NULL, (struct ps_prochandle *)P);
+  rb_iv_set(process, "@dtrace", self);
+  return process;
 }

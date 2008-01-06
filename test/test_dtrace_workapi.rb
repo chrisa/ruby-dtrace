@@ -16,22 +16,16 @@ class TestDtrace < Test::Unit::TestCase
     c = DtraceConsumer.new(t)
     assert c
 
-    begin
-      i = 0
-      c.consume do |r|
-        assert r
-        assert_equal DtraceRecord, r.class
-
-        i = i + 1
-        if i > 10
-          break
-        end
+    i = 0
+    c.consume do |d|
+      i = i + 1
+      if i > 10
+        break
       end
-    rescue Interrupt
-      puts "interrupted"
     end
+    
   end
-
+    
   def test_work_dprogram_aggregates
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -56,33 +50,15 @@ EOD
     
     c = DtraceConsumer.new(t)
 
-    begin
-      i = 0
-      c.consume do |e|
-        assert e
-        case e.class.to_s
-        when "DtraceProbeData"
-          assert e.probedesc
-          e.each_record do |r|
-            assert r.value
-          end
-        when "DtraceRecord"
-          assert e.value
-        when "DtraceAggregate"
-          assert e.value
-          assert e.tuple
-          assert_equal 3, e.tuple.length
-        end
-          
-        i = i + 1
-        if i > 100
-          break
-        end
+    i = 0
+    c.consume do |d|
+      assert d
+      i = i + 1
+      if i >= 10
+        break
       end
-    rescue Interrupt
-      puts "interrupted"
     end
-   
+    
   end
 
   def test_work_dprogram_aggregates_once
@@ -114,21 +90,8 @@ EOD
     
     c = DtraceConsumer.new(t)
     
-    c.consume_once do |e|
-      assert e
-      case e.class.to_s
-      when "DtraceProbeData"
-        assert e.probedesc
-        e.each_record do |r|
-          assert r.value
-        end
-      when "DtraceRecord"
-        assert e.value
-      when "DtraceAggregate"
-        assert e.value
-        assert e.tuple
-        assert_equal 3, e.tuple.length
-      end
+    c.consume_once do |d|
+      assert d
     end
     
   end
@@ -151,12 +114,8 @@ EOD
     end
     
     c = DtraceConsumer.new(t)
-    c.consume_once do |e|
-      if e && e.class == DtraceAggregate
-        assert e.value
-        assert e.tuple
-        assert_equal 3, e.tuple.length
-      end
+    c.consume_once do |d|
+      assert d
     end
   end
 
@@ -174,8 +133,8 @@ EOD
 
     c = DtraceConsumer.new(t)
     i = 0
-    c.consume do |e|
-      assert e
+    c.consume do |d|
+      assert d
       i = i + 1
       if i > 10
         break
@@ -195,13 +154,77 @@ EOD
 
     c = DtraceConsumer.new(t)
     i = 0
-    c.consume do |e|
-      assert e
+    c.consume do |d|
+      assert d
       i = i + 1
       if i > 10
         break
       end
     end
   end
+  
+  def test_createprocess
 
+    t = Dtrace.new 
+    t.setopt("bufsize", "8m")
+    t.setopt("aggsize", "4m")
+    t.setopt("stackframes", "5")
+    t.setopt("strsize", "131072")
+
+    progtext = <<EOD
+pid$target:*::entry,
+pid$target:*::return
+{
+
+}
+EOD
+
+    p = t.createprocess([ '/usr/bin/true' ])
+    prog = t.compile(progtext)
+    prog.execute
+    t.go
+    p.continue
+
+    i = 0
+    c = DtraceConsumer.new(t)
+    c.consume do |d|
+      assert d
+      i = i + 1
+      if i > 10
+        break
+      end
+    end
+
+  end
+
+  def test_grabprocess
+
+    t = Dtrace.new 
+    t.setopt("bufsize", "8m")
+    t.setopt("aggsize", "4m")
+    t.setopt("stackframes", "5")
+    t.setopt("strsize", "131072")
+
+    progtext = <<EOD
+pid$target:*::entry,
+pid$target:*::return
+{
+
+}
+EOD
+
+    p = t.grabprocess(1)
+
+    prog = t.compile(progtext)
+    prog.execute
+
+    t.go
+    p.continue
+
+    c = DtraceConsumer.new(t)
+    c.consume_once do |d|
+      assert d
+    end
+
+  end
 end

@@ -383,8 +383,8 @@ t.go
 begin
   c = DtraceConsumer.new(t)
   
-  c.consume do |e|
-    records = e.records
+  c.consume do |d|
+    records = d.data
     
     # D exit at timeout
     if records.length == 1 && records[0].value == 0

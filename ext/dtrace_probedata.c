@@ -16,21 +16,6 @@ VALUE dtraceprobedata_init(VALUE self)
   return self;
 }
 
-/* Returns the DtraceProbe object corresponding to the probe which generated this record. */
-VALUE dtraceprobedata_probedesc(VALUE self)
-{
-  dtrace_probedata_t *data;
-  dtrace_probedesc_t *pdp;
-  VALUE probe;
-
-  Data_Get_Struct(self, dtrace_probedata_t, data);
-
-  pdp = data->dtpda_pdesc;
-  probe = Data_Wrap_Struct(cDtraceProbe, 0, NULL, (dtrace_probedesc_t *)pdp);
-
-  return probe;
-}
-
 static VALUE _handle_ustack_record(dtrace_hdl_t *handle, caddr_t addr, const dtrace_recdesc_t *rec)
 {
   VALUE stack;
@@ -106,6 +91,98 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
   }
 
   return stack;
+}
+
+VALUE dtraceprobedata_epid(VALUE self)
+{
+  dtrace_probedata_t *data;
+
+  Data_Get_Struct(self, dtrace_probedata_t, data);
+  return INT2FIX(data->dtpda_edesc->dtepd_epid);
+}
+
+/* 
+ * Returns the DtraceProbe for the probe which generated this data 
+ */
+VALUE dtraceprobedata_probe(VALUE self)
+{
+  VALUE dtraceprobe;
+  dtrace_probedata_t *data;
+  dtrace_probedesc_t *pd;
+
+  Data_Get_Struct(self, dtrace_probedata_t, data);
+  pd = data->dtpda_pdesc;
+
+  if (pd) {
+    dtraceprobe = Data_Wrap_Struct(cDtraceProbe, 0, NULL, (dtrace_probedesc_t *)pd);
+    return dtraceprobe;
+  }
+
+  return Qnil;
+}
+
+/* Returns the CPU which generated this data */
+VALUE dtraceprobedata_cpu(VALUE self)
+{
+  dtrace_probedata_t *data;
+  processorid_t cpu;
+
+  Data_Get_Struct(self, dtrace_probedata_t, data);
+  cpu = data->dtpda_cpu;
+
+  if (cpu) 
+    return INT2FIX(cpu);
+  else
+    return Qnil;
+}
+
+/* Returns the indent level given to this data by DTrace */
+VALUE dtraceprobedata_indent(VALUE self)
+{
+  dtrace_probedata_t *data;
+  int indent;
+
+  Data_Get_Struct(self, dtrace_probedata_t, data);
+  indent = data->dtpda_indent;
+
+  if (indent) 
+    return INT2FIX(indent);
+  else
+    return Qnil;
+}
+
+/* Returns the prefix given to this data by DTrace */
+VALUE dtraceprobedata_prefix(VALUE self)
+{
+  dtrace_probedata_t *data;
+  const char *prefix;
+
+  Data_Get_Struct(self, dtrace_probedata_t, data);
+  prefix = data->dtpda_prefix;
+
+  if (prefix) 
+    return rb_str_new2(prefix);
+  else
+    return Qnil;
+}
+
+/* Returns the flow kind given to this data by DTrace */
+VALUE dtraceprobedata_flow(VALUE self)
+{
+  dtrace_probedata_t *data;
+
+  Data_Get_Struct(self, dtrace_probedata_t, data);
+
+  switch (data->dtpda_flow) {
+  case DTRACEFLOW_ENTRY:
+    return rb_str_new2("->");
+    break;
+  case DTRACEFLOW_RETURN:
+    return rb_str_new2("<-");
+    break;
+  default:
+    return Qnil;
+  }
 }
 
 /* 

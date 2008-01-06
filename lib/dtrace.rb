@@ -10,6 +10,7 @@ require 'dtraceaggregate'
 require 'dtraceprobedata'
 require 'dtraceprobe'
 require 'dtracestackrecord'
+require 'dtracedata'
 
 # A DTrace handle. Provides methods for inspecting available probes,
 # compiling and running programs, and for setting up callbacks to
