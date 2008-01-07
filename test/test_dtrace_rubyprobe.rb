@@ -1,3 +1,8 @@
+#
+# Ruby-Dtrace
+# (c) 2007 Chris Andrews <chris@nodnol.org>
+#
+
 require 'dtrace'
 require 'test/unit'
 
