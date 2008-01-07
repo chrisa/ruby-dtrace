@@ -1,6 +1,5 @@
 require 'dtrace'
 require 'test/unit'
-require 'pp'
 
 class TestDtrace < Test::Unit::TestCase
   def test_rubyprobe
@@ -21,26 +20,25 @@ EOD
 
     c = DtraceConsumer.new(t)
 
+    # Leopard's ruby-probe is DTracer, Solaris's is Tracer.
     begin
       trace_module = DTracer
+    rescue NameError
+      trace_module = Tracer
     end
 
     (0..9).each do |i|
-      trace_module.fire("foo", i.to_s) # { raise }
+      trace_module.fire("foo", i.to_s)
     end
 
     data = []
     c.consume_once do |d|
-      pp d
       data << d
     end
     
     (0..9).each do |i|
       d = data.shift
-      assert_equal("foo-start", d.data[0].value)
-      assert_equal(i.to_s, d.data[1].value)
-      d = data.shift
-      assert_equal("foo-end", d.data[0].value)
+      assert_equal("foo", d.data[0].value)
       assert_equal(i.to_s, d.data[1].value)
     end
 
