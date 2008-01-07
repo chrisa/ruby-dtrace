@@ -6,6 +6,8 @@
 require 'dtrace'
 require 'test/unit'
 
+# Tests for the Dtrace handle class
+
 class TestDtrace < Test::Unit::TestCase
   def test_dtrace
     t = Dtrace.new

@@ -68,7 +68,6 @@ VALUE dtracebufdata_record(VALUE self)
   VALUE dtracerecord;
   VALUE dtraceaggdata;
   VALUE dtracerecdesc;
-  VALUE dtracestack;
 
   Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
   
@@ -94,15 +93,20 @@ VALUE dtracebufdata_record(VALUE self)
   case DTRACEACT_PRINTF:
     /* printf action, not available in probedata */
     v = rb_str_new2(s);
+    dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("DtracePrintfRecord"));
+    rb_iv_set(dtracerecord, "@from", rb_str_new2("bufdata"));
+    rb_iv_set(dtracerecord, "@value", v);
+    return (dtracerecord);
     break;
   case DTRACEACT_STACK:
   case DTRACEACT_USTACK:
   case DTRACEACT_JSTACK:
     /* stand-alone stack(), ustack(), or jstack() action */
     v = rb_str_new2(s);
-    dtracestack = rb_class_new_instance(0, NULL, rb_path2class("DtraceStackRecord"));
-    rb_funcall(dtracestack, rb_intern("parse"), 1, v);
-    return (dtracestack);
+    dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("DtraceStackRecord"));
+    rb_iv_set(dtracerecord, "@from", rb_str_new2("bufdata"));
+    rb_funcall(dtracerecord, rb_intern("parse"), 1, v);
+    return (dtracerecord);
     break;
   case DTRACEACT_USYM:
   case DTRACEACT_UADDR:
@@ -125,6 +129,8 @@ VALUE dtracebufdata_record(VALUE self)
   if (!NIL_P(v)) {
     dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("DtraceRecord"));
     rb_iv_set(dtracerecord, "@value", v);
+    rb_iv_set(dtracerecord, "@action", INT2FIX(act));
+    rb_iv_set(dtracerecord, "@from", rb_str_new2("bufdata"));
     return (dtracerecord);
   }
   else {

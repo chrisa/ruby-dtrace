@@ -6,6 +6,8 @@
 # records from the callbacks, and is yielded when the data is complete.
 class DtraceData
   attr_reader :data
+  attr_reader :probe
+  attr_reader :cpu, :indent, :prefix, :flow
 
   def initialize
     @data = []
@@ -32,6 +34,8 @@ class DtraceData
       when DtraceStackRecord.to_s
         @data << r
       when DtraceRecord.to_s
+        @data << r
+      when DtracePrintfRecord.to_s
         @data << r
       when DtraceAggData.to_s
         if @curragg == nil

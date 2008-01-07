@@ -131,12 +131,14 @@ VALUE dtraceprobedata_cpu(VALUE self)
   processorid_t cpu;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
-  cpu = data->dtpda_cpu;
-
-  if (cpu) 
+  
+  if (data) {
+    cpu = data->dtpda_cpu;
     return INT2FIX(cpu);
-  else
+  }
+  else {
     return Qnil;
+  }
 }
 
 /* Returns the indent level given to this data by DTrace */
@@ -201,10 +203,10 @@ VALUE dtraceprobedata_each_record(VALUE self)
   dtrace_hdl_t *handle;
   dtrace_actkind_t act;
   int i;
+  caddr_t addr;
   VALUE dtracerecord;
   VALUE dtracehandle;
   VALUE v;
-  caddr_t addr;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
   dtracehandle = rb_iv_get(self, "@handle");
@@ -213,18 +215,24 @@ VALUE dtraceprobedata_each_record(VALUE self)
   eprobe = data->dtpda_edesc;
   
   for (i = 0; i < eprobe->dtepd_nrecs; i++) {
+    v = 0;
     rec = &eprobe->dtepd_rec[i];
     if (rec->dtrd_size > 0) {
       act = rec->dtrd_action;
       addr = data->dtpda_data + rec->dtrd_offset;
-	
-      if (act == DTRACEACT_STACK) {
-	v = _handle_stack_record(handle, addr, rec);
-      }
-      else if (act == DTRACEACT_USTACK || act == DTRACEACT_JSTACK) {
-	v = _handle_ustack_record(handle, addr, rec);
-      }
-      else {
+      
+      switch (act) {
+      case DTRACEACT_STACK:
+      case DTRACEACT_USTACK:
+      case DTRACEACT_JSTACK:
+	/* Stack records come from bufdata */
+	/* v = _handle_stack_record(handle, addr, rec); */
+	/* v = _handle_ustack_record(handle, addr, rec); */
+	break;
+      case DTRACEACT_PRINTA:
+	/* don't want the probedata record for a printa() action */
+	break;
+      default:
 	switch (rec->dtrd_size) {
 	case 1:
 	  v = INT2FIX((int)(*((uint8_t *)addr)));
@@ -244,9 +252,14 @@ VALUE dtraceprobedata_each_record(VALUE self)
 	}
       }
 	
-      dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("DtraceRecord"));
-      rb_iv_set(dtracerecord, "@value", v);
-      rb_yield(dtracerecord);
+      if (v) {
+	dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("DtraceRecord"));
+	rb_iv_set(dtracerecord, "@value", v);
+	rb_iv_set(dtracerecord, "@from", rb_str_new2("probedata"));
+	rb_iv_set(dtracerecord, "@index", INT2FIX(i));
+	rb_iv_set(dtracerecord, "@action", INT2FIX(act));
+	rb_yield(dtracerecord);
+      }
     }
   }
 }
