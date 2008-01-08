@@ -50,6 +50,17 @@ require 'dtracedata'
 #
 #   d.buf_consumer(prob {|buf| yield buf })
 #   d.work(proc {|probe| yield probe }, proc {|rec| yield rec })
+#
+# === Creating a process
+#
+#   p = t.createprocess([ '/usr/bin/true' ])
+#   t.go
+#   p.continue
+#
+#   c = DtraceConsumer.new(t)
+#   c.consume do |d|
+#     ..
+#   end
 
 class Dtrace
   VERSION = '0.0.3'
