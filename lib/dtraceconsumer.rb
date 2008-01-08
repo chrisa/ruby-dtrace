@@ -101,7 +101,8 @@ class DtraceConsumer
     begin
       while(true) do
         @t.sleep
-        if (@done || @t.work(probe_consumer, rec_consumer(block)))
+        work = @t.work(probe_consumer, rec_consumer(block))
+        if (@done || work > 0)
           break
         end
       end

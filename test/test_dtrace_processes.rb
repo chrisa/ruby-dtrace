@@ -38,6 +38,9 @@ EOD
       assert d
       assert_equal "pid#{d.data[0].value}", d.probe.provider
       i = i + 1
+      if i > 10
+        c.finish
+      end
     end
     assert i > 0
   end
