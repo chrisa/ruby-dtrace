@@ -148,12 +148,14 @@ VALUE dtraceprobedata_indent(VALUE self)
   int indent;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
-  indent = data->dtpda_indent;
 
-  if (indent) 
-    return INT2FIX(indent);
-  else
+  if (data) {
+    indent = data->dtpda_indent;
+    return INT2FIX(indent / 2);
+  }
+  else {
     return Qnil;
+  }
 }
 
 /* Returns the prefix given to this data by DTrace */

@@ -5,6 +5,8 @@
 #include "dtrace_api.h"
 
 RUBY_EXTERN VALUE eDtraceException;
+
+RUBY_EXTERN VALUE cDtrace;
 RUBY_EXTERN VALUE cDtraceProbe;
 RUBY_EXTERN VALUE cDtraceProgram;
 RUBY_EXTERN VALUE cDtraceRecDesc;
@@ -14,7 +16,8 @@ RUBY_EXTERN VALUE cDtraceProcess;
 
 void dtrace_hdl_free (void *handle)
 {
-  dtrace_close(handle);
+  if (handle)
+    dtrace_close(handle);
 }
 
 VALUE dtrace_hdl_alloc(VALUE klass)
@@ -332,6 +335,8 @@ VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self)
   handlers.handle = self;
 
   status = dtrace_work(handle, NULL, _probe_consumer, _rec_consumer, &handlers);
+  if (status < 0)
+    rb_raise(eDtraceException, (dtrace_errmsg(handle, dtrace_errno(handle))));
 
   return INT2FIX(status);
 }  
@@ -369,7 +374,8 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
   char **argv;
   long len;
   int i;
-  VALUE process;
+  VALUE dtraceprocess;
+  dtrace_process_t *process;
 
   Data_Get_Struct(self, dtrace_hdl_t, handle);
 
@@ -388,9 +394,12 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
     rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
   }
   
-  process = Data_Wrap_Struct(cDtraceProcess, 0, NULL, (struct ps_prochandle *)P);
-  rb_iv_set(process, "@dtrace", self);
-  return process;
+  process = ALLOC(dtrace_process_t);
+  process->handle = handle;
+  process->proc   = P;
+
+  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release, (dtrace_process_t *)process);
+  return dtraceprocess;
 }
 
 /* 
@@ -403,7 +412,8 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
 {
   dtrace_hdl_t *handle;
   struct ps_prochandle *P;
-  VALUE process;
+  dtrace_process_t *process;
+  VALUE dtraceprocess;
 
   Data_Get_Struct(self, dtrace_hdl_t, handle);
 
@@ -413,7 +423,10 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
     rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
   }
   
-  process = Data_Wrap_Struct(cDtraceProcess, 0, NULL, (struct ps_prochandle *)P);
-  rb_iv_set(process, "@dtrace", self);
-  return process;
+  process = ALLOC(dtrace_process_t);
+  process->handle = handle;
+  process->proc   = P;
+
+  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release, (dtrace_process_t *)process);
+  return dtraceprocess;
 }

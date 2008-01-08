@@ -7,13 +7,20 @@
 /* :nodoc: */
 VALUE dtrace_process_init(VALUE self)
 {
-  struct ps_prochandle *P;
+  dtrace_process_t *process;
 
-  Data_Get_Struct(self, struct ps_prochandle, P);
-  if (P)
+  Data_Get_Struct(self, dtrace_process_t, process);
+  if (process)
     return self;
   else
     return Qnil;
+}
+
+/* :nodoc: */
+void dtrace_process_release(dtrace_process_t *process)
+{
+  dtrace_proc_release(process->handle, process->proc);
+  free(process);
 }
 
 /*
@@ -22,15 +29,9 @@ VALUE dtrace_process_init(VALUE self)
  */
 VALUE dtrace_process_continue(VALUE self)
 {
-  struct ps_prochandle *P;
-  dtrace_hdl_t *handle;
-  VALUE dtrace;
-  
-  Data_Get_Struct(self, struct ps_prochandle, P);
+  dtrace_process_t *process;
 
-  dtrace = rb_iv_get(self, "@dtrace");
-  Data_Get_Struct(dtrace, dtrace_hdl_t, handle);
-  
-  dtrace_proc_continue(handle, P);
+  Data_Get_Struct(self, dtrace_process_t, process);
+  dtrace_proc_continue(process->handle, process->proc);
 }
 

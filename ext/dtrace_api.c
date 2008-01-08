@@ -80,7 +80,8 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceAggData, "aggtype",            dtraceaggdata_aggtype, 0); // in dtrace_aggdata.c
 
   cDtraceRecDesc = rb_define_class("DtraceRecDesc", rb_cObject);
-  rb_define_method(cDtraceRecDesc, "initialize",         dtracerecdesc_init, 0); // in dtrace_recdesc.c 
+  rb_define_method(cDtraceRecDesc, "initialize",         dtracerecdesc_init,   0); // in dtrace_recdesc.c 
+  rb_define_method(cDtraceRecDesc, "action",             dtracerecdesc_action, 0); // in dtrace_recdesc.c 
 
   eDtraceException = rb_define_class("DtraceException", rb_eStandardError);
 }

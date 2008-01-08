@@ -11,6 +11,25 @@ class DtraceData
 
   def initialize
     @data = []
+    @curraggset = nil
+    @curragg    = nil
+  end
+
+  def finish
+    if @curraggset
+      @data << @curraggset
+      @curraggset = nil
+    end
+  end
+
+  def add_recdata(rec)
+    if @curraggset
+      @data << @curraggset
+      @curraggset = nil
+    end
+    if rec.action == "printa"
+      @curraggset = DtraceAggregateSet.new
+    end
   end
 
   def add_probedata(probedata)
@@ -25,7 +44,7 @@ class DtraceData
     @prefix = probedata.prefix
     @flow   = probedata.flow
   end
-
+  
   def add_bufdata(buf)
     r = buf.record
     # buf records can be empty (trace();)
@@ -42,8 +61,10 @@ class DtraceData
           @curragg = DtraceAggregate.new
         end
         if agg = @curragg.add_record(r)
-          @data << @curragg
-          @curragg = DtraceAggregate.new
+          if @curraggset
+            @curraggset.add_aggregate(@curragg)
+          end
+          @curragg = nil
         end
       end
     end

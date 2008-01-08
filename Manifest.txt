@@ -18,8 +18,10 @@ ext/dtrace_util.c
 ext/extconf.rb
 lib/dtrace.rb
 lib/dtraceaggregate.rb
+lib/dtraceaggregateset.rb
 lib/dtraceconsumer.rb
 lib/dtracedata.rb
+lib/dtraceprintfrecord.rb
 lib/dtraceprobe.rb
 lib/dtraceprobedata.rb
 lib/dtracerecord.rb
@@ -38,6 +40,8 @@ plugin/dtrace/tasks/dtrace.rake
 plugin/dtrace/test/dtrace_test.rb
 plugin/dtrace/views/dtrace/_report.rhtml
 test/test_dtrace.rb
+test/test_dtrace_aggregates.rb
 test/test_dtrace_processes.rb
 test/test_dtrace_profile.rb
+test/test_dtrace_repeat.rb
 test/test_dtrace_rubyprobe.rb

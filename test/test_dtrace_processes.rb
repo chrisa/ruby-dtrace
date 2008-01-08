@@ -22,7 +22,7 @@ class TestDtraceProcesses < Test::Unit::TestCase
 pid$target:*::entry,
 pid$target:*::return
 {
-
+  trace(pid);
 }
 EOD
 
@@ -36,12 +36,10 @@ EOD
     c = DtraceConsumer.new(t)
     c.consume do |d|
       assert d
+      assert_equal "pid#{d.data[0].value}", d.probe.provider
       i = i + 1
-      if i > 10
-        break
-      end
     end
-
+    assert i > 0
   end
 
   def test_grabprocess
@@ -60,18 +58,23 @@ pid$target:*::return
 }
 EOD
 
-    p = t.grabprocess(1)
-
+    pid = Kernel.fork { (0..9).each do sleep 1 end }
+    p = t.grabprocess(pid)
     prog = t.compile(progtext)
     prog.execute
 
     t.go
     p.continue
 
+    sleep 3
+
+    i = 0
     c = DtraceConsumer.new(t)
     c.consume_once do |d|
       assert d
+      assert_equal "pid#{pid}", d.probe.provider
+      i = i + 1
     end
-
+    assert i > 0
   end
 end

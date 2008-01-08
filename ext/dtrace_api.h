@@ -17,6 +17,15 @@ typedef struct dtrace_work_handlers {
   VALUE rec;
 } dtrace_work_handlers_t;
 
+/* Used to keep a reference to a struct ps_prochandle and a reference
+   to the DTrace handle in a DtraceProcess object: we need to be able 
+   to call dtrace_proc_release() when the DtraceProcess goes away, and
+   that requires the DTrace handle. */
+typedef struct dtrace_process {
+  dtrace_hdl_t *handle;
+  struct ps_prochandle *proc;
+} dtrace_process_t;
+
 /* Handle missing RARRAY_LEN etc */
 #ifdef RARRAY_LEN
 static inline long   rb_str_len(VALUE s) {return RSTRING_LEN(s);}
@@ -33,6 +42,7 @@ static inline VALUE *rb_ary_ptr(VALUE s) {return  RARRAY(s)->ptr;}
 VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
 
 VALUE dtrace_process_init(VALUE self);
+void dtrace_process_release(dtrace_process_t *process);
 VALUE dtrace_process_continue(VALUE self);
 
 VALUE dtraceaggdata_init(VALUE self);
@@ -40,8 +50,8 @@ VALUE dtraceaggdata_value(VALUE self);
 VALUE dtraceaggdata_aggtype(VALUE self);
 
 void  dtrace_hdl_free (void *handle);
-VALUE dtrace_hdl_alloc(VALUE klass);
 VALUE dtrace_init(VALUE self);
+VALUE dtrace_hdl_alloc(VALUE klass);
 VALUE dtrace_each_probe(VALUE self);
 VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self);
 VALUE dtrace_hdl_go(VALUE self);
@@ -87,3 +97,4 @@ VALUE dtraceprograminfo_matches_count(VALUE self);
 VALUE dtraceprograminfo_speculations_count(VALUE self);
 
 VALUE dtracerecdesc_init(VALUE self);
+VALUE dtracerecdesc_action(VALUE self);

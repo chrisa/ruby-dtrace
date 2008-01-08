@@ -32,6 +32,9 @@
 #   c = DtraceConsumer.new(t)
 #   c.consume_once do |d|
 #     # handle DtraceData objects
+#     # ...
+#     # get bored:
+#     c.finish
 #   end
 
 class DtraceConsumer
@@ -39,6 +42,7 @@ class DtraceConsumer
   def initialize(t)
     @t = t
     @curr = DtraceData.new
+    @done = false
   end
 
   private
@@ -60,7 +64,10 @@ class DtraceConsumer
   
   def rec_consumer(block)
     proc do |rec|
-      unless rec
+      if rec
+        @curr.add_recdata(rec)
+      else
+        @curr.finish
         block.call(@curr)
         @curr = DtraceData.new
       end
@@ -80,6 +87,12 @@ class DtraceConsumer
   end
   
   public
+
+  # Signals that the client wishes to stop consuming trace data. 
+  def finish
+    @t.stop
+    @done = true
+  end
   
   # Waits for data from the D program, and yields the records returned
   # to the block given. Returns when the D program exits.
@@ -88,7 +101,9 @@ class DtraceConsumer
     begin
       while(true) do
         @t.sleep
-        @t.work(probe_consumer, rec_consumer(block))
+        if (@done || @t.work(probe_consumer, rec_consumer(block)))
+          break
+        end
       end
     ensure
       @t.stop
