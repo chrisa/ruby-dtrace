@@ -1,4 +1,5 @@
 require 'dtrace'
+require 'pp'
 
 class Dtracer
   
@@ -25,14 +26,14 @@ syscall:::entry
 
 END
 {
-        printf("report:syscalls");
-        printa(@syscalls);
-        printf("report:rbclasses");
-        printa(@rbclasses);
-        printf("report:rbmethods");
-        printa(@rbmethods);
-        printf("report:queries");
+        printf("MySQL Queries");
         printa(@queries);
+        printf("System Calls");
+        printa(@syscalls);
+        printf("Ruby Classes");
+        printa(@rbclasses);
+        printf("Ruby Methods");
+        printa(@rbmethods);
 }
 
 EOD
@@ -57,28 +58,19 @@ EOD
   end
   
   def end_dtrace
-    return {} unless @d
+    return [] unless @d
 
+    dtrace_data = nil
     current_report = 'none'
     begin
-      dtrace_report = Hash.new
       c = DtraceConsumer.new(@d)
-      c.consume_once do |e|
-        if e.respond_to? :tuple
-          dtrace_report[current_report][e.tuple.first] = e.value
-        elsif e.respond_to? :value
-          if e.value =~ /report:(.*)/
-            current_report = Regexp.last_match(1)
-            unless dtrace_report[current_report]
-              dtrace_report[current_report] = Hash.new
-            end
-          end
-        end
+      c.consume_once do |d|
+        dtrace_data = d
       end
     rescue DtraceException => e
       puts "end: #{e.message}"
     end
 
-    return dtrace_report
+    return dtrace_data.data
   end
 end
