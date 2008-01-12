@@ -13,7 +13,7 @@ module DtraceReport
         if options[:tracer] == :self
           DtraceReport.tracer = Dtracer.new
         elsif options[:tracer] == :helper
-          DtracerReport.tracer = DtracerClient.new
+          DtraceReport.tracer = DtracerClient.new
         else
           raise "tracer option is self or helper"
         end
