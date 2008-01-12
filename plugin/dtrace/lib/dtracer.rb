@@ -20,6 +20,7 @@ ruby$1:::function-entry
 }
 
 syscall:::entry
+/pid == $1/
 {
         @syscalls[probefunc] = count();
 }
@@ -61,7 +62,6 @@ EOD
     return [] unless @d
 
     dtrace_data = nil
-    current_report = 'none'
     begin
       c = DtraceConsumer.new(@d)
       c.consume_once do |d|
@@ -70,7 +70,11 @@ EOD
     rescue DtraceException => e
       puts "end: #{e.message}"
     end
-
-    return dtrace_data.data
+    
+    if dtrace_data
+      return dtrace_data.data
+    else
+      return []
+    end
   end
 end
