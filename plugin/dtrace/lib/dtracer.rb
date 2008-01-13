@@ -1,65 +1,37 @@
 require 'dtrace'
-require 'pp'
 
 class Dtracer
-  
+  attr_writer :logger
+  attr_reader :script
+
+  def script=(script)
+    @script = script
+    scriptdir = File.expand_path(File.dirname(__FILE__) + "/../scripts")
+    @dprogram = IO.read("#{scriptdir}/#{script}")
+  end
+
   def start_dtrace(pid)
-    progtext = <<EOD
-self string uri;
-
-pid$1::mysql_real_query:entry
-{
-        @queries[copyinstr(arg1)] = count();
-}
-
-ruby$1:::function-entry
-{
-        @rbclasses[this->class = copyinstr(arg0)] = count();
-        this->sep = strjoin(this->class, "#");
-        @rbmethods[strjoin(this->sep, copyinstr(arg1))] = count();
-}
-
-syscall:::entry
-/pid == $1/
-{
-        @syscalls[probefunc] = count();
-}
-
-END
-{
-        printf("MySQL Queries");
-        printa(@queries);
-        printf("System Calls");
-        printa(@syscalls);
-        printf("Ruby Classes");
-        printa(@rbclasses);
-        printf("Ruby Methods");
-        printa(@rbmethods);
-}
-
-EOD
-
     begin
       @d = Dtrace.new
       @d.setopt("aggsize", "4m")
       @d.setopt("bufsize", "4m")
     rescue DtraceException => e
-      puts "start setup: #{e.message}"
+      @logger.warn("DTrace start setup: #{e.message}")
       return
     end
 
     begin
-      prog = @d.compile(progtext, pid.to_s)
+      prog = @d.compile(@dprogram, pid.to_s)
       prog.execute
       @d.go
     rescue DtraceException => e
-      puts "start: #{e.message}"
+      @logger.warn("DTrace start compile: #{e.message}")
     end
-
   end
   
   def end_dtrace
-    return [] unless @d
+    # Check presence of handle and correct status.
+    return [] unless @d && @d.status == 1
 
     dtrace_data = nil
     begin
@@ -68,7 +40,7 @@ EOD
         dtrace_data = d
       end
     rescue DtraceException => e
-      puts "end: #{e.message}"
+      @logger.warn("DTrace end: #{e.message}")
     end
     
     if dtrace_data

@@ -1,4 +1,12 @@
 Dtrace
 ======
 
-Description goes here
+A simple plugin to run a DTrace script while your Rails app runs. 
+
+Installation:
+
+  script/plugin install http://ruby-dtrace.rubyforge.org/svn/trunk/plugin/dtrace
+
+Or copy the plugin/dtrace directory from the installed ruby-dtrace-gem
+to your app's vendor/plugins directory. 
+
