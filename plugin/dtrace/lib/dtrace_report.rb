@@ -20,6 +20,8 @@ module DtraceReport
           raise "tracer option is self or helper"
         end
 
+        tracer.logger = logger
+
         # Set script, or default
         if options[:script]
           tracer.script = options[:script]
@@ -27,7 +29,6 @@ module DtraceReport
           tracer.script = 'default.d'
         end
 
-        tracer.logger = logger
         DtraceReport.tracer = tracer
       end
     end

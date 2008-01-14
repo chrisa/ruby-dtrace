@@ -1,7 +1,7 @@
 require 'dtrace'
 
 class Dtracer
-  attr_writer :logger
+  attr_writer :logger, :dprogram
   attr_reader :script
 
   def script=(script)
