@@ -20,5 +20,10 @@ require 'dtracer'
 here = "druby://localhost:2999"
 tracer = Dtracer.new
 DRb.start_service here, tracer
-DRb.thread.join
+puts "DTrace helper started"
+begin
+  DRb.thread.join
+rescue Interrupt
+  exit 0
+end
 
