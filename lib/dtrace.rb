@@ -63,7 +63,7 @@ require 'dtracedata'
 #   end
 
 class Dtrace
-  VERSION = '0.0.3'
+  VERSION = '0.0.4'
 
   STATUS_NONE    = 0
   STATUS_OKAY    = 1

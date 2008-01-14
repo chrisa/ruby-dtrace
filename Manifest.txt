@@ -32,10 +32,11 @@ plugin/dtrace/bin/dtracer.rb
 plugin/dtrace/init.rb
 plugin/dtrace/lib/dtrace_helper.rb
 plugin/dtrace/lib/dtrace_report.rb
-plugin/dtrace/lib/dtrace_tracer.rb
 plugin/dtrace/lib/dtracer.rb
 plugin/dtrace/lib/dtracer_client.rb
 plugin/dtrace/public/stylesheets/dtrace.css
+plugin/dtrace/scripts/default.d
+plugin/dtrace/scripts/rails_mysql.d
 plugin/dtrace/tasks/dtrace.rake
 plugin/dtrace/test/dtrace_test.rb
 plugin/dtrace/views/dtrace/_report.rhtml
