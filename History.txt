@@ -1,3 +1,6 @@
+== 0.0.4 / 2008-01-14
+ * Fix the very basic Rails plugin.
+
 == 0.0.3 / 2008-01-06
 
  * Add a DtraceData class which consumers return, containing
