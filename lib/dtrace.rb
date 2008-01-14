@@ -64,5 +64,11 @@ require 'dtracedata'
 
 class Dtrace
   VERSION = '0.0.3'
+
+  STATUS_NONE    = 0
+  STATUS_OKAY    = 1
+  STATUS_EXITED  = 2
+  STATUS_FILLED  = 3
+  STATUS_STOPPED = 4
 end
 
