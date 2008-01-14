@@ -31,7 +31,7 @@ class Dtracer
   
   def end_dtrace
     # Check presence of handle and correct status.
-    return [] unless @d && @d.status == 1
+    return [] unless @d && @d.status == Dtrace::STATUS_OKAY
 
     dtrace_data = nil
     begin
