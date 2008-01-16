@@ -9,22 +9,29 @@ class DtraceData
   attr_reader :probe
   attr_reader :cpu, :indent, :prefix, :flow
 
-  def initialize
+  def initialize(types)
+    @types = types
     @data = []
     @curraggset = nil
     @curragg    = nil
   end
 
+  def add_data(d)
+    if @types.length == 0 || @types.include?(d.class)
+      @data << d
+    end
+  end
+
   def finish
     if @curraggset
-      @data << @curraggset
+      add_data(@curraggset)
       @curraggset = nil
     end
   end
 
   def add_recdata(rec)
     if @curraggset
-      @data << @curraggset
+      add_data(@curraggset)
       @curraggset = nil
     end
     if rec.action == "printa"
@@ -34,7 +41,7 @@ class DtraceData
 
   def add_probedata(probedata)
     probedata.each_record do |p|
-      @data << p
+      add_data(p)
     end
 
     # Record the probe that fired, and CPU/indent/prefix/flow
@@ -51,11 +58,11 @@ class DtraceData
     if r
       case r.class.to_s
       when DtraceStackRecord.to_s
-        @data << r
+        add_data(r)
       when DtraceRecord.to_s
-        @data << r
+        add_data(r)
       when DtracePrintfRecord.to_s
-        @data << r
+        add_data(r)
       when DtraceAggData.to_s
         if @curragg == nil
           @curragg = DtraceAggregate.new

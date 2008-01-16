@@ -41,8 +41,8 @@ class DtraceConsumer
 
   def initialize(t)
     @t = t
-    @curr = DtraceData.new
     @done = false
+    @types = []
   end
 
   private
@@ -69,7 +69,7 @@ class DtraceConsumer
       else
         @curr.finish
         block.call(@curr)
-        @curr = DtraceData.new
+        @curr = DtraceData.new(@types)
       end
     end
   end
@@ -86,6 +86,11 @@ class DtraceConsumer
     end
   end
   
+  def filter_types(types)
+    @types = types
+    @curr = DtraceData.new(types)
+  end
+  
   public
 
   # Signals that the client wishes to stop consuming trace data. 
@@ -96,7 +101,17 @@ class DtraceConsumer
   
   # Waits for data from the D program, and yields the records returned
   # to the block given. Returns when the D program exits.
-  def consume(&block)
+  #
+  # Pass a list of classes to restrict the types of data returned,
+  # from:
+  #
+  # * DtraceRecord
+  # * DtracePrintfRecord
+  # * DtraceAggregateSet
+  # * DtraceStackRecord
+  #
+  def consume(*types, &block)
+    filter_types(types)
     @t.buf_consumer(buf_consumer)
     begin
       while(true) do
@@ -113,7 +128,17 @@ class DtraceConsumer
   end
   
   # Yields the data waiting from the current program, then returns.
-  def consume_once(&block)
+  #
+  # Pass a list of classes to restrict the types of data returned,
+  # from:
+  #
+  # * DtraceRecord
+  # * DtracePrintfRecord
+  # * DtraceAggregateSet
+  # * DtraceStackRecord
+  #
+  def consume_once(*types, &block)
+    filter_types(types)
     @t.buf_consumer(buf_consumer)
     @t.stop
     @t.work(probe_consumer, rec_consumer(block))
