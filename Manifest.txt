@@ -7,6 +7,9 @@ ext/dtrace_aggdata.c
 ext/dtrace_api.c
 ext/dtrace_api.h
 ext/dtrace_bufdata.c
+ext/dtrace_dropdata.c
+ext/dtrace_dropdata.c
+ext/dtrace_errdata.c
 ext/dtrace_hdl.c
 ext/dtrace_probe.c
 ext/dtrace_probedata.c
@@ -42,7 +45,9 @@ plugin/dtrace/test/dtrace_test.rb
 plugin/dtrace/views/dtrace/_report.rhtml
 test/test_dtrace.rb
 test/test_dtrace_aggregates.rb
+test/test_dtrace_drops_errors.rb
 test/test_dtrace_processes.rb
 test/test_dtrace_profile.rb
 test/test_dtrace_repeat.rb
 test/test_dtrace_rubyprobe.rb
+test/test_dtrace_typefilter.rb
