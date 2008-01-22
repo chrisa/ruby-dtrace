@@ -428,6 +428,9 @@ VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer)
     return Qnil;
   }
 
+  /* XXX GC appears to be claiming err_consumer after a while, need to
+     make sure we take a reference to it. */
+
   /* attach the err-record handler */
   if (dtrace_handle_err(handle, &_err_consumer, (void *)err_consumer) == -1) {
     rb_raise(eDtraceException, "failed to establish err-record handler: %s",
