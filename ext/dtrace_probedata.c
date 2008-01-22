@@ -202,17 +202,17 @@ VALUE dtraceprobedata_each_record(VALUE self)
   dtrace_probedata_t *data;
   dtrace_eprobedesc_t *eprobe;
   dtrace_recdesc_t *rec;
-  dtrace_hdl_t *handle;
+  dtrace_handle_t *handle;
   dtrace_actkind_t act;
   int i;
   caddr_t addr;
   VALUE dtracerecord;
-  VALUE dtracehandle;
+  VALUE dtrace;
   VALUE v;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
-  dtracehandle = rb_iv_get(self, "@handle");
-  Data_Get_Struct(dtracehandle, dtrace_hdl_t, handle);
+  dtrace = rb_iv_get(self, "@handle");
+  Data_Get_Struct(dtrace, dtrace_handle_t, handle);
 
   eprobe = data->dtpda_edesc;
   
@@ -228,8 +228,8 @@ VALUE dtraceprobedata_each_record(VALUE self)
       case DTRACEACT_USTACK:
       case DTRACEACT_JSTACK:
 	/* Stack records come from bufdata */
-	/* v = _handle_stack_record(handle, addr, rec); */
-	/* v = _handle_ustack_record(handle, addr, rec); */
+	/* v = _handle_stack_record(handle->hdl, addr, rec); */
+	/* v = _handle_ustack_record(handle->hdl, addr, rec); */
 	break;
       case DTRACEACT_PRINTA:
 	/* don't want the probedata record for a printa() action */

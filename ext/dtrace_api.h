@@ -26,6 +26,18 @@ typedef struct dtrace_process {
   struct ps_prochandle *proc;
 } dtrace_process_t;
 
+/* Used to wrap up the DTrace handle, so we can keep references to the
+   various callbacks: we must mark them from the dtrace_hdl_mark
+   routine, which only gets a pointer to this structure. */
+typedef struct dtrace_handle {
+  dtrace_hdl_t *hdl;
+  VALUE probe;
+  VALUE rec;
+  VALUE buf;
+  VALUE err;
+  VALUE drop;
+} dtrace_handle_t;
+
 /* Handle missing RARRAY_LEN etc */
 #ifdef RARRAY_LEN
 static inline long   rb_str_len(VALUE s) {return RSTRING_LEN(s);}
@@ -49,7 +61,6 @@ VALUE dtraceaggdata_init(VALUE self);
 VALUE dtraceaggdata_value(VALUE self);
 VALUE dtraceaggdata_aggtype(VALUE self);
 
-void  dtrace_hdl_free (void *handle);
 VALUE dtrace_init(VALUE self);
 VALUE dtrace_hdl_alloc(VALUE klass);
 VALUE dtrace_each_probe(VALUE self);

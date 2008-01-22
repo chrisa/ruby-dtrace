@@ -24,17 +24,17 @@ VALUE dtraceprogram_exec(VALUE self)
 {
   dtrace_prog_t *prog;
   dtrace_proginfo_t *proginfo;
-  dtrace_hdl_t *handle;
+  dtrace_handle_t *handle;
   VALUE dtrace;
   VALUE dtraceprograminfo;
   int ret;
 
   Data_Get_Struct(self, dtrace_prog_t, prog);
-  dtrace = rb_iv_get(self, "@dtrace");
-  Data_Get_Struct(dtrace, dtrace_hdl_t, handle);
+  dtrace = rb_iv_get(self, "@handle");
+  Data_Get_Struct(dtrace, dtrace_handle_t, handle);
   
   proginfo = ALLOC(dtrace_proginfo_t);
-  ret = dtrace_program_exec(handle, prog, proginfo);
+  ret = dtrace_program_exec(handle->hdl, prog, proginfo);
 
   if (ret == 0) {
     dtraceprograminfo = Data_Wrap_Struct(cDtraceProgramInfo, 0, NULL, proginfo);
@@ -42,7 +42,7 @@ VALUE dtraceprogram_exec(VALUE self)
   }
 
   if (ret < 0)
-    rb_raise(eDtraceException, dtrace_errmsg(handle, dtrace_errno(handle)));
+    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
   
   return Qnil;
 }
