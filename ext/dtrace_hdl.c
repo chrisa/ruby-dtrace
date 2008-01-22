@@ -400,9 +400,14 @@ static int _err_consumer(const dtrace_errdata_t *errdata, void *arg)
 
   proc = (VALUE)arg;
 
-  if (!NIL_P(proc)) {
+  /* guard against bad invocations where arg is not what we provided... */
+  if (TYPE(proc) == T_DATA) {
     dtraceerrdata = Data_Wrap_Struct(cDtraceErrData, 0, NULL, (dtrace_errdata_t *)errdata);
     rb_funcall(proc, rb_intern("call"), 1, dtraceerrdata);
+  }
+  else {
+    /* arg looked bad, throw an exception */
+    rb_raise(eDtraceException, "bad argument to _err_consumer: %p\n", arg);
   }
 
   return (DTRACE_HANDLE_OK);
