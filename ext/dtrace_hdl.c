@@ -13,6 +13,8 @@ RUBY_EXTERN VALUE cDtraceRecDesc;
 RUBY_EXTERN VALUE cDtraceProbeData;
 RUBY_EXTERN VALUE cDtraceBufData;
 RUBY_EXTERN VALUE cDtraceProcess;
+RUBY_EXTERN VALUE cDtraceDropData;
+RUBY_EXTERN VALUE cDtraceErrData;
 
 void dtrace_hdl_free (void *handle)
 {
@@ -187,7 +189,7 @@ VALUE dtrace_hdl_setopt(VALUE self, VALUE key, VALUE value)
   int ret;
 
   Data_Get_Struct(self, dtrace_hdl_t, handle);
-  
+
   if (NIL_P(value)) {
     ret = dtrace_setopt(handle, STR2CSTR(key), 0);
   }
@@ -351,7 +353,80 @@ VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer)
 
   /* attach the buffered output handler */
   if (dtrace_handle_buffered(handle, &_buf_consumer, (void *)buf_consumer) == -1) {
-    rb_raise(eDtraceException, "failed to establish buffered handler");
+    rb_raise(eDtraceException, "failed to establish buffered handler: %s", 
+	     (dtrace_errmsg(handle, dtrace_errno(handle))));
+  }
+
+  return Qnil;
+}
+
+static int _drop_consumer(const dtrace_dropdata_t *dropdata, void *arg)
+{
+  VALUE proc;
+  VALUE dtracedropdata;
+
+  proc = (VALUE)arg;
+
+  if (!NIL_P(proc)) {
+    dtracedropdata = Data_Wrap_Struct(cDtraceDropData, 0, NULL, (dtrace_dropdata_t *)dropdata);
+    rb_funcall(proc, rb_intern("call"), 1, dtracedropdata);
+  }
+
+  return (DTRACE_HANDLE_OK);
+}
+
+/*
+ * Set up the drop-record handler for this handle. Takes a block,
+ * which will be called with any drop records returned by DTrace,
+ * represented by DtraceDropData objects.
+ */
+VALUE dtrace_hdl_drop_consumer(VALUE self, VALUE drop_consumer)
+{
+  dtrace_hdl_t *handle;
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  /* attach the drop-record handler */
+  if (dtrace_handle_drop(handle, &_drop_consumer, (void *)drop_consumer) == -1) {
+    rb_raise(eDtraceException, "failed to establish drop-record handler");
+  }
+
+  return Qnil;
+}
+
+static int _err_consumer(const dtrace_errdata_t *errdata, void *arg)
+{
+  VALUE proc;
+  VALUE dtraceerrdata;
+
+  proc = (VALUE)arg;
+
+  if (!NIL_P(proc)) {
+    dtraceerrdata = Data_Wrap_Struct(cDtraceErrData, 0, NULL, (dtrace_errdata_t *)errdata);
+    rb_funcall(proc, rb_intern("call"), 1, dtraceerrdata);
+  }
+
+  return (DTRACE_HANDLE_OK);
+}
+
+/*
+ * Set up the err-record handler for this handle. Takes a block, which
+ * will be called with any error records returned by DTrace,
+ * represented by DTraceErrData records. 
+ */
+VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer)
+{
+  dtrace_hdl_t *handle;
+  Data_Get_Struct(self, dtrace_hdl_t, handle);
+
+  if (dtrace_status(handle) != 0) {
+    rb_raise(eDtraceException, "too late to add error handler");
+    return Qnil;
+  }
+
+  /* attach the err-record handler */
+  if (dtrace_handle_err(handle, &_err_consumer, (void *)err_consumer) == -1) {
+    rb_raise(eDtraceException, "failed to establish err-record handler: %s",
+	     dtrace_errmsg(handle, dtrace_errno(handle)));
   }
 
   return Qnil;

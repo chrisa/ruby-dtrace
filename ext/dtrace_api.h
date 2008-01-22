@@ -62,6 +62,8 @@ VALUE dtrace_hdl_error(VALUE self);
 VALUE dtrace_hdl_sleep(VALUE self);
 VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self);
 VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer_proc);
+VALUE dtrace_hdl_drop_consumer(VALUE self, VALUE drop_consumer_proc);
+VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer_proc);
 VALUE dtrace_hdl_createprocess(VALUE self, VALUE argv);
 VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid);
 
@@ -98,3 +100,18 @@ VALUE dtraceprograminfo_speculations_count(VALUE self);
 
 VALUE dtracerecdesc_init(VALUE self);
 VALUE dtracerecdesc_action(VALUE self);
+
+VALUE dtracedropdata_init(VALUE self);
+VALUE dtracedropdata_cpu(VALUE self);
+VALUE dtracedropdata_drops(VALUE self);
+VALUE dtracedropdata_total(VALUE self);
+VALUE dtracedropdata_msg(VALUE self);
+VALUE dtracedropdata_kind(VALUE self);
+
+VALUE dtraceerrdata_init(VALUE self);
+VALUE dtraceerrdata_cpu(VALUE self);
+VALUE dtraceerrdata_action(VALUE self);
+VALUE dtraceerrdata_offset(VALUE self);
+VALUE dtraceerrdata_fault(VALUE self);
+VALUE dtraceerrdata_addr(VALUE self);
+VALUE dtraceerrdata_msg(VALUE self);

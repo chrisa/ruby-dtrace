@@ -43,6 +43,9 @@ class DtraceConsumer
     @t = t
     @done = false
     @types = []
+
+    @drophandler = nil
+    @errhandler = nil
   end
 
   private
@@ -85,13 +88,35 @@ class DtraceConsumer
       @curr.add_bufdata(buf)
     end
   end
-  
+
   def filter_types(types)
     @types = types
     @curr = DtraceData.new(types)
   end
   
   public
+
+  # Provide a proc which will be executed when a drop record is
+  # received.
+  def drophandler(&block)
+    @drophandler = block
+    @t.drop_consumer(proc do |drop|
+                       if @drophandler
+                         @drophandler.call(drop)
+                       end
+                     end)
+  end
+
+  # Provide a proc which will be executed when an error record is
+  # received.
+  def errhandler(&block)
+    @errhandler = block
+    @t.err_consumer(proc do |err|
+                      if @errhandler
+                        @errhandler.call(err)
+                      end
+                    end)
+  end
 
   # Signals that the client wishes to stop consuming trace data. 
   def finish
