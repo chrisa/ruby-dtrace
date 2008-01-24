@@ -61,6 +61,11 @@ VALUE dtrace_hdl_alloc(VALUE klass)
     (void) dtrace_setopt(hdl, "flowindent", 0);
 
     handle = ALLOC(dtrace_handle_t);
+    if (!handle) {
+      rb_raise(eDtraceException, "alloc failed");
+      return Qnil;
+    }
+
     handle->hdl   = hdl;
     handle->probe = Qnil;
     handle->rec   = Qnil;
@@ -140,6 +145,11 @@ VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self)
 
   dtrace_argc = rb_ary_len(dtrace_argv_array);
   dtrace_argv = ALLOC_N(char *, dtrace_argc + 1);
+  if (!dtrace_argv) {
+    rb_raise(eDtraceException, "alloc failed");
+    return Qnil;
+  }
+  
   for (i = 0; i < dtrace_argc; i++) {
     dtrace_argv[i + 1] = STR2CSTR(rb_ary_entry(dtrace_argv_array, i));
   }
@@ -502,6 +512,10 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
 
   len = rb_ary_len(rb_argv);
   argv = ALLOC_N(char *, len + 1);
+  if (!argv) {
+    rb_raise(eDtraceException, "alloc failed");
+    return Qnil;
+  }
 
   for (i = 0; i < len; i++) {
     argv[i] = STR2CSTR(rb_ary_entry(rb_argv, i));
@@ -516,6 +530,11 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
   }
   
   process = ALLOC(dtrace_process_t);
+  if (!process) {
+    rb_raise(eDtraceException, "alloc failed");
+    return Qnil;
+  }
+
   process->handle = handle->hdl;
   process->proc   = P;
 
@@ -545,6 +564,11 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
   }
   
   process = ALLOC(dtrace_process_t);
+  if (!process) {
+    rb_raise(eDtraceException, "alloc failed");
+    return Qnil;
+  }
+
   process->handle = handle->hdl;
   process->proc   = P;
 

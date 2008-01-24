@@ -34,6 +34,11 @@ VALUE dtraceprogram_exec(VALUE self)
   Data_Get_Struct(dtrace, dtrace_handle_t, handle);
   
   proginfo = ALLOC(dtrace_proginfo_t);
+  if (!proginfo) {
+    rb_raise(eDtraceException, "alloc failed");
+    return Qnil;
+  }
+
   ret = dtrace_program_exec(handle->hdl, prog, proginfo);
 
   if (ret == 0) {
