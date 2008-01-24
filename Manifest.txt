@@ -8,7 +8,6 @@ ext/dtrace_api.c
 ext/dtrace_api.h
 ext/dtrace_bufdata.c
 ext/dtrace_dropdata.c
-ext/dtrace_dropdata.c
 ext/dtrace_errdata.c
 ext/dtrace_hdl.c
 ext/dtrace_probe.c
