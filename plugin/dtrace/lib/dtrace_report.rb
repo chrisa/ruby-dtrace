@@ -5,6 +5,7 @@ module DtraceReport
 
   def self.included(base)
     base.extend DtraceMacro
+    @@tracer = nil
   end
 
   module DtraceMacro
@@ -43,19 +44,23 @@ module DtraceReport
   end
 
   def enable_dtrace
-    @@tracer.start_dtrace($$)
+    if @@tracer
+      @@tracer.start_dtrace($$)
+    end
   end
 
   def append_dtrace_report
-    @dtrace_script = @@tracer.script
-    @dtrace_report = @@tracer.end_dtrace
-    # yuck!
-    old_template_root = @template.base_path
-    begin
-      @template.view_paths =  File.expand_path(File.dirname(__FILE__) + '/../views')
-      response.body.gsub!(/<\/body/, @template.render(:partial => 'dtrace/report') + '</body')
-    ensure
-      @template.view_paths = old_template_root
+    if @@tracer 
+      @dtrace_script = @@tracer.script
+      @dtrace_report = @@tracer.end_dtrace
+      # yuck!
+      old_template_root = @template.base_path
+      begin
+        @template.view_paths =  File.expand_path(File.dirname(__FILE__) + '/../views')
+        response.body.gsub!(/<\/body/, @template.render(:partial => 'dtrace/report') + '</body')
+      ensure
+        @template.view_paths = old_template_root
+      end
     end
   end
   
