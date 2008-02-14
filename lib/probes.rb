@@ -5,5 +5,8 @@ end
 
 require 'probes/active_record'
 ActiveRecord::Base.class_eval do
-  include Probes::ActiveRecord
+  include Probes::ActiveRecord::Base
+end
+ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
+  include Probes::ActiveRecord::ConnectionAdapters::MysqlAdapter
 end
