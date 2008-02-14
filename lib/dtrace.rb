@@ -14,9 +14,6 @@ require 'dtracestackrecord'
 require 'dtraceprintfrecord'
 require 'dtracedata'
 
-require 'dtrace/probe'
-require 'dtrace/provider'
-
 # A DTrace handle. Provides methods for inspecting available probes,
 # compiling and running programs, and for setting up callbacks to
 # receive trace data.
@@ -73,12 +70,5 @@ class Dtrace
   STATUS_EXITED  = 2
   STATUS_FILLED  = 3
   STATUS_STOPPED = 4
-  
-  def self.provider(name)
-    provider = Dtrace::Provider.new(name)
-    yield provider
-    provider.build
-  end
-
 end
 

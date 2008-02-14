@@ -2,6 +2,8 @@
 # Ruby-Dtrace
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
+
+require 'dtrace/probe'
 require 'inline/dtrace_probes'
 
 DTRACE = '/usr/sbin/dtrace'
@@ -9,6 +11,12 @@ DTRACE = '/usr/sbin/dtrace'
 class Dtrace
   class Provider
 
+    def self.create(name)
+      provider = Dtrace::Provider.new(name)
+      yield provider
+      provider.build
+    end
+    
     # Pinched from ActiveSupport's Inflector
     def camelize(lower_case_and_underscored_word)
       lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
