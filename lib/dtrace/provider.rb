@@ -84,9 +84,10 @@ EOC
         
         # Create the provider class
         c = Class.new
+        module_name = @name
         c.module_eval do
           inline('DtraceProbes') do |builder|
-            builder.set_module_name "rubydtrace"
+            builder.set_module_name module_name
             builder.include "\"#{h.path}\""
             builder.c_raw <<EOC
 static VALUE fire(VALUE self, VALUE args) {
