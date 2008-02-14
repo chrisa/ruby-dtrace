@@ -1,4 +1,4 @@
 # Include hook code here
-require 'dtrace'
+require 'dtrace/provider'
 require 'probes'
 
