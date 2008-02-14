@@ -13,7 +13,7 @@ module Probes
     end
 
     def self.included(base)
-      Dtrace.provider :action_controller do |p|
+      Dtrace::Provider.create :action_controller do |p|
         p.probe :process_start,  :string
         p.probe :process_finish, :string, :integer
       end
