@@ -3,6 +3,7 @@
  */
 
 #include "dtrace_api.h"
+#include <ctype.h>
 
 RUBY_EXTERN VALUE eDtraceException;
 
