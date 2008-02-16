@@ -6,6 +6,7 @@
 require 'dtrace'
 require 'dtrace/provider'
 require 'test/unit'
+require 'rbconfig'
 
 # Tests for the Dtrace "dynamic USDT" library
 
@@ -18,9 +19,11 @@ class TestDynUsdt < Test::Unit::TestCase
 
     t = Dtrace.new
     t.setopt("bufsize", "4m")
+    t.setopt("aggsize", "4m")
 
-    progtext = 'test_provider$1:::test-probe { trace(copyinstr(arg0)); }'
-    prog = t.compile progtext, $$.to_s
+    progtext = 'test_provider*:::test-probe { trace(copyinstr(arg0)); }'
+
+    prog = t.compile progtext
     prog.execute
     t.go
     
@@ -35,7 +38,7 @@ class TestDynUsdt < Test::Unit::TestCase
       i = i + 1
       assert d
       assert_not_nil d.probe
-      assert_equal "test_provider#{$$.to_s}:test_provider.bundle:test_probe:test-probe", d.probe.to_s
+      assert_equal "test_provider#{$$.to_s}:test_provider.#{Config::CONFIG['DLEXT']}:test_probe:test-probe", d.probe.to_s
       assert_equal 1, d.data.length
       assert_equal "test_argument", d.data[0].value
     end
