@@ -4,7 +4,9 @@
 #
 
 require 'dtrace/probe'
-require 'inline/dtrace_probes'
+require 'dtrace/provider/solaris'
+require 'dtrace/provider/osx'
+require 'pathname'
 
 DTRACE = '/usr/sbin/dtrace'
 
@@ -12,9 +14,13 @@ class Dtrace
   class Provider
 
     def self.create(name)
-      provider = Dtrace::Provider.new(name)
+      if RUBY_PLATFORM =~ /darwin/
+        provider = Dtrace::Provider::OSX.new(name)
+      else
+        provider = Dtrace::Provider::Solaris.new(name)
+      end
       yield provider
-      provider.build
+      provider.enable
     end
     
     # Pinched from ActiveSupport's Inflector
@@ -33,8 +39,28 @@ class Dtrace
       @probes[name] = types.map {|t| typemap[t]}
     end
 
-    def build
-      # compose provider definition .d file
+    def enable
+      Tempfile.open("dtrace_probe_#{@name}") do |f|
+        p = Pathname.new(f.path)
+        @tempdir = "#{p.dirname}/#{@name}" 
+        begin
+          Dir.mkdir @tempdir
+        rescue Errno::EEXIST
+          nil
+        end
+
+        definition
+        header
+        source
+        ruby_object
+        dtrace_object
+        link
+        load
+      end
+    end
+
+    # compose provider definition .d file
+    def definition
       stability = <<EOS
 #pragma D attributes Evolving/Evolving/Common provider #{@name} provider
 #pragma D attributes Private/Private/Common provider #{@name} module
@@ -42,66 +68,81 @@ class Dtrace
 #pragma D attributes Evolving/Evolving/Common provider #{@name} name
 #pragma D attributes Evolving/Evolving/Common provider #{@name} args
 EOS
-      
-      providerdesc = "provider #{@name} {\n"
-      @probes.each_pair do |name, types|
-        probename = name.to_s.gsub(/_/, '__')
-        typesdesc = types.join(', ')
-        probedesc = "  probe #{probename}(#{typesdesc});\n"
-        providerdesc << probedesc
+      File.open("#{@tempdir}/probes.d", 'w') do |io|
+        io << "provider #{@name} {\n"
+        @probes.each_pair do |name, types|
+          probename = name.to_s.gsub(/_/, '__')
+          typesdesc = types.join(', ')
+          probedesc = "  probe #{probename}(#{typesdesc});\n"
+          io << probedesc
+        end
+        io << "\n};\n\n#{stability}"
       end
-      providerdesc << "\n};\n\n#{stability}"
-      
-      # Generate the C source for the provider class
-      fns = []
+    end
 
+    def header
+      Kernel.system("#{DTRACE} -h -s #{@tempdir}/probes.d -o #{@tempdir}/probes.h")
+    end
+
+    # Generate the C source for the provider class
+    def source
       rb2c = { 'char *' => 'STR2CSTR', 'int' => 'FIX2INT' }
+      
+      File.open("#{@tempdir}/probes.c", 'w') do |io|
+        io.puts '#include "ruby.h"'
+        io.puts "#include \"#{@tempdir}/probes.h\""
 
-      @probes.each_pair do |name, types|
-        defn_args = []
-        call_args = []
-        types.each_with_index { |type, i| defn_args << "#{type} arg#{i}" }
-        types.each_with_index { |type, i| call_args << "#{rb2c[type]}(rb_ary_entry(args, #{i}))" }
-
-        cstr = <<EOC
-void #{name}(void) {
+        @probes.each_pair do |name, types|
+          defn_args = []
+          call_args = []
+          types.each_with_index { |type, i| defn_args << "#{type} arg#{i}" }
+          types.each_with_index { |type, i| call_args << "#{rb2c[type]}(rb_ary_entry(args, #{i}))" }
+          
+          io.puts <<EOC
+static VALUE #{name}(VALUE self) {
   if (#{@name.upcase}_#{name.to_s.upcase}_ENABLED()) {
     VALUE args = rb_yield(self);
     #{@name.upcase}_#{name.to_s.upcase}(#{call_args.join(', ')});
   }
+  return Qnil;
 }
 EOC
-        fns << cstr
-      end
-
-      # write out provider description, run dtrace -h
-      Tempfile.open('header') do |h|
-        Tempfile.open('provider') do |d|
-          d.puts providerdesc
-          d.flush
-          Kernel.system("#{DTRACE} -h -s #{d.path} -o #{h.path}")
         end
-        
-        # Create the provider class
-        c = Class.new
-        module_name = @name
-        c.module_eval do
-          inline('DtraceProbes') do |builder|
-            builder.set_module_name module_name
-            builder.include "\"#{h.path}\""
-            builder.c_raw <<EOC
+        io.puts <<EOC
 static VALUE fire(VALUE self, VALUE args) {
   return args;
 }
+
+void Init_#{@name}() {
+  fprintf(stderr, "in Init_#{@name}\\n");
+  VALUE c = rb_cObject;
+  rb_define_method(c, "fire", (VALUE(*)(ANYARGS))fire, -2);
 EOC
-            fns.each do |cstr|
-              builder.c cstr
-            end
-          end
+        
+        @probes.each_pair do |name, types|
+          io.puts "  rb_define_singleton_method(c, \"#{name}\", (VALUE(*)(ANYARGS))#{name}, 0);"
         end
-        eval "Dtrace::Probe::#{@class} = c"
+        
+        io.puts '}'
       end
-      
     end
+    
+    def load
+      lib = "#{@tempdir}/#{@name}"
+      c = Class.new
+      c.module_eval do 
+        require lib
+      end
+      eval "Dtrace::Probe::#{@class} = c"
+    end
+
+    def hdrdir
+      %w(srcdir archdir).map { |name|
+        dir = Config::CONFIG[name]
+      }.find { |dir|
+        dir and File.exist? File.join(dir, "/ruby.h")
+      } or abort "ERROR: Can't find header dir for ruby. Exiting..."
+    end
+
   end
 end
