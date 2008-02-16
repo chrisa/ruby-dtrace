@@ -11,20 +11,17 @@ class Dtrace
 
       # build the .o 
       def ruby_object
-        cmd = "#{Config::CONFIG['CC']} -I#{hdrdir} -o #{@tempdir}/#{@name}.o -c #{@tempdir}/probes.c"
-        Kernel.system cmd
+        run "#{Config::CONFIG['CC']} -I#{hdrdir} -o #{@tempdir}/#{@name}.o -c #{@tempdir}/probes.c"
       end
 
       # build the dtrace.o (dtrace -G)
       def dtrace_object
-        cmd = "/usr/sbin/dtrace -G -s #{@tempdir}/probes.d -o #{@tempdir}/probes.o #{@tempdir}/#{@name}.o"
-        Kernel.system cmd
+        run "/usr/sbin/dtrace -G -s #{@tempdir}/probes.d -o #{@tempdir}/probes.o #{@tempdir}/#{@name}.o"
       end
 
       # build the .so
       def link
-        cmd = "#{Config::CONFIG['CC']} -shared -o #{@tempdir}/#{@name}.so #{@tempdir}/#{@name}.o #{@tempdir}/probes.o"
-        Kernel.system cmd
+        run "#{Config::CONFIG['CC']} -shared -o #{@tempdir}/#{@name}.so #{@tempdir}/#{@name}.o #{@tempdir}/probes.o"
       end
 
     end

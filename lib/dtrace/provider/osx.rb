@@ -9,8 +9,7 @@ class Dtrace
       
       # build the .bundle
       def ruby_object
-        cmd = "#{Config::CONFIG['LDSHARED']} -I #{hdrdir} -o #{@tempdir}/#{@name}.bundle #{@tempdir}/probes.c"
-        Kernel.system cmd
+        run "#{Config::CONFIG['LDSHARED']} -I #{hdrdir} -o #{@tempdir}/#{@name}.bundle #{@tempdir}/probes.c"
       end
 
       def dtrace_object

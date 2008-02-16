@@ -7,11 +7,14 @@ require 'dtrace/probe'
 require 'dtrace/provider/solaris'
 require 'dtrace/provider/osx'
 require 'pathname'
+require 'tempfile'
 
 DTRACE = '/usr/sbin/dtrace'
 
 class Dtrace
   class Provider
+
+    class BuildError < StandardError; end
 
     def self.create(name)
       if RUBY_PLATFORM =~ /darwin/
@@ -28,6 +31,13 @@ class Dtrace
       lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
     end
     
+    def run(cmd)
+      result = `#{cmd}`
+      if $? != 0
+        raise BuildError.new("Error running:\n#{cmd}\n\n#{result}")
+      end
+    end
+
     def initialize(name)
       @name   = name.to_s
       @class  = camelize(name)
@@ -81,7 +91,7 @@ EOS
     end
 
     def header
-      Kernel.system("#{DTRACE} -h -s #{@tempdir}/probes.d -o #{@tempdir}/probes.h")
+      run "#{DTRACE} -h -s #{@tempdir}/probes.d -o #{@tempdir}/probes.h"
     end
 
     # Generate the C source for the provider class
@@ -114,7 +124,6 @@ static VALUE fire(VALUE self, VALUE args) {
 }
 
 void Init_#{@name}() {
-  fprintf(stderr, "in Init_#{@name}\\n");
   VALUE c = rb_cObject;
   rb_define_method(c, "fire", (VALUE(*)(ANYARGS))fire, -2);
 EOC
