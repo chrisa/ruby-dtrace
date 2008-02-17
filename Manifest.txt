@@ -19,6 +19,11 @@ ext/dtrace_recdesc.c
 ext/dtrace_util.c
 ext/extconf.rb
 lib/dtrace.rb
+lib/dtrace/probe.rb
+lib/dtrace/provider.rb
+lib/dtrace/provider/osx.rb
+lib/dtrace/provider/solaris.rb
+lib/dtrace/tracer.rb
 lib/dtraceaggregate.rb
 lib/dtraceaggregateset.rb
 lib/dtraceconsumer.rb
