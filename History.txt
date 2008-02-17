@@ -1,3 +1,8 @@
+== 0.0.6 / 2008-02-17
+
+ * Add Dtrace::Provider, which allows creation of USDT providers from
+   Ruby, without the need to patch the interpreter.
+
 == 0.0.5 / 2008-01-24
 
  * Add DtraceErrData and DtraceDropData for access to error 
