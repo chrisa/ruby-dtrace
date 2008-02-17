@@ -55,3 +55,4 @@ test/test_dtrace_profile.rb
 test/test_dtrace_repeat.rb
 test/test_dtrace_rubyprobe.rb
 test/test_dtrace_typefilter.rb
+test/test_dynusdt.rb
