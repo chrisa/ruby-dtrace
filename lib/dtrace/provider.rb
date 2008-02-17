@@ -12,10 +12,63 @@ require 'tempfile'
 DTRACE = '/usr/sbin/dtrace'
 
 class Dtrace
+
+  # A DTrace provider. Allows creation of USDT probes on a running
+  # Ruby program, by dynamically creating an extension module
+  # implementing the probes, and compiling and loading it.
+  #
+  # This requires the DTrace and Ruby toolchains to be available:
+  # dtrace(1M), and the compiler and linker used to build Ruby. The
+  # process is similar to RubyInline, but the actual RubyInline
+  # library is not required (the build process for DTrace USDT probes
+  # is sufficiently differnent to a standard Ruby extension that it's
+  # not worth using it).
+  #
+  # Both Solaris and OSX 10.5 are supported. Other DTrace-supporting
+  # platforms can be added by creating a new class under
+  # Dtrace::Provider and implementing or overriding the required steps
+  # in the build process.
+  #
+  # Firing probes is explained in Dtrace::Probe.
+  #
+  # There are some limitations:
+  #
+  # You cannot choose all the components of the probe name: you can
+  # choose the provider and probe name, but the module and function
+  # components will be derived by DTrace, and won't be meaningful
+  # (they'll refer to the shim extension that gets created, not to
+  # anything in your Ruby program). It seems unlikely it's possible to
+  # change this. 
+  #
+  # You cannot currently set D attributes: they're hardcoded to a
+  # default set. This will change. 
+  #
+  # The extension will currently be rebuilt every time the provider is
+  # created, as there's not yet any support for packaging the provider
+  # in some way. This will change, to something along the lines of
+  # what RubyInline does to allow a pre-built extension to be used.
+  #
   class Provider
 
     class BuildError < StandardError; end
 
+    # Creates a DTrace provider. Causes a shim extension to be built
+    # and loaded, implementing the probes. 
+    #
+    # Example:
+    # 
+    #   Dtrace::Provider.create :action_controller do |p|
+    #     p.probe :process_start,  :string
+    #     p.probe :process_finish, :string, :integer
+    #   end
+    #
+    # The symbol passed to create becomes the name of the provider,
+    # and the class exposed under Dtrace::Probe in Ruby (camelized, so
+    # the above statement creates Dtrace::Probe::ActionController).
+    # 
+    # create yields a Provider for the current platform, on which you
+    # can call probe, to create the individual probes. 
+    # 
     def self.create(name)
       if RUBY_PLATFORM =~ /darwin/
         provider = Dtrace::Provider::OSX.new(name)
@@ -25,28 +78,31 @@ class Dtrace
       yield provider
       provider.enable
     end
-    
-    # Pinched from ActiveSupport's Inflector
-    def camelize(lower_case_and_underscored_word)
-      lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
-    end
-    
-    def run(cmd)
-      result = `#{cmd}`
-      if $? != 0
-        raise BuildError.new("Error running:\n#{cmd}\n\n#{result}")
-      end
+
+    # Creates a DTrace USDT probe. Arguments are the probe name, and
+    # then the argument types it will accept. The following argument
+    # types are supported:
+    #
+    # :string  (char *)
+    # :integer (int)
+    #
+    # The probe will be named based on the provider name and the
+    # probe's name:
+    #
+    #   provider_name:provider_name.so:probe_name:probe-name
+    #
+    # See the limitations explained elsewhere for an explanation of
+    # this redundancy in probe names.
+    #
+    def probe(name, *types) 
+      typemap = { :string => 'char *', :integer => 'int' } 
+      @probes[name] = types.map {|t| typemap[t]} 
     end
 
     def initialize(name)
       @name   = name.to_s
       @class  = camelize(name)
       @probes = {}
-    end
-
-    def probe(name, *types)
-      typemap = { :string => 'char *', :integer => 'int' }
-      @probes[name] = types.map {|t| typemap[t]}
     end
 
     def enable
@@ -59,6 +115,7 @@ class Dtrace
           nil
         end
 
+        # Probe setup is split up for easy overriding
         definition
         header
         source
@@ -67,6 +124,30 @@ class Dtrace
         link
         load
       end
+    end
+
+    protected
+
+    def run(cmd)
+      result = `#{cmd}`
+      if $? != 0
+        raise BuildError.new("Error running:\n#{cmd}\n\n#{result}")
+      end
+    end
+
+    def hdrdir
+      %w(srcdir archdir).map { |name|
+        dir = Config::CONFIG[name]
+      }.find { |dir|
+        dir and File.exist? File.join(dir, "/ruby.h")
+      } or abort "ERROR: Can't find header dir for ruby. Exiting..."
+    end
+
+    private
+
+    def camelize(lower_case_and_underscored_word)
+      # Pinched from ActiveSupport's Inflector
+      lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
     end
 
     # compose provider definition .d file
@@ -137,6 +218,10 @@ EOC
     end
     
     def load
+      # Load the generated extension with a full path (saves adjusting
+      # $:) Done in the context of an anonymous class, since the
+      # module does not itself define a class.  TODO: find a way of
+      # doing this without string eval...
       lib = "#{@tempdir}/#{@name}"
       c = Class.new
       c.module_eval do 
@@ -144,14 +229,6 @@ EOC
       end
       eval "Dtrace::Probe::#{@class} = c"
     end
-
-    def hdrdir
-      %w(srcdir archdir).map { |name|
-        dir = Config::CONFIG[name]
-      }.find { |dir|
-        dir and File.exist? File.join(dir, "/ruby.h")
-      } or abort "ERROR: Can't find header dir for ruby. Exiting..."
-    end
-
+    
   end
 end
