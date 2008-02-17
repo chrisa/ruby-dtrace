@@ -15,7 +15,9 @@ class Dtrace
 
   # A DTrace provider. Allows creation of USDT probes on a running
   # Ruby program, by dynamically creating an extension module
-  # implementing the probes, and compiling and loading it.
+  # implementing the probes, and compiling and loading it. You can use
+  # this with a Ruby interpreter compiled with the core DTrace probes,
+  # but you don't have to.
   #
   # This requires the DTrace and Ruby toolchains to be available:
   # dtrace(1M), and the compiler and linker used to build Ruby. The
