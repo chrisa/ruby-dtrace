@@ -320,11 +320,12 @@ dof_parse(VALUE self, VALUE rdof)
   dof_data = rb_ary_new();
   
   /* Walk section headers, parsing sections */
-  for (i = 1; i <= dof_hdr.dofh_secnum; i++) {
+  for (i = 0; i < dof_hdr.dofh_secnum; i++) {
     memcpy(&dof_sec, pos, sizeof(dof_sec));
 
     sec_data = rb_hash_new();
-    rb_hash_aset(sec_data, ID2SYM(rb_intern("type")), rb_str_new2(_dof_sec_type(dof_sec.dofs_type)));
+    rb_hash_aset(sec_data, ID2SYM(rb_intern("index")), INT2FIX(i));
+    rb_hash_aset(sec_data, ID2SYM(rb_intern("type")),  rb_str_new2(_dof_sec_type(dof_sec.dofs_type)));
 
     sec = Qnil;
     switch(dof_sec.dofs_type) {
@@ -340,6 +341,7 @@ dof_parse(VALUE self, VALUE rdof)
     case DOF_SECT_PRARGS:
       sec = _dof_parse_uint8_t_array(self, dof, &dof_sec);
       break;
+    case DOF_SECT_PRENOFFS:
     case DOF_SECT_PROFFS:
       sec = _dof_parse_uint32_t_array(self, dof, &dof_sec);
       break;

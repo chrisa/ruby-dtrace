@@ -19,4 +19,11 @@ class TestDofParser < Test::Unit::TestCase
     d = Dtrace::Dof::Parser.parse(dof)
     pp d
   end
+
+  def test_parse2
+    assert File.exists?("#{$dof_dir}/dof2")
+    dof = IO.read("#{$dof_dir}/dof2")
+    d = Dtrace::Dof::Parser.parse(dof)
+    pp d
+  end
 end
