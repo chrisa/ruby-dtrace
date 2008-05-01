@@ -9,6 +9,8 @@ require 'dtrace/provider/osx'
 require 'pathname'
 require 'tempfile'
 
+require 'provider/loader'
+
 DTRACE = '/usr/sbin/dtrace'
 
 class Dtrace
@@ -79,6 +81,10 @@ class Dtrace
       end
       yield provider
       provider.enable
+    end
+
+    def self.unload(name)
+      DtraceProviderLoader.unload(name.to_s)
     end
 
     # Creates a DTrace USDT probe. Arguments are the probe name, and
@@ -207,7 +213,11 @@ static VALUE fire(VALUE self, VALUE args) {
 }
 
 void Init_#{@name}() {
-  VALUE c = rb_cObject;
+  VALUE c;
+  VALUE dtrace = rb_const_get(rb_cObject, rb_intern("Dtrace"));
+  VALUE probe  = rb_const_get(dtrace, rb_intern("Probe"));
+
+  c = rb_define_class_under(probe, "#{@class}", rb_cObject);
   rb_define_method(c, "fire", (VALUE(*)(ANYARGS))fire, -2);
 EOC
         
@@ -220,16 +230,7 @@ EOC
     end
     
     def load
-      # Load the generated extension with a full path (saves adjusting
-      # $:) Done in the context of an anonymous class, since the
-      # module does not itself define a class.  TODO: find a way of
-      # doing this without string eval...
-      lib = "#{@tempdir}/#{@name}"
-      c = Class.new
-      c.module_eval do 
-        require lib
-      end
-      eval "Dtrace::Probe::#{@class} = c"
+      DtraceProviderLoader.load(@name, "#{@tempdir}/#{@name}.#{Config::CONFIG['DLEXT']}")
     end
     
   end

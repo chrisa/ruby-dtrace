@@ -131,5 +131,53 @@ EOD
     assert_equal 1, i
   end
 
+  def test_many_providers
+    n = 50
+    (1..n).each do |i|
+      Dtrace::Provider.create "test_provider_create_many_providers_#{i}_nth" do |p|
+        p.probe :test_probe, :string
+      end
+    end
+
+    t = Dtrace.new
+    i = 0
+    t.each_probe do |probe|
+      if probe.provider =~ /^test_provider_create_many_providers/
+        i = i + 1
+      end
+    end
+
+    assert_equal n, i
+  end
+  
+  def test_unload
+    Dtrace::Provider.create :unload_me do |p|
+      p.probe :test_probe, :string
+    end
+
+    Dtrace::Probe::UnloadMe.test_probe do |p|
+      p.fire("Testval")
+    end
+
+    t = Dtrace.new
+    i = 0
+    t.each_probe do |probe|
+      if probe.provider =~ /^unload_me/
+        i = i + 1
+      end
+    end
+    assert_equal 1, i
+
+    dlerror = Dtrace::Provider.unload :unload_me
+    puts dlerror
+
+    i = 0
+    t.each_probe do |probe|
+      if probe.provider =~ /^unload_me/
+        i = i + 1
+      end
+    end
+    assert_equal 0, i
+  end
 end
     

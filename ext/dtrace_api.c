@@ -36,6 +36,7 @@ void Init_dtrace_api() {
   rb_define_method(cDtrace, "err_consumer",    dtrace_hdl_err_consumer,    1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "createprocess",   dtrace_hdl_createprocess,   1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "grabprocess",     dtrace_hdl_grabprocess,     1); // in dtrace_hdl.c
+  rb_define_singleton_method(cDtrace, "loaddof", dtracehelper_loaddof,     1); // in dtrace_helper.c
   rb_define_alloc_func(cDtrace, dtrace_hdl_alloc);
 
   cDtraceProcess = rb_define_class("DtraceProcess", rb_cObject);

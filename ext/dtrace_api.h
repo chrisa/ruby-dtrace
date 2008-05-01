@@ -126,3 +126,5 @@ VALUE dtraceerrdata_offset(VALUE self);
 VALUE dtraceerrdata_fault(VALUE self);
 VALUE dtraceerrdata_addr(VALUE self);
 VALUE dtraceerrdata_msg(VALUE self);
+
+VALUE dtracehelper_loaddof(VALUE self, VALUE dof);
