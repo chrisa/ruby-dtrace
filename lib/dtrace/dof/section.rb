@@ -5,8 +5,9 @@
 
 class Dtrace::Dof::Section
   include Dtrace::Dof::Constants
-  attr_writer :data, :offset, :size
+  attr_writer :offset, :size, :entsize
   attr_reader :flags
+  attr_accessor :data
   
   def initialize(type, index)
     @section_type  = type

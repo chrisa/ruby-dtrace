@@ -19,23 +19,11 @@ VALUE dof_generate_section_header(VALUE self) {
   uint32_t entsize;
 
   memset(&hdr, 0, sizeof(hdr));
-  hdr.dofs_flags = DOF_SECF_LOAD;
-
-  type = FIX2INT(rb_iv_get(self, "@section_type"));
-  hdr.dofs_type = type;
-
-  offset = FIX2INT(rb_iv_get(self, "@offset"));
-  hdr.dofs_offset = offset;
-
-  size = FIX2INT(rb_iv_get(self, "@size"));
-  hdr.dofs_size = size;
-
-  data = rb_iv_get(self, "@data");
-  if (TYPE(data) == T_ARRAY) {
-    /* XXX entsize is size of each element of the array in bytes */
-    entsize = rb_funcall(data, rb_intern("length"), 0);
-    hdr.dofs_entsize = entsize;
-  }
+  hdr.dofs_flags   = FIX2INT(rb_iv_get(self, "@flags"));
+  hdr.dofs_type    = FIX2INT(rb_iv_get(self, "@section_type"));
+  hdr.dofs_offset  = FIX2INT(rb_iv_get(self, "@offset"));
+  hdr.dofs_size    = FIX2INT(rb_iv_get(self, "@size"));
+  hdr.dofs_entsize = FIX2INT(rb_iv_get(self, "@entsize"));
 
   hdr_data = rb_str_new((const char *)&hdr, sizeof(hdr));
   return hdr_data;
@@ -60,6 +48,7 @@ VALUE dof_generate_probes(VALUE self) {
   VALUE dof;
   VALUE probes = rb_iv_get(self, "@data");
   VALUE probe;
+  int i;
   
   if (NIL_P(probes) ) {
     rb_raise(eDtraceDofException, "no probes in dof_generate_probes");
@@ -69,9 +58,8 @@ VALUE dof_generate_probes(VALUE self) {
  
   dof = rb_str_new2("");
 
-  while (probe = rb_ary_shift(probes)) {
-    if (NIL_P(probe))
-      break;
+  for (i = 0; i < rb_ary_len(probes); i++) {
+    probe = rb_ary_entry(probes, i);
 
     Check_Type(probe, T_HASH);
 
@@ -103,6 +91,7 @@ VALUE dof_generate_strtab(VALUE self) {
   VALUE dof;
   VALUE strings = rb_iv_get(self, "@data");
   VALUE string;
+  int i;
   
   if (NIL_P(strings) ) {
     rb_raise(eDtraceDofException, "no strings in dof_generate_strtab");
@@ -113,9 +102,9 @@ VALUE dof_generate_strtab(VALUE self) {
   dof = rb_str_new("", 0);
   rb_str_concat(dof, rb_str_new("\0", 1));
  
-  while (string = rb_ary_shift(strings)) {
-    if (NIL_P(string))
-      break;
+  for (i = 0; i < rb_ary_len(strings); i++) {
+    string = rb_ary_entry(strings, i);
+
     Check_Type(string, T_STRING);
 
     rb_str_concat(dof, rb_str_new(RSTRING(string)->ptr, RSTRING(string)->len + 1));
@@ -142,6 +131,7 @@ VALUE dof_generate_prargs(VALUE self) {
   VALUE args = rb_iv_get(self, "@data");
   VALUE rarg;
   uint8_t arg;
+  int i;
   
   if (NIL_P(args) ) {
     rb_raise(eDtraceDofException, "no args in dof_generate_prargs");
@@ -151,9 +141,8 @@ VALUE dof_generate_prargs(VALUE self) {
  
   dof = rb_str_new("", 0);
  
-  while (rarg = rb_ary_shift(args)) {
-    if (NIL_P(rarg))
-      break;
+  for (i = 0; i < rb_ary_len(args); i++) {
+    rarg = rb_ary_entry(args, i);
     Check_Type(rarg, T_FIXNUM);
     if (FIX2INT(rarg) >= 0 && FIX2INT(rarg) < 256) {
       arg = FIX2INT(rarg);
@@ -169,6 +158,7 @@ VALUE dof_generate_proffs(VALUE self) {
   VALUE args = rb_iv_get(self, "@data");
   VALUE rarg;
   uint32_t arg;
+  int i;
   
   if (NIL_P(args) ) {
     rb_raise(eDtraceDofException, "no args in dof_generate_proffs");
@@ -178,9 +168,8 @@ VALUE dof_generate_proffs(VALUE self) {
  
   dof = rb_str_new("", 0);
  
-  while (rarg = rb_ary_shift(args)) {
-    if (NIL_P(rarg))
-      break;
+  for (i = 0; i < rb_ary_len(args); i++) {
+    rarg = rb_ary_entry(args, i);
     Check_Type(rarg, T_FIXNUM);
     arg = FIX2INT(rarg);
     rb_str_concat(dof, rb_str_new((char *)&arg, 4));

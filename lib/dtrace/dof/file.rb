@@ -29,6 +29,20 @@ class Dtrace::Dof::File
 
       filesz += dof.length
 
+      # for dofs_entsize:
+      pp s
+      begin
+        if s.data.class == Array
+          len = s.data.length
+          puts "got array len #{len}"          
+          entsize = dof.length / s.data.length
+          puts "entsize: #{entsize}"
+          s.entsize = entsize
+        end
+      rescue ZeroDivisionError
+        s.entsize = 0
+      end
+
       dof
     end
     
