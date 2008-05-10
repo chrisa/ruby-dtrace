@@ -1,5 +1,5 @@
 /* Ruby-Dtrace
- * (c) 2008 Chris Andrews <chris@nodnol.org>
+ * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
@@ -17,20 +17,6 @@ static const char *helper = "/dev/dtracehelper";
 static const char *helper = "/dev/dtrace/helper";
 #endif
 
-static void
-rubydump(void *data, int len)
-{
-  VALUE str;
-  VALUE dumped;
-  char *out;
-
-  str = rb_str_new(data, len);
-  dumped = rb_funcall(str, rb_intern("inspect"), 0);
-  out = STR2CSTR(dumped);
-
-  fprintf(stderr, "%s\n", out);
-}
-
 VALUE dtracehelper_loaddof(VALUE self, VALUE rdof)
 {
   dof_hdr_t *dof = NULL;
@@ -47,16 +33,11 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof)
     rb_raise(eDtraceException, "DOF corrupt: bad magic");
     return Qnil;
   }
-  
-  fprintf(stderr, "dof ptr: %p\n", dof);
-  fprintf(stderr, "dh ptr: %p\n", &dh);
 
-  dh.dofhp_dof = (uintptr_t)dof;
-  dh.dofhp_addr = 0;
+  dh.dofhp_dof  = (uintptr_t)dof;
+  dh.dofhp_addr = (uintptr_t)dof;
   
   (void) snprintf(dh.dofhp_mod, sizeof (dh.dofhp_mod), "testmodule");
-
-  rubydump(&dh, sizeof(dof_helper_t));
 
   if ((fd = open(helper, O_RDWR)) < 0) {
     rb_raise(eDtraceException, "failed to open helper device %s: %s", 
@@ -64,7 +45,7 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof)
     return Qnil;
   }
   else {
-    if ((gen = ioctl(fd, DTRACEHIOC_ADDDOF, &dh)) == -1)
+    if ((gen = ioctl(fd, DTRACEHIOC_ADDDOF, &dh)) < 0)
       rb_raise(eDtraceException, "DTrace ioctl failed: %s", strerror(errno));
     
     (void) close(fd);
