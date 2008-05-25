@@ -24,6 +24,7 @@ VALUE dof_generate_section_header(VALUE self) {
   hdr.dofs_offset  = FIX2INT(rb_iv_get(self, "@offset"));
   hdr.dofs_size    = FIX2INT(rb_iv_get(self, "@size"));
   hdr.dofs_entsize = FIX2INT(rb_iv_get(self, "@entsize"));
+  hdr.dofs_align   = FIX2INT(rb_iv_get(self, "@align"));
 
   hdr_data = rb_str_new((const char *)&hdr, sizeof(hdr));
   return hdr_data;
@@ -180,15 +181,15 @@ VALUE dof_generate_proffs(VALUE self) {
 
 dof_attr_t _dof_generate_dof_attr_t(VALUE data) {
   dof_attr_t attr = 0;
-  short n = 0;
-  short d = 0;
-  short c = 0;
+  uint8_t n = 0;
+  uint8_t d = 0;
+  uint8_t c = 0;
 
   Check_Type(data, T_HASH);
 
-  n = rb_hash_aref(data, ID2SYM(rb_intern("name")));
-  d = rb_hash_aref(data, ID2SYM(rb_intern("data")));
-  c = rb_hash_aref(data, ID2SYM(rb_intern("class")));
+  n = FIX2INT(rb_hash_aref(data, ID2SYM(rb_intern("name"))));
+  d = FIX2INT(rb_hash_aref(data, ID2SYM(rb_intern("data"))));
+  c = FIX2INT(rb_hash_aref(data, ID2SYM(rb_intern("class"))));
 
   attr = DOF_ATTR(n, d, c);
   return attr;
@@ -204,20 +205,6 @@ VALUE dof_generate_provider(VALUE self) {
     return Qnil;
   }
   Check_Type(provider, T_HASH);
-
-/*     727 typedef struct dof_provider { */
-/*     728 	dof_secidx_t dofpv_strtab;	/\* link to DOF_SECT_STRTAB section *\/ */
-/*     729 	dof_secidx_t dofpv_probes;	/\* link to DOF_SECT_PROBES section *\/ */
-/*     730 	dof_secidx_t dofpv_prargs;	/\* link to DOF_SECT_PRARGS section *\/ */
-/*     731 	dof_secidx_t dofpv_proffs;	/\* link to DOF_SECT_PROFFS section *\/ */
-/*     732 	dof_stridx_t dofpv_name;	/\* provider name string *\/ */
-/*     733 	dof_attr_t dofpv_provattr;	/\* provider attributes *\/ */
-/*     734 	dof_attr_t dofpv_modattr;	/\* module attributes *\/ */
-/*     735 	dof_attr_t dofpv_funcattr;	/\* function attributes *\/ */
-/*     736 	dof_attr_t dofpv_nameattr;	/\* name attributes *\/ */
-/*     737 	dof_attr_t dofpv_argsattr;	/\* args attributes *\/ */
-/*     738 	dof_secidx_t dofpv_prenoffs;	/\* link to DOF_SECT_PRENOFFS section *\/ */
-/*     739 } dof_provider_t; */
     
   p.dofpv_strtab   = (dof_secidx_t)FIX2INT(rb_hash_aref(provider, ID2SYM(rb_intern("strtab"))));
   p.dofpv_probes   = (dof_secidx_t)FIX2INT(rb_hash_aref(provider, ID2SYM(rb_intern("probes"))));
@@ -234,3 +221,57 @@ VALUE dof_generate_provider(VALUE self) {
   dof = rb_str_new((const char *)&p, sizeof(p));
   return dof;
 }
+
+VALUE dof_generate_reltab(VALUE self) {
+  VALUE dof;
+  VALUE relos = rb_iv_get(self, "@data");
+  VALUE relo;
+  int i;
+  
+  if (NIL_P(relos) ) {
+    rb_raise(eDtraceDofException, "no relos in dof_generate_reltab");
+    return Qnil;
+  }
+  Check_Type(relos, T_ARRAY);
+ 
+  dof = rb_str_new2("");
+
+  for (i = 0; i < rb_ary_len(relos); i++) {
+    relo = rb_ary_entry(relos, i);
+
+    Check_Type(relo, T_HASH);
+
+    dof_relodesc_t r;
+    memset(&r, 0, sizeof(r));
+    
+    r.dofr_name   = (dof_stridx_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("name"))));
+    r.dofr_type   =     (uint32_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("type"))));
+    r.dofr_offset =     (uint64_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("offset"))));
+    r.dofr_data   =     (uint64_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("data"))));
+    
+    VALUE r_dof = rb_str_new((const char *)&r, sizeof(r));
+    rb_str_concat(dof, r_dof);
+  }
+
+  return dof;
+}
+
+VALUE dof_generate_relhdr(VALUE self) {
+  VALUE dof;
+  VALUE relhdr = rb_iv_get(self, "@data");
+  dof_relohdr_t r;
+  
+  if (NIL_P(relhdr) ) {
+    rb_raise(eDtraceDofException, "no data in dof_generate_relhdr");
+    return Qnil;
+  }
+  Check_Type(relhdr, T_HASH);
+  
+  r.dofr_strtab = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("strtab"))));
+  r.dofr_relsec = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("relsec"))));
+  r.dofr_tgtsec = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("tgtsec"))));  
+    
+  dof = rb_str_new((const char *)&r, sizeof(r));
+  return dof;
+}
+

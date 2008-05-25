@@ -26,7 +26,7 @@ VALUE dof_generate_header(VALUE self) {
 
   hdr.dofh_ident[DOF_ID_MODEL]    = DOF_MODEL_NATIVE;
   hdr.dofh_ident[DOF_ID_ENCODING] = DOF_ENCODE_NATIVE;
-  hdr.dofh_ident[DOF_ID_VERSION]  = DOF_VERSION;
+  hdr.dofh_ident[DOF_ID_VERSION]  = DOF_VERSION_1;
   hdr.dofh_ident[DOF_ID_DIFVERS]  = DIF_VERSION;
   hdr.dofh_ident[DOF_ID_DIFIREG]  = DIF_DIR_NREGS;
   hdr.dofh_ident[DOF_ID_DIFTREG]  = DIF_DTR_NREGS;
@@ -49,4 +49,14 @@ VALUE dof_generate_header(VALUE self) {
 
   hdr_data = rb_str_new((const char *)&hdr, sizeof(hdr));
   return hdr_data;
+}
+
+VALUE dof_header_len(VALUE self) {
+  uint64_t hdrlen;
+  uint32_t secnum;
+
+  secnum = FIX2INT(rb_iv_get(self, "@secnum"));
+  hdrlen = (sizeof(dof_hdr_t) + secnum * sizeof(dof_sec_t));
+  
+  return INT2FIX(hdrlen);
 }

@@ -15,6 +15,7 @@ VALUE cDtraceBufData;
 VALUE cDtraceProcess;
 VALUE cDtraceDropData;
 VALUE cDtraceErrData;
+VALUE cDtraceStub;
 
 VALUE eDtraceException;
 
@@ -105,6 +106,11 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceErrData, "addr",        dtraceerrdata_addr,    0); // in dtrace_errdata.c 
   rb_define_method(cDtraceErrData, "msg",         dtraceerrdata_msg,     0); // in dtrace_errdata.c 
 
+  cDtraceStub = rb_define_class("DtraceStub", rb_cObject);
+  rb_define_method(cDtraceStub, "call", dtracestub_call, 0); // in dtrace_stub.c
+  rb_define_method(cDtraceStub, "addr", dtracestub_addr, 0); // in dtrace_stub.c
+  rb_define_alloc_func(cDtraceStub, dtracestub_alloc);
+  
   eDtraceException = rb_define_class("DtraceException", rb_eStandardError);
 }
 

@@ -38,6 +38,13 @@ typedef struct dtrace_handle {
   VALUE drop;
 } dtrace_handle_t;
 
+/* Struct wrapping a "stub", a handcrafted function created to be a
+   probe trigger point. */
+typedef struct dtrace_stub {
+  void *mem;
+  int (*func)();
+} dtrace_stub_t;
+
 /* Handle missing RARRAY_LEN etc */
 #ifdef RARRAY_LEN
 static inline long   rb_str_len(VALUE s) {return RSTRING_LEN(s);}
@@ -126,5 +133,9 @@ VALUE dtraceerrdata_offset(VALUE self);
 VALUE dtraceerrdata_fault(VALUE self);
 VALUE dtraceerrdata_addr(VALUE self);
 VALUE dtraceerrdata_msg(VALUE self);
+
+VALUE dtracestub_alloc(VALUE klass);
+VALUE dtracestub_call(VALUE self);
+VALUE dtracestub_addr(VALUE self);
 
 VALUE dtracehelper_loaddof(VALUE self, VALUE dof);

@@ -24,7 +24,8 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof)
   int fd;
   int gen;
 
-  dof = (dof_hdr_t *)RSTRING(rdof)->ptr;
+  dof = (dof_hdr_t *)ALLOC_N(char, RSTRING(rdof)->len);
+  memcpy(dof, RSTRING(rdof)->ptr, RSTRING(rdof)->len);
 
   if (dof->dofh_ident[DOF_ID_MAG0] != DOF_MAG_MAG0 ||
       dof->dofh_ident[DOF_ID_MAG1] != DOF_MAG_MAG1 ||

@@ -11,55 +11,45 @@ class Dtrace::Dof::File
   end
 
   def generate
-    filesz = 0
-    loadsz = 0
-    sec_offsets = []
-    sec_sizes = []
+    hdr = Dtrace::Dof::Header.new
+    hdr.secnum = @sections.length
+    filesz = hdr.hdrlen
+    loadsz = filesz
 
-    @section_data = @sections.map do |s|
-      sec_offsets << filesz
+    @sections.each do |s|
+      length = s.generate
+      s.offset = filesz
 
-      dof = s.generate
-      sec_sizes << dof.length
-      
-      # Include in loadable part of file?
-      if s.flags & 1 # DOF_SECF_LOAD
-        loadsz += dof.length
-      end
-
-      filesz += dof.length
-
-      # for dofs_entsize:
-      begin
-        if s.data.class == Array
-          len = s.data.length
-          entsize = dof.length / s.data.length
-          s.entsize = entsize
+      pad = 0
+      if s.align > 1
+        i = s.offset.to_f % s.align
+        if i > 0
+          pad = (s.align - i).to_i
+          s.offset = pad + s.offset
+          s.pad = "\000" * pad
         end
-      rescue ZeroDivisionError
-        s.entsize = 0
       end
 
-      dof
+      s.size = length + pad
+
+      loadsz += s.size if (s.flags & 1) == 1 # DOF_SECF_LOAD
+      filesz += s.size
+
     end
     
-    hdr = Dtrace::Dof::Header.new
     hdr.loadsz = loadsz
     hdr.filesz = filesz
-    hdr.secnum = @sections.length
 
     dof = String.new
     dof << hdr.generate
     
     @sections.each do |s|
-      s.offset = sec_offsets.shift + hdr.hdrlen
-      s.size = sec_sizes.shift
-      sec_hdr = s.generate_header
-      dof << sec_hdr
+      dof << s.generate_header
     end
       
-    @section_data.each do |d|
-      dof << d
+    @sections.each do |s|
+      dof << s.pad if s.pad
+      dof << s.dof
     end
 
     dof

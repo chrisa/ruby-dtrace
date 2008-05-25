@@ -17,11 +17,7 @@ class TestDofHelper < Test::Unit::TestCase
     dof = File.read("#{$dof_dir}/dof")
     Dtrace.loaddof(dof)
 
-    d = Dtrace::Dof::Parser.parse(dof)
-    pp d
-
     t = Dtrace.new
-
     matches = 0
     t.each_probe do |p|
       if p.to_s == "test#{$$}:testmodule:main:test"
@@ -70,27 +66,60 @@ class TestDofHelper < Test::Unit::TestCase
       :prargs => 2,
       :proffs => 3,
       :name => 25,
-      :provattr => { :name => 1, :data => 1, :class => 1 },
-      :modattr  => { :name => 1, :data => 1, :class => 1 },
-      :funcattr => { :name => 1, :data => 1, :class => 1 },
-      :nameattr => { :name => 1, :data => 1, :class => 1 },
-      :argsattr => { :name => 1, :data => 1, :class => 1 }
+      :provattr => { :name => 5, :data => 5, :class => 5 },
+      :modattr  => { :name => 1, :data => 1, :class => 5 },
+      :funcattr => { :name => 1, :data => 1, :class => 5 },
+      :nameattr => { :name => 5, :data => 5, :class => 5 },
+      :argsattr => { :name => 5, :data => 5, :class => 5 }
     }
     f.sections << s
 
-    s = Dtrace::Dof::Section.new(DOF_SECT_UTSNAME, 5)
+    s = Dtrace::Dof::Section.new(DOF_SECT_RELTAB, 5)
+    s.data = [
+              { :name   => 20, # main
+                :type   => 1,  # setx?
+                :offset => 0,
+                :data   => 0,
+              }
+             ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_URELHDR, 6)
+    s.data = {
+      :strtab => 0,
+      :relsec => 5,
+      :tgtsec => 1,
+    }
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_COMMENTS, 7)
+    s.flags = 0 # no load
+    s.data = "Sun D 1.5"
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_UTSNAME, 8)
+    s.flags = 0 # no load
     f.sections << s
 
     dof = f.generate
     assert dof
 
-    d = Dtrace::Dof::Parser.parse(dof)
-    pp d
+    #File.open('testdof', 'w') do |io|
+	#io.puts dof
+    #end
+
+    #d = Dtrace::Dof::Parser.parse(dof)
 
     Dtrace.loaddof(dof)
+
+    t = Dtrace.new
+    matches = 0
     t.each_probe do |p|
-      puts p
+      if p.to_s == "test#{$$}:testmodule:main:test"
+        matches += 1
+      end
     end
+    assert_equal 1, matches
 
   end
 
