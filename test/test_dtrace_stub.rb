@@ -20,31 +20,29 @@ class TestDofHelper < Test::Unit::TestCase
     s.call
   end
 
-  def test_fire_probe
+  def test_fire_probe_no_args
     stub = DtraceStub.new
     addr = stub.addr
 
     f = Dtrace::Dof::File.new
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['test', 'char *', 'char *', 'main', 'test', 'test2']
+    s.data = ['test', 'main', 'test']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
     s.data = [
               {
-                :nargv    => 6,
                 :noffs    => 1,
-                :xargv    => 13,
                 :enoffidx => 0,
                 :argidx   => 0,
                 :name     => 1,
                 :nenoffs  => 0,
                 :offidx   => 0,
                 :addr     => addr,
-                :nargc    => 1,
-                :func     => 20,
-                :xargc    => 1
+                :nargc    => 0,
+                :func     => 6,
+                :xargc    => 0
               },
              ]
     f.sections << s
@@ -63,7 +61,7 @@ class TestDofHelper < Test::Unit::TestCase
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
-      :name   => 25,
+      :name   => 11,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
       :funcattr => { :name => 1, :data => 1, :class => 5 },
@@ -98,5 +96,6 @@ EOD
     end
 
     assert_equal 1, data.length
+    assert_equal 'fired!', data[0].data[0].value
   end
 end
