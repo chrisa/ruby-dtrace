@@ -17,9 +17,12 @@ VALUE dtracestub_alloc(VALUE klass)
   VALUE obj;
   dtrace_stub_t *stub;
 
-  char insns[FUNC_SIZE] = { 0x55, 0x89, 0xe5, 0x83, 0xec, 0x08, 0x83, 0xe4, 0xf0, 0xb8, 0x00, 0x00,
-			    0x00, 0x00, 0x83, 0xc0, 0x0f, 0x83, 0xc0, 0x0f, 0xc1, 0xe8, 0x04, 0xc1,
-			    0xe0, 0x04, 0x29, 0xc4, 0x90, 0x90, 0x90, 0x90, 0x90, 0xc9, 0xc3 };
+/*   char insns[FUNC_SIZE] = { 0x55, 0x89, 0xe5, 0x83, 0xec, 0x08, 0x83, 0xe4, 0xf0, 0xb8, 0x00, 0x00, */
+/* 			    0x00, 0x00, 0x83, 0xc0, 0x0f, 0x83, 0xc0, 0x0f, 0xc1, 0xe8, 0x04, 0xc1, */
+/* 			    0xe0, 0x04, 0x29, 0xc4, 0x90, 0x90, 0x90, 0x90, 0x90, 0xc9, 0xc3 }; */
+
+  char insns[FUNC_SIZE] = { 0x90, 0x90, 0x90, 0x90, 0x90,
+			    0xc9, 0xc3 };
 
   stub = ALLOC(dtrace_stub_t);
   if (!stub) {
@@ -31,7 +34,11 @@ VALUE dtracestub_alloc(VALUE klass)
   stub->func = NULL;
 
   /* create stub function, get offset */ 
+#ifdef __APPLE__
+  if ((stub->mem = (void *)malloc(FUNC_SIZE)) < 0) {
+#else
   if ((stub->mem = (void *)memalign(FUNC_SIZE, FUNC_SIZE)) < 0) {
+#endif
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
   }
@@ -58,6 +65,24 @@ VALUE dtracestub_call(VALUE self) {
   
   Data_Get_Struct(self, dtrace_stub_t, stub);
   (void)(*stub->func)();
+  
+  return Qnil;
+}
+
+VALUE dtracestub_call1(VALUE self, VALUE arg0) {
+  dtrace_stub_t *stub;
+  
+  Data_Get_Struct(self, dtrace_stub_t, stub);
+  (void)(*stub->func)(FIX2INT(arg0));
+  
+  return Qnil;
+}
+
+VALUE dtracestub_call2(VALUE self, VALUE arg0, VALUE arg1) {
+  dtrace_stub_t *stub;
+  
+  Data_Get_Struct(self, dtrace_stub_t, stub);
+  (void)(*stub->func)(FIX2INT(arg0), FIX2INT(arg1));
   
   return Qnil;
 }
