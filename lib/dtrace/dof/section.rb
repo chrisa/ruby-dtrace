@@ -3,6 +3,8 @@
 # (c) 2008 Chris Andrews <chris@nodnol.org>
 #
 
+require 'dtrace/dof/section/strtab'
+
 class Dtrace::Dof::Section
   include Dtrace::Dof::Constants
   attr_writer :entsize
