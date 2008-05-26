@@ -60,37 +60,78 @@ VALUE dtracestub_alloc(VALUE klass)
   return obj;
 }
 
-VALUE dtracestub_call(VALUE self) {
-  dtrace_stub_t *stub;
-  
-  Data_Get_Struct(self, dtrace_stub_t, stub);
-  (void)(*stub->func)();
-  
-  return Qnil;
-}
-
-VALUE dtracestub_call1(VALUE self, VALUE arg0) {
-  dtrace_stub_t *stub;
-  
-  Data_Get_Struct(self, dtrace_stub_t, stub);
-  (void)(*stub->func)(FIX2INT(arg0));
-  
-  return Qnil;
-}
-
-VALUE dtracestub_call2(VALUE self, VALUE arg0, VALUE arg1) {
-  dtrace_stub_t *stub;
-  
-  Data_Get_Struct(self, dtrace_stub_t, stub);
-  (void)(*stub->func)(FIX2INT(arg0), FIX2INT(arg1));
-  
-  return Qnil;
-}
-
 VALUE dtracestub_addr(VALUE self) {
   dtrace_stub_t *stub;
   int ret;
   
   Data_Get_Struct(self, dtrace_stub_t, stub);
   return INT2FIX(stub->mem);
+}
+
+VALUE dtracestub_call(int argc, VALUE *ruby_argv, VALUE self) {
+  dtrace_stub_t *stub;
+  int i;
+  void *argv[8];
+
+  Data_Get_Struct(self, dtrace_stub_t, stub);
+
+  fprintf(stderr, "in call, got %d args\n", argc);
+
+  /* munge Ruby values to either char *s or ints. */
+  for (i = 0; i < argc; i++) {
+    switch (TYPE(ruby_argv[i])) {
+    case T_STRING:
+      argv[i] = (void *)RSTRING(ruby_argv[i])->ptr;
+      break;
+    case T_FIXNUM:
+      argv[i] = (void *)FIX2INT(ruby_argv[i]);
+      break;
+    default:
+      rb_raise(eDtraceException, "type of arg[%d] is not string or fixnum", i);
+      break;
+    }
+  }
+
+  /* dispatch to stub: we're using C to build the arguments on the
+   * stack for us here, so avoiding any argument handling in the stub
+   * itself. 
+   */
+  switch (argc) {
+  case 0:
+    (void)(*stub->func)();
+    break;
+  case 1:
+    (void)(*stub->func)(argv[0]);
+    break;
+  case 2:
+    (void)(*stub->func)(argv[0], argv[1]);
+    break;
+  case 3:
+    (void)(*stub->func)(argv[0], argv[1], argv[2]);
+    break;
+  case 4:
+    (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3]);
+    break;
+  case 5:
+    (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3], 
+			argv[4]);
+    break;
+  case 6:
+    (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3],
+			argv[4], argv[5]);
+    break;
+  case 7:
+    (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3],
+			argv[4], argv[5], argv[6]);
+    break;
+  case 8:
+    (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3],
+			argv[4], argv[5], argv[6], argv[7]);
+    break;
+  default:
+    rb_raise(eDtraceException, "probe argc max is 8");
+    break;
+  }
+  
+  return Qnil;
 }
