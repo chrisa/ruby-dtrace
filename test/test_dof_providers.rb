@@ -10,7 +10,7 @@ require 'pp'
 
 $dof_dir = File.dirname(__FILE__)
 
-class TestDofHelper < Test::Unit::TestCase
+class TestDofProviders < Test::Unit::TestCase
   include Dtrace::Dof::Constants
   
   def test_probe_no_args

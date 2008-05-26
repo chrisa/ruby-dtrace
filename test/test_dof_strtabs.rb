@@ -6,7 +6,6 @@
 require 'dtrace'
 require 'dtrace/dof'
 require 'test/unit'
-require 'pp'
 
 class TestDofStrtabs < Test::Unit::TestCase
   include Dtrace::Dof::Constants
@@ -36,8 +35,6 @@ class TestDofStrtabs < Test::Unit::TestCase
     strings = ['test', 'main', 'test']
     strtab = Dtrace::Dof::Section::Strtab.new(strings, 0)
     f.sections << strtab
-
-    pp strtab
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
     s.data = [
@@ -78,8 +75,6 @@ class TestDofStrtabs < Test::Unit::TestCase
       :argsattr => { :name => 5, :data => 5, :class => 5 }
     }
     f.sections << s
-
-    pp f
 
     dof = f.generate
     assert dof
