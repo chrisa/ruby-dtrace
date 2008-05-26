@@ -71,11 +71,9 @@ VALUE dtracestub_addr(VALUE self) {
 VALUE dtracestub_call(int argc, VALUE *ruby_argv, VALUE self) {
   dtrace_stub_t *stub;
   int i;
-  void *argv[8];
+  void *argv[8]; // probe argc max for now.
 
   Data_Get_Struct(self, dtrace_stub_t, stub);
-
-  fprintf(stderr, "in call, got %d args\n", argc);
 
   /* munge Ruby values to either char *s or ints. */
   for (i = 0; i < argc; i++) {
