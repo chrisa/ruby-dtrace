@@ -67,12 +67,32 @@ class TestDofStrtabs < Test::Unit::TestCase
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
-      :name   => strtab.stridx('test'),
-      :provattr => { :name => 5, :data => 5, :class => 5 },
-      :modattr  => { :name => 1, :data => 1, :class => 5 },
-      :funcattr => { :name => 1, :data => 1, :class => 5 },
-      :nameattr => { :name => 5, :data => 5, :class => 5 },
-      :argsattr => { :name => 5, :data => 5, :class => 5 }
+      :name => strtab.stridx('test'),
+      :provattr => { 
+        :name  => DTRACE_STABILITY_EVOLVING,
+        :data  => DTRACE_STABILITY_EVOLVING,
+        :class => DTRACE_STABILITY_EVOLVING 
+      },
+      :modattr  => { 
+        :name => DTRACE_STABILITY_PRIVATE,
+        :data => DTRACE_STABILITY_PRIVATE,
+        :class => DTRACE_STABILITY_EVOLVING 
+      },
+      :funcattr => { 
+        :name => DTRACE_STABILITY_PRIVATE,
+        :data => DTRACE_STABILITY_PRIVATE,
+        :class => DTRACE_STABILITY_EVOLVING
+      },
+      :nameattr => { 
+        :name => DTRACE_STABILITY_EVOLVING,
+        :data => DTRACE_STABILITY_EVOLVING,
+        :class => DTRACE_STABILITY_EVOLVING
+      },
+      :argsattr => {
+        :name => DTRACE_STABILITY_EVOLVING,
+        :data => DTRACE_STABILITY_EVOLVING,
+        :class => DTRACE_STABILITY_EVOLVING
+      },
     }
     f.sections << s
 

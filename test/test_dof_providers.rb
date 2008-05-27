@@ -6,9 +6,6 @@
 require 'dtrace'
 require 'dtrace/dof'
 require 'test/unit'
-require 'pp'
-
-$dof_dir = File.dirname(__FILE__)
 
 class TestDofProviders < Test::Unit::TestCase
   include Dtrace::Dof::Constants

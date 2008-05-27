@@ -21,7 +21,7 @@ profile-1000
   @b[execname] = count();
 }
 
-profile-10
+profile-1
 {
   printa(@a);
   printa(@b);
@@ -32,7 +32,7 @@ EOD
     prog.execute
     t.go
 
-    sleep 1
+    sleep 3
 
     c = DtraceConsumer.new(t)
     assert c

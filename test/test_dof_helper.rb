@@ -94,7 +94,7 @@ class TestDofHelper < Test::Unit::TestCase
 
     s = Dtrace::Dof::Section.new(DOF_SECT_COMMENTS, 7)
     s.flags = 0 # no load
-    s.data = "Sun D 1.5"
+    s.data = "Ruby-Dtrace 0.12"
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_UTSNAME, 8)
@@ -103,12 +103,6 @@ class TestDofHelper < Test::Unit::TestCase
 
     dof = f.generate
     assert dof
-
-    #File.open('testdof', 'w') do |io|
-	#io.puts dof
-    #end
-
-    #d = Dtrace::Dof::Parser.parse(dof)
 
     Dtrace.loaddof(dof)
 
