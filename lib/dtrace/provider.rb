@@ -103,8 +103,8 @@ class Dtrace
           :nenoffs  => 0,
           :offidx   => 0,
           :addr     => probe.addr,
-          :nargc    => 0,
-          :xargc    => 0
+          :nargc    => @probe_defs[name].length,
+          :xargc    => @probe_defs[name].length,
         }
         
         stubs[name] = probe
