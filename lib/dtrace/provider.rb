@@ -58,7 +58,14 @@ class Dtrace
     #
     def probe(name, *types) 
       typemap = { :string => 'char *', :integer => 'int' } 
-      @probe_defs[name] = types.map {|t| typemap[t]} 
+      @probe_defs[name] = []
+      types.each do |t|
+        if typemap[t].nil?
+          raise DtraceException.new("type '#{t}' invalid")
+        else
+          @probe_defs[name] << typemap[t]
+        end
+      end
     end
 
     def initialize(name)
@@ -69,51 +76,48 @@ class Dtrace
 
     def enable
       f = Dtrace::Dof::File.new
-      strings = Array.new
       
-      # Gather strings
-      strings << @name
-      strings << 'main' # XXX
-
-      @probe_defs.each_key do |name|
-        strings << name
-      end
-
-      @probe_defs.each_value do |p|
-        p.each do |type|
-          strings << type
-        end
-      end
-
-      strtab = Dtrace::Dof::Section::Strtab.new(strings, 0)
+      strtab = Dtrace::Dof::Section::Strtab.new(0)
       f.sections << strtab
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
       probes = Array.new
       stubs = Hash.new
+      idx = 0
       @probe_defs.each_key do |name|
+        
+        argv = 0
+        @probe_defs[name].each do |type|
+          i = strtab.add(type)
+          argv = i if argv == 0
+        end
+        
         probe = Dtrace::Probe.new
         probes <<
           {
-          :name     => strtab.stridx(name),
-          :func     => strtab.stridx('main'), # XXX
+          :name     => strtab.add(name),
+          :func     => strtab.add('main'), # XXX
           :noffs    => 1,
           :enoffidx => 0,
-          :argidx   => 0,
+          :argidx   => idx,
           :nenoffs  => 0,
           :offidx   => 0,
           :addr     => probe.addr,
           :nargc    => @probe_defs[name].length,
           :xargc    => @probe_defs[name].length,
+          :nargv    => argv,
+          :xargv    => argv,
         }
         
         stubs[name] = probe
+        idx += @probe_defs[name].length
       end
       s.data = probes
       f.sections << s
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
       s.data = Array.new
+
       @probe_defs.each_value do |args|
         args.each_with_index do |arg, i|
           s.data << (i + 1)
@@ -125,7 +129,10 @@ class Dtrace
       f.sections << s
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-      s.data = [ 0 ]
+      s.data = []
+      @probe_defs.each do |p|
+        s.data << 0
+      end
       f.sections << s
       
       s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
@@ -134,7 +141,7 @@ class Dtrace
         :probes => 1,
         :prargs => 2,
         :proffs => 3,
-        :name => strtab.stridx(@name),
+        :name => strtab.add(@name),
         :provattr => { 
           :name  => DTRACE_STABILITY_EVOLVING,
           :data  => DTRACE_STABILITY_EVOLVING,
@@ -162,7 +169,7 @@ class Dtrace
         },
       }
       f.sections << s
-
+      
       dof = f.generate
       Dtrace.loaddof(dof)
 

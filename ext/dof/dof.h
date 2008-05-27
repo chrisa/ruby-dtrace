@@ -29,6 +29,7 @@ VALUE dof_generate_strtab(VALUE self);
 VALUE dof_generate_utsname(VALUE self);
 VALUE dof_generate_prargs(VALUE self);
 VALUE dof_generate_proffs(VALUE self);
+VALUE dof_generate_prenoffs(VALUE self);
 VALUE dof_generate_provider(VALUE self);
 VALUE dof_generate_reltab(VALUE self);
 VALUE dof_generate_relhdr(VALUE self);

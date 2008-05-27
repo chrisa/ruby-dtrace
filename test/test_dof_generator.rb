@@ -82,6 +82,13 @@ class TestDofGenerator < Test::Unit::TestCase
     assert dof
   end
 
+  def test_generate_section_proffs
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 1)
+    s.data = [ 5, 6 ]
+    dof = s.generate
+    assert dof
+  end
+
   def test_generate_section_provider
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 1)
     data = {

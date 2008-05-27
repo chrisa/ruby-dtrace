@@ -179,6 +179,31 @@ VALUE dof_generate_proffs(VALUE self) {
   return dof;
 }
 
+VALUE dof_generate_prenoffs(VALUE self) {
+  VALUE dof;
+  VALUE args = rb_iv_get(self, "@data");
+  VALUE rarg;
+  uint32_t arg;
+  int i;
+  
+  if (NIL_P(args) ) {
+    rb_raise(eDtraceDofException, "no args in dof_generate_prenoffs");
+    return Qnil;
+  }
+  Check_Type(args, T_ARRAY);
+ 
+  dof = rb_str_new("", 0);
+ 
+  for (i = 0; i < rb_ary_len(args); i++) {
+    rarg = rb_ary_entry(args, i);
+    Check_Type(rarg, T_FIXNUM);
+    arg = FIX2INT(rarg);
+    rb_str_concat(dof, rb_str_new((char *)&arg, 4));
+  }
+  
+  return dof;
+}
+
 dof_attr_t _dof_generate_dof_attr_t(VALUE data) {
   dof_attr_t attr = 0;
   uint8_t n = 0;

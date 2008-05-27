@@ -16,7 +16,19 @@ VALUE dof_generate_header(VALUE self) {
   uint64_t filesz;
   uint64_t hdrlen;
   VALUE hdr_data;
+  uint8_t dof_version;
 
+  switch(FIX2INT(rb_iv_get(self, "@dof_version"))) {
+  case 1:
+    dof_version = DOF_VERSION_1;
+    break;
+  case 2:
+    dof_version = DOF_VERSION_2;
+    break;
+  default:
+    dof_version = DOF_VERSION;
+  }
+  
   memset(&hdr, 0, sizeof(hdr));
   
   hdr.dofh_ident[DOF_ID_MAG0] = DOF_MAG_MAG0;
@@ -26,7 +38,7 @@ VALUE dof_generate_header(VALUE self) {
 
   hdr.dofh_ident[DOF_ID_MODEL]    = DOF_MODEL_NATIVE;
   hdr.dofh_ident[DOF_ID_ENCODING] = DOF_ENCODE_NATIVE;
-  hdr.dofh_ident[DOF_ID_VERSION]  = DOF_VERSION_1;
+  hdr.dofh_ident[DOF_ID_VERSION]  = dof_version;
   hdr.dofh_ident[DOF_ID_DIFVERS]  = DIF_VERSION;
   hdr.dofh_ident[DOF_ID_DIFIREG]  = DIF_DIR_NREGS;
   hdr.dofh_ident[DOF_ID_DIFTREG]  = DIF_DTR_NREGS;

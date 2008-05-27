@@ -4,22 +4,18 @@
 #
 
 class Dtrace::Dof::Section::Strtab < Dtrace::Dof::Section
-  def initialize(strings, index)
+  def initialize(index)
     super(DOF_SECT_STRTAB, index)
-    
-    # to_s and uniq the strings, and save them 
-    self.data = strings.map {|s| s.to_s }.uniq
-
-    # compute and save the stridx values
-    @strings = Hash.new
-    i = 1
-    self.data.each do |s|
-      @strings[s] = i
-      i += (s.length + 1)
-    end
+    self.data = []
+    @idx = 1
   end
 
-  def stridx(string)
-    return @strings[string.to_s]
+  def add(string)
+    idx = @idx
+    string = string.to_s
+    @idx += (string.length + 1)
+    self.data << string
+    return idx
   end
+
 end

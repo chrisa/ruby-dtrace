@@ -10,14 +10,14 @@ require 'test/unit'
 class TestDtraceProviders < Test::Unit::TestCase
   
   def test_probe_no_args
-    Dtrace::Provider.create :test do |p|
+    Dtrace::Provider.create :test1 do |p|
       p.probe :test
     end
 
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:test"
+      if p.to_s == "test1#{$$}:testmodule:main:test"
         matches += 1
       end
     end
@@ -25,14 +25,14 @@ class TestDtraceProviders < Test::Unit::TestCase
   end
 
   def test_probe_with_char_arg
-    Dtrace::Provider.create :test do |p|
+    Dtrace::Provider.create :test2 do |p|
       p.probe :test, :string
     end
 
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:test"
+      if p.to_s == "test2#{$$}:testmodule:main:test"
         matches += 1
       end
     end
@@ -40,14 +40,14 @@ class TestDtraceProviders < Test::Unit::TestCase
   end
 
   def test_probe_with_int_arg
-    Dtrace::Provider.create :test do |p|
-      p.probe :test, :int
+    Dtrace::Provider.create :test3 do |p|
+      p.probe :test, :integer
     end
 
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:test"
+      if p.to_s == "test3#{$$}:testmodule:main:test"
         matches += 1
       end
     end
@@ -55,14 +55,14 @@ class TestDtraceProviders < Test::Unit::TestCase
   end
 
   def test_probe_with_two_args
-    Dtrace::Provider.create :test do |p|
-      p.probe :test, :int, :int
+    Dtrace::Provider.create :test4 do |p|
+      p.probe :test, :integer, :integer
     end
 
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:test"
+      if p.to_s == "test4#{$$}:testmodule:main:test"
         matches += 1
       end
     end
@@ -70,15 +70,15 @@ class TestDtraceProviders < Test::Unit::TestCase
   end
 
   def test_multiple_probes_with_two_args
-    Dtrace::Provider.create :test do |p|
-      p.probe :test1, :int, :int
-      p.probe :test2, :int, :int
+    Dtrace::Provider.create :test5 do |p|
+      p.probe :test1, :integer, :integer
+      p.probe :test2, :integer, :integer
     end
 
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s =~ /^test#{$$}:testmodule:main:test/
+      if p.to_s =~ /^test5#{$$}:testmodule:main:test/
         matches += 1
       end
     end
@@ -86,18 +86,18 @@ class TestDtraceProviders < Test::Unit::TestCase
   end
 
   def test_multiple_probes
-    Dtrace::Provider.create :test do |p|
-      p.probe :test1, :int
-      p.probe :test2, :int
-      p.probe :test3, :int
-      p.probe :test4, :int
-      p.probe :test5, :int
+    Dtrace::Provider.create :test6 do |p|
+      p.probe :test1, :integer
+      p.probe :test2, :integer
+      p.probe :test3, :integer
+      p.probe :test4, :integer
+      p.probe :test5, :integer
     end
 
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s =~ /^test#{$$}:testmodule:main:test/
+      if p.to_s =~ /^test6#{$$}:testmodule:main:test/
         matches += 1
       end
     end

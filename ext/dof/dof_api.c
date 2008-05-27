@@ -29,6 +29,7 @@ void Init_dof_api() {
   rb_define_method(cDtraceDofSection, "dof_generate_utsname",   dof_generate_utsname,   0); // in section.c
   rb_define_method(cDtraceDofSection, "dof_generate_prargs",    dof_generate_prargs,    0); // in section.c
   rb_define_method(cDtraceDofSection, "dof_generate_proffs",    dof_generate_proffs,    0); // in section.c
+  rb_define_method(cDtraceDofSection, "dof_generate_prenoffs",  dof_generate_prenoffs,  0); // in section.c
   rb_define_method(cDtraceDofSection, "dof_generate_provider",  dof_generate_provider,  0); // in section.c
   rb_define_method(cDtraceDofSection, "dof_generate_reltab",    dof_generate_reltab,    0); // in section.c
   rb_define_method(cDtraceDofSection, "dof_generate_relhdr",    dof_generate_relhdr,    0); // in section.c
@@ -39,6 +40,7 @@ void Init_dof_api() {
   rb_define_attr(cDtraceDofHeader, "filesz", 1, 1);
   rb_define_attr(cDtraceDofHeader, "secnum", 1, 1);
   rb_define_attr(cDtraceDofHeader, "hdrlen", 1, 0);
+  rb_define_attr(cDtraceDofHeader, "dof_version", 0, 1);
   rb_define_method(cDtraceDofHeader, "generate", dof_generate_header, 0); // in header.c
   rb_define_method(cDtraceDofHeader, "hdrlen",   dof_header_len,      0); // in header.c
 

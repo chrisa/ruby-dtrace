@@ -4,6 +4,7 @@
 #
 
 class Dtrace::Dof::File
+  include Dtrace::Dof::Constants
   attr_accessor :sections
 
   def initialize
@@ -15,8 +16,14 @@ class Dtrace::Dof::File
     hdr.secnum = @sections.length
     filesz = hdr.hdrlen
     loadsz = filesz
+    dof_version = 1
 
     @sections.each do |s|
+      # Presence of is_enabled probes forces DOF version 2.
+      if s.section_type == DOF_SECT_PRENOFFS
+        dof_version = 2
+      end
+      
       length = s.generate
       s.offset = filesz
 
@@ -39,6 +46,7 @@ class Dtrace::Dof::File
     
     hdr.loadsz = loadsz
     hdr.filesz = filesz
+    hdr.dof_version = dof_version
 
     dof = String.new
     dof << hdr.generate
