@@ -3,6 +3,8 @@
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
 
+require 'dtrace'
+
 class Dtrace
   # DTrace::Probe - Using dynamically created USDT probes in Ruby
   # programs:
@@ -44,6 +46,17 @@ class Dtrace
   # simply wraps the DTrace IS_ENABLED() macro for the probe.
   #
   class Probe
+    def initialize
+      @stub = DtraceStub.new
+    end
+
+    def fire(*args)
+      @stub.call(*args)
+    end
+
+    def addr
+      @stub.addr
+    end
   end
 end
 

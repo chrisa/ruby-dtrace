@@ -58,13 +58,13 @@ class Dtrace
     #
     def probe(name, *types) 
       typemap = { :string => 'char *', :integer => 'int' } 
-      @probes[name] = types.map {|t| typemap[t]} 
+      @probe_defs[name] = types.map {|t| typemap[t]} 
     end
 
     def initialize(name)
-      @name   = name.to_s
-      @class  = camelize(name)
-      @probes = {}
+      @name       = name.to_s
+      @class      = camelize(name)
+      @probe_defs = {}
     end
 
     def enable
@@ -75,11 +75,11 @@ class Dtrace
       strings << @name
       strings << 'main' # XXX
 
-      @probes.each_key do |name|
+      @probe_defs.each_key do |name|
         strings << name
       end
 
-      @probes.each_value do |p|
+      @probe_defs.each_value do |p|
         p.each do |type|
           strings << type
         end
@@ -90,7 +90,9 @@ class Dtrace
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
       probes = Array.new
-      @probes.each_key do |name|
+      stubs = Hash.new
+      @probe_defs.each_key do |name|
+        probe = Dtrace::Probe.new
         probes <<
           {
           :name     => strtab.stridx(name),
@@ -100,17 +102,19 @@ class Dtrace
           :argidx   => 0,
           :nenoffs  => 0,
           :offidx   => 0,
-          :addr     => 0,
+          :addr     => probe.addr,
           :nargc    => 0,
           :xargc    => 0
         }
+        
+        stubs[name] = probe
       end
       s.data = probes
       f.sections << s
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
       s.data = Array.new
-      @probes.each_value do |args|
+      @probe_defs.each_value do |args|
         args.each_with_index do |arg, i|
           s.data << (i + 1)
         end
@@ -130,7 +134,7 @@ class Dtrace
         :probes => 1,
         :prargs => 2,
         :proffs => 3,
-        :name => strtab.stridx('test'),
+        :name => strtab.stridx(@name),
         :provattr => { 
           :name  => DTRACE_STABILITY_EVOLVING,
           :data  => DTRACE_STABILITY_EVOLVING,
@@ -161,6 +165,18 @@ class Dtrace
 
       dof = f.generate
       Dtrace.loaddof(dof)
+
+      c = Class.new
+      c.class_eval do
+        @@probes = stubs
+        def self.method_missing(name)
+          unless @@probes[name].nil?
+            yield @@probes[name]
+          end
+        end
+      end
+      eval "Dtrace::Probe::#{@class} = c"
+
     end
 
     private
@@ -169,7 +185,6 @@ class Dtrace
       # Pinched from ActiveSupport's Inflector
       lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
     end
-
     
   end
 end
