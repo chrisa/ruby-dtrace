@@ -86,6 +86,7 @@ class Dtrace
       argidx = 0
       offidx = 0
       @probe_defs.each_key do |name|
+        argc = @probe_defs[name].length
         
         argv = 0
         @probe_defs[name].each do |type|
@@ -93,7 +94,7 @@ class Dtrace
           argv = i if argv == 0
         end
         
-        probe = Dtrace::Probe.new
+        probe = Dtrace::Probe.new(argc)
         probes <<
           {
           :name     => strtab.add(name),
@@ -104,14 +105,14 @@ class Dtrace
           :nenoffs  => 0,
           :offidx   => offidx,
           :addr     => probe.addr,
-          :nargc    => @probe_defs[name].length,
-          :xargc    => @probe_defs[name].length,
+          :nargc    => argc,
+          :xargc    => argc,
           :nargv    => argv,
           :xargv    => argv,
         }
         
         stubs[name] = probe
-        argidx += @probe_defs[name].length
+        argidx += argc
         offidx += 1
       end
       s.data = probes
@@ -132,8 +133,15 @@ class Dtrace
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
       s.data = Array.new
-      @probe_defs.each do
-        s.data << 30 # offset of NOPs into stub, see dtrace_stub.c
+      @probe_defs.each_value do |args|
+        # compute offset into stub: see dtrace_stub.c
+        #
+        # 6 bytes - function entry
+        # +
+        # 3 bytes per argument - arg->stack push
+        #
+        offset = 6 + 3 * args.length
+        s.data << offset
       end
       if s.data.empty?
         s.data = [ 0 ]

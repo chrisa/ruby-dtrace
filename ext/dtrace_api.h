@@ -135,6 +135,7 @@ VALUE dtraceerrdata_addr(VALUE self);
 VALUE dtraceerrdata_msg(VALUE self);
 
 VALUE dtracestub_alloc(VALUE klass);
+VALUE dtracestub_init(VALUE self, VALUE argc);
 VALUE dtracestub_addr(VALUE self);
 VALUE dtracestub_call(int argc, VALUE *argv, VALUE self);
 

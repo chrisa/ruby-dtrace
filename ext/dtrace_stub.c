@@ -10,72 +10,68 @@
 
 RUBY_EXTERN VALUE eDtraceException;
 
-#define FUNC_SIZE 4096
+#define FUNC_SIZE 64 /* good for 16 arguments: 16 + 3 * argc */
 
-VALUE dtracestub_alloc(VALUE klass)
+/* :nodoc: */
+VALUE dtracestub_init(VALUE self, VALUE rargc)
 {
-  VALUE obj;
   dtrace_stub_t *stub;
+  char insns[FUNC_SIZE];
+  char *ip = insns;
+  int i;
+  int argc = FIX2INT(rargc);
 
-/*      3. void probe8(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { */
-/*         <Function: probe8> */
-/*         [ 3]  805133c:  pushl   %ebp */
-/*         [ 3]  805133d:  movl    %esp,%ebp */
-/*         [ 3]  805133f:  subl    $8,%esp */
-/*      4.         TEST_TEST_INT_INT_INT_INT_INT_INT_INT_INT_PROBE(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7); */
-/*         [ 4]  8051342:  pushl   0x24(%ebp) */
-/*         [ 4]  8051345:  pushl   0x20(%ebp) */
-/*         [ 4]  8051348:  pushl   0x1c(%ebp) */
-/*         [ 4]  805134b:  pushl   0x18(%ebp) */
-/*         [ 4]  805134e:  pushl   0x14(%ebp) */
-/*         [ 4]  8051351:  pushl   0x10(%ebp) */
-/*         [ 4]  8051354:  pushl   0xc(%ebp) */
-/*         [ 4]  8051357:  pushl   8(%ebp) */
-/*         [ 4]  805135a:  nop      */
-/*         [ 4]  805135b:  nop      */
-/*         [ 4]  805135c:  nop      */
-/*         [ 4]  805135d:  nop      */
-/*         [ 4]  805135e:  nop      */
-/*         [ 4]  805135f:  addl    $0x20,%esp */
-/*      5. } */
-/*         [ 5]  8051362:  leave    */
-/*         [ 5]  8051363:  ret      */
+  Data_Get_Struct(self, dtrace_stub_t, stub);
 
-/* 1330                                       55 89 e5 83  .....^[. ....U... */
-/* 1340  ec 08 ff 75 24 ff 75 20  ff 75 1c ff 75 18 ff 75  ...u$.u  .u..u..u */
-/* 1350  14 ff 75 10 ff 75 0c ff  75 08 90 90 90 90 90 83  ..u..u.. u....... */
-/* 1360  c4 20 c9 c3 */
+#define OP_PUSHL_EBP     0x55
+#define OP_MOVL_ESP_EBP  0x89, 0xe5
+#define OP_SUBL_N_ESP    0x83, 0xec
+#define OP_PUSHL_N_EBP_U 0xff
+#define OP_PUSHL_N_EBP_L 0x75
+#define OP_NOP           0x90
+#define OP_ADDL_ESP_U    0x83
+#define OP_ADDL_ESP_L    0xc4
+#define OP_LEAVE         0xc9
+#define OP_RET           0xc3
 
-  char insns[FUNC_SIZE] = 
-    {
-      0x55, 0x89, 0xe5, 0x83, 0xec, 0x08,
-      0xff, 0x75, 0x24,
-      0xff, 0x75, 0x20,
-      0xff, 0x75, 0x1c,
-      0xff, 0x75, 0x18,
-      0xff, 0x75, 0x14,
-      0xff, 0x75, 0x10,
-      0xff, 0x75, 0x0c,
-      0xff, 0x75, 0x08,
-      0x90, 0x90, 0x90, 0x90, 0x90,
-      0x83, 0xc4, 0x20,
-      0xc9, 0xc3
-    };
+  char func_in[7] = {
+    OP_PUSHL_EBP, OP_MOVL_ESP_EBP, OP_SUBL_N_ESP, 0x08, NULL
+  };
 
-  stub = ALLOC(dtrace_stub_t);
-  if (!stub) {
-    rb_raise(eDtraceException, "alloc failed");
-    return Qnil;
+  char func_out[3] = {
+    OP_LEAVE, OP_RET, NULL
+  };
+
+  for (i = 0; func_in[i]; i++)
+    *ip++ = func_in[i];
+
+  for (i = (4 + 4*argc); i >= 0x08; i -= 4) {
+    *ip++ = OP_PUSHL_N_EBP_U;
+    *ip++ = OP_PUSHL_N_EBP_L;
+    *ip++ = i;
   }
+
+  for (i = 0; i <=5; i++)
+    *ip++ = OP_NOP;
+
+  *ip++ = OP_ADDL_ESP_U;
+  *ip++ = OP_ADDL_ESP_L;
+  *ip++ = argc * 4;
+  
+  for (i = 0; func_out[i]; i++)
+    *ip++ = func_out[i];
 
   stub->mem  = NULL;
   stub->func = NULL;
 
   /* create stub function, get offset */ 
+
+  /* allocate memory on a page boundary, for mprotect: valloc on OSX,
+     memalign(PAGESIZE, ...) on Solaris. */
 #ifdef __APPLE__
-  if ((stub->mem = (void *)malloc(FUNC_SIZE)) < 0) {
+  if ((stub->mem = (void *)valloc(FUNC_SIZE)) < 0) {
 #else
-  if ((stub->mem = (void *)memalign(FUNC_SIZE, FUNC_SIZE)) < 0) {
+  if ((stub->mem = (void *)memalign(PAGESIZE, FUNC_SIZE)) < 0) {
 #endif
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
@@ -92,6 +88,20 @@ VALUE dtracestub_alloc(VALUE klass)
   }    
   
   stub->func = stub->mem;
+
+  return self;
+}
+
+VALUE dtracestub_alloc(VALUE klass)
+{
+  VALUE obj;
+  dtrace_stub_t *stub;
+
+  stub = ALLOC(dtrace_stub_t);
+  if (!stub) {
+    rb_raise(eDtraceException, "alloc failed");
+    return Qnil;
+  }
 
   /* obj = Data_Wrap_Struct(klass, dtrace_hdl_mark, dtrace_hdl_free, handle); */
   obj = Data_Wrap_Struct(klass, NULL, NULL, stub);
@@ -128,10 +138,6 @@ VALUE dtracestub_call(int argc, VALUE *ruby_argv, VALUE self) {
     }
   }
 
-  /* dispatch to stub: we're using C to build the arguments on the
-   * stack for us here, so avoiding any argument handling in the stub
-   * itself. 
-   */
   switch (argc) {
   case 0:
     (void)(*stub->func)();

@@ -46,8 +46,8 @@ class Dtrace
   # simply wraps the DTrace IS_ENABLED() macro for the probe.
   #
   class Probe
-    def initialize
-      @stub = DtraceStub.new
+    def initialize(argc)
+      @stub = DtraceStub.new(argc)
     end
 
     def fire(*args)
