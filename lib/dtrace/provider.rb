@@ -83,7 +83,8 @@ class Dtrace
       s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
       probes = Array.new
       stubs = Hash.new
-      idx = 0
+      argidx = 0
+      offidx = 0
       @probe_defs.each_key do |name|
         
         argv = 0
@@ -99,9 +100,9 @@ class Dtrace
           :func     => strtab.add('main'), # XXX
           :noffs    => 1,
           :enoffidx => 0,
-          :argidx   => idx,
+          :argidx   => argidx,
           :nenoffs  => 0,
-          :offidx   => 0,
+          :offidx   => offidx,
           :addr     => probe.addr,
           :nargc    => @probe_defs[name].length,
           :xargc    => @probe_defs[name].length,
@@ -110,7 +111,8 @@ class Dtrace
         }
         
         stubs[name] = probe
-        idx += @probe_defs[name].length
+        argidx += @probe_defs[name].length
+        offidx += 1
       end
       s.data = probes
       f.sections << s
@@ -120,7 +122,7 @@ class Dtrace
 
       @probe_defs.each_value do |args|
         args.each_with_index do |arg, i|
-          s.data << (i + 1)
+          s.data << i
         end
       end
       if s.data.empty?
@@ -129,9 +131,12 @@ class Dtrace
       f.sections << s
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-      s.data = []
-      @probe_defs.each do |p|
-        s.data << 0
+      s.data = Array.new
+      @probe_defs.each do
+        s.data << 30 # offset of NOPs into stub, see dtrace_stub.c
+      end
+      if s.data.empty?
+        s.data = [ 0 ]
       end
       f.sections << s
       

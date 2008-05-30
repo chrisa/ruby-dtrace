@@ -17,12 +17,50 @@ VALUE dtracestub_alloc(VALUE klass)
   VALUE obj;
   dtrace_stub_t *stub;
 
-/*   char insns[FUNC_SIZE] = { 0x55, 0x89, 0xe5, 0x83, 0xec, 0x08, 0x83, 0xe4, 0xf0, 0xb8, 0x00, 0x00, */
-/* 			    0x00, 0x00, 0x83, 0xc0, 0x0f, 0x83, 0xc0, 0x0f, 0xc1, 0xe8, 0x04, 0xc1, */
-/* 			    0xe0, 0x04, 0x29, 0xc4, 0x90, 0x90, 0x90, 0x90, 0x90, 0xc9, 0xc3 }; */
+/*      3. void probe8(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { */
+/*         <Function: probe8> */
+/*         [ 3]  805133c:  pushl   %ebp */
+/*         [ 3]  805133d:  movl    %esp,%ebp */
+/*         [ 3]  805133f:  subl    $8,%esp */
+/*      4.         TEST_TEST_INT_INT_INT_INT_INT_INT_INT_INT_PROBE(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7); */
+/*         [ 4]  8051342:  pushl   0x24(%ebp) */
+/*         [ 4]  8051345:  pushl   0x20(%ebp) */
+/*         [ 4]  8051348:  pushl   0x1c(%ebp) */
+/*         [ 4]  805134b:  pushl   0x18(%ebp) */
+/*         [ 4]  805134e:  pushl   0x14(%ebp) */
+/*         [ 4]  8051351:  pushl   0x10(%ebp) */
+/*         [ 4]  8051354:  pushl   0xc(%ebp) */
+/*         [ 4]  8051357:  pushl   8(%ebp) */
+/*         [ 4]  805135a:  nop      */
+/*         [ 4]  805135b:  nop      */
+/*         [ 4]  805135c:  nop      */
+/*         [ 4]  805135d:  nop      */
+/*         [ 4]  805135e:  nop      */
+/*         [ 4]  805135f:  addl    $0x20,%esp */
+/*      5. } */
+/*         [ 5]  8051362:  leave    */
+/*         [ 5]  8051363:  ret      */
 
-  char insns[FUNC_SIZE] = { 0x90, 0x90, 0x90, 0x90, 0x90,
-			    0xc9, 0xc3 };
+/* 1330                                       55 89 e5 83  .....^[. ....U... */
+/* 1340  ec 08 ff 75 24 ff 75 20  ff 75 1c ff 75 18 ff 75  ...u$.u  .u..u..u */
+/* 1350  14 ff 75 10 ff 75 0c ff  75 08 90 90 90 90 90 83  ..u..u.. u....... */
+/* 1360  c4 20 c9 c3 */
+
+  char insns[FUNC_SIZE] = 
+    {
+      0x55, 0x89, 0xe5, 0x83, 0xec, 0x08,
+      0xff, 0x75, 0x24,
+      0xff, 0x75, 0x20,
+      0xff, 0x75, 0x1c,
+      0xff, 0x75, 0x18,
+      0xff, 0x75, 0x14,
+      0xff, 0x75, 0x10,
+      0xff, 0x75, 0x0c,
+      0xff, 0x75, 0x08,
+      0x90, 0x90, 0x90, 0x90, 0x90,
+      0x83, 0xc4, 0x20,
+      0xc9, 0xc3
+    };
 
   stub = ALLOC(dtrace_stub_t);
   if (!stub) {
@@ -52,7 +90,7 @@ VALUE dtracestub_alloc(VALUE klass)
     rb_raise(eDtraceException, "memcpy failed: %s\n", strerror(errno));
     return Qnil;
   }    
-
+  
   stub->func = stub->mem;
 
   /* obj = Data_Wrap_Struct(klass, dtrace_hdl_mark, dtrace_hdl_free, handle); */
@@ -67,7 +105,7 @@ VALUE dtracestub_addr(VALUE self) {
   Data_Get_Struct(self, dtrace_stub_t, stub);
   return INT2FIX(stub->mem);
 }
-
+   
 VALUE dtracestub_call(int argc, VALUE *ruby_argv, VALUE self) {
   dtrace_stub_t *stub;
   int i;
@@ -112,19 +150,19 @@ VALUE dtracestub_call(int argc, VALUE *ruby_argv, VALUE self) {
     break;
   case 5:
     (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3], 
-			argv[4]);
+                        argv[4]);
     break;
   case 6:
     (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3],
-			argv[4], argv[5]);
+                        argv[4], argv[5]);
     break;
   case 7:
     (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3],
-			argv[4], argv[5], argv[6]);
+                        argv[4], argv[5], argv[6]);
     break;
   case 8:
     (void)(*stub->func)(argv[0], argv[1], argv[2], argv[3],
-			argv[4], argv[5], argv[6], argv[7]);
+                        argv[4], argv[5], argv[6], argv[7]);
     break;
   default:
     rb_raise(eDtraceException, "probe argc max is 8");

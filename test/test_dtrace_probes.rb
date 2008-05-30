@@ -171,17 +171,87 @@ EOD
     
   end
 
-  def test_all_eight_args_integers
+  def test_all_argcs
     Dtrace::Provider.create :foo5 do |p|
-      p.probe :bar, :integer, :integer, :integer, :integer,
-                    :integer, :integer, :integer, :integer
+      p.probe :bar1, :integer
+      p.probe :bar2, :integer, :integer
+      p.probe :bar3, :integer, :integer, :integer
+      p.probe :bar4, :integer, :integer, :integer, :integer
+      p.probe :bar5, :integer, :integer, :integer, :integer,
+                     :integer
+      p.probe :bar6, :integer, :integer, :integer, :integer,
+                     :integer, :integer
+      p.probe :bar7, :integer, :integer, :integer, :integer,
+                     :integer, :integer, :integer
+      p.probe :bar8, :integer, :integer, :integer, :integer,
+                     :integer, :integer, :integer, :integer
     end
     
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo5*:testmodule:main:bar
+foo5*:testmodule:main:bar1
+{
+  trace(arg0);
+
+}
+
+foo5*:testmodule:main:bar2
+{
+  trace(arg0);
+  trace(arg1);
+
+}
+
+foo5*:testmodule:main:bar3
+{
+  trace(arg0);
+  trace(arg1);
+  trace(arg2);
+
+}
+
+foo5*:testmodule:main:bar4
+{
+  trace(arg0);
+  trace(arg1);
+  trace(arg2);
+  trace(arg3);
+
+}
+
+foo5*:testmodule:main:bar5
+{
+  trace(arg0);
+  trace(arg1);
+  trace(arg2);
+  trace(arg3);
+  trace(arg4);
+}
+
+foo5*:testmodule:main:bar6
+{
+  trace(arg0);
+  trace(arg1);
+  trace(arg2);
+  trace(arg3);
+  trace(arg4);
+  trace(arg5);
+}
+
+foo5*:testmodule:main:bar7
+{
+  trace(arg0);
+  trace(arg1);
+  trace(arg2);
+  trace(arg3);
+  trace(arg4);
+  trace(arg5);
+  trace(arg6);
+}
+
+foo5*:testmodule:main:bar8
 {
   trace(arg0);
   trace(arg1);
@@ -191,7 +261,6 @@ foo5*:testmodule:main:bar
   trace(arg5);
   trace(arg6);
   trace(arg7);
-
 }
 EOD
     
@@ -200,8 +269,29 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
     
-    Dtrace::Probe::Foo5.bar do |p|
-      p.fire(1, 2, 3, 4, 5, 6, 7, 8)
+    Dtrace::Probe::Foo5.bar1 do |p|
+      p.fire(11)
+    end    
+    Dtrace::Probe::Foo5.bar2 do |p|
+      p.fire(21, 22)
+    end    
+    Dtrace::Probe::Foo5.bar3 do |p|
+      p.fire(31, 32, 33)
+    end    
+    Dtrace::Probe::Foo5.bar4 do |p|
+      p.fire(41, 42, 43, 44)
+    end    
+    Dtrace::Probe::Foo5.bar5 do |p|
+      p.fire(51, 52, 53, 54, 55)
+    end    
+    Dtrace::Probe::Foo5.bar6 do |p|
+      p.fire(61, 62, 63, 64, 65, 66)
+    end    
+    Dtrace::Probe::Foo5.bar7 do |p|
+      p.fire(71, 72, 73, 74, 75, 76, 77)
+    end    
+    Dtrace::Probe::Foo5.bar8 do |p|
+      p.fire(81, 82, 83, 84, 85, 86, 87, 88)
     end    
 
     data = []
@@ -209,15 +299,51 @@ EOD
       data << d
     end
 
-    assert_equal 1, data.length
-    assert_equal 1, data[0].data[0].value
-    assert_equal 2, data[0].data[1].value
-    assert_equal 3, data[0].data[2].value
-    assert_equal 4, data[0].data[3].value
-    assert_equal 5, data[0].data[4].value
-    assert_equal 6, data[0].data[5].value
-    assert_equal 7, data[0].data[6].value
-    assert_equal 8, data[0].data[7].value
+    assert_equal 8, data.length
+
+    assert_equal 11, data[0].data[0].value
+
+    assert_equal 21, data[1].data[0].value
+    assert_equal 22, data[1].data[1].value
+
+    assert_equal 31, data[2].data[0].value
+    assert_equal 32, data[2].data[1].value
+    assert_equal 33, data[2].data[2].value
+
+    assert_equal 41, data[3].data[0].value
+    assert_equal 42, data[3].data[1].value
+    assert_equal 43, data[3].data[2].value
+    assert_equal 44, data[3].data[3].value
+
+    assert_equal 51, data[4].data[0].value
+    assert_equal 52, data[4].data[1].value
+    assert_equal 53, data[4].data[2].value
+    assert_equal 54, data[4].data[3].value
+    assert_equal 55, data[4].data[4].value
+
+    assert_equal 61, data[5].data[0].value
+    assert_equal 62, data[5].data[1].value
+    assert_equal 63, data[5].data[2].value
+    assert_equal 64, data[5].data[3].value
+    assert_equal 65, data[5].data[4].value
+    assert_equal 66, data[5].data[5].value
+
+    assert_equal 71, data[6].data[0].value
+    assert_equal 72, data[6].data[1].value
+    assert_equal 73, data[6].data[2].value
+    assert_equal 74, data[6].data[3].value
+    assert_equal 75, data[6].data[4].value
+    assert_equal 76, data[6].data[5].value
+    assert_equal 77, data[6].data[6].value
+
+    assert_equal 81, data[7].data[0].value
+    assert_equal 82, data[7].data[1].value
+    assert_equal 83, data[7].data[2].value
+    assert_equal 84, data[7].data[3].value
+    assert_equal 85, data[7].data[4].value
+    assert_equal 86, data[7].data[5].value
+    assert_equal 87, data[7].data[6].value
+    assert_equal 88, data[7].data[7].value
     
   end
 

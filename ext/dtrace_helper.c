@@ -1,5 +1,5 @@
 /* Ruby-Dtrace
- * (c) 2007 Chris Andrews <chris@nodnol.org>
+ * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"

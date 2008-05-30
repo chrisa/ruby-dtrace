@@ -5,7 +5,6 @@
 
 require 'dtrace/dof'
 require 'test/unit'
-require 'pp'
 
 $dof_dir = File.dirname(__FILE__)
 
