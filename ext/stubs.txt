@@ -48,3 +48,31 @@ Hand-built 8-arg stub:
 /*       0x83, 0xc4, 0x20, */
 /*       0xc9, 0xc3 */
 /*     }; */
+
+disassembly of is_enabled function:
+
+    21. int is_enabled(void) {
+        <Function: is_enabled>
+        [21]  805142a:  pushl   %ebp
+        [21]  805142b:  movl    %esp,%ebp
+        [21]  805142d:  subl    $8,%esp
+    22.         return TEST_TEST_PROBE_ENABLED() ? 1 : 0;
+        [22]  8051430:  xorl    %eax,%eax
+        [22]  8051432:  nop     
+        [22]  8051433:  nop     
+        [22]  8051434:  nop     
+        [22]  8051435:  movl    %eax,-4(%ebp)
+        [22]  8051438:  cmpl    $0,-4(%ebp)
+        [22]  805143c:  setne   %al
+        [22]  805143f:  movzbl  %al,%eax
+        [22]  8051442:  movl    %eax,-4(%ebp)
+        [22]  8051445:  movl    -4(%ebp),%eax
+    23. }
+        [23]  8051448:  leave   
+        [23]  8051449:  ret     
+
+Binary:
+
+                                     55 89 e5 83 ec 08  .......  ..U.....
+1430  33 c0 90 90 90 89 45 fc  83 7d fc 00 0f 95 c0 0f  3.....E. .}......
+1440  b6 c0 89 45 fc 8b 45 fc  c9 c3

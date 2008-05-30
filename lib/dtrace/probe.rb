@@ -50,12 +50,16 @@ class Dtrace
       @stub = DtraceStub.new(argc)
     end
 
-    def fire(*args)
-      @stub.call(*args)
-    end
-
     def addr
       @stub.addr
+    end
+
+    def fire(*args)
+      @stub.fire(*args)
+    end
+
+    def is_enabled?
+      @stub.is_enabled?
     end
   end
 end

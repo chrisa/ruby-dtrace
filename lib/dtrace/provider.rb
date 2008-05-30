@@ -100,9 +100,9 @@ class Dtrace
           :name     => strtab.add(name),
           :func     => strtab.add('main'), # XXX
           :noffs    => 1,
-          :enoffidx => 0,
+          :enoffidx => offidx,
           :argidx   => argidx,
-          :nenoffs  => 0,
+          :nenoffs  => 1,
           :offidx   => offidx,
           :addr     => probe.addr,
           :nargc    => argc,
@@ -136,24 +136,37 @@ class Dtrace
       @probe_defs.each_value do |args|
         # compute offset into stub: see dtrace_stub.c
         #
+        # 32 bytes - length of is_enabled function
+        # +
         # 6 bytes - function entry
         # +
         # 3 bytes per argument - arg->stack push
         #
-        offset = 6 + 3 * args.length
+        offset = 32 + 6 + 3 * args.length
         s.data << offset
       end
       if s.data.empty?
         s.data = [ 0 ]
       end
       f.sections << s
+
+      s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+      s.data = Array.new
+      @probe_defs.each_value do |args|
+        s.data << 8
+      end
+      if s.data.empty?
+        s.data = [ 0 ]
+      end
+      f.sections << s
       
-      s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+      s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
       s.data = {
         :strtab => 0,
         :probes => 1,
         :prargs => 2,
         :proffs => 3,
+        :prenoffs => 4,
         :name => strtab.add(@name),
         :provattr => { 
           :name  => DTRACE_STABILITY_EVOLVING,
@@ -191,7 +204,9 @@ class Dtrace
         @@probes = stubs
         def self.method_missing(name)
           unless @@probes[name].nil?
-            yield @@probes[name]
+            if @@probes[name].is_enabled?
+              yield @@probes[name]
+            end
           end
         end
       end

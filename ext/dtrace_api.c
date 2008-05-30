@@ -107,9 +107,10 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceErrData, "msg",         dtraceerrdata_msg,     0); // in dtrace_errdata.c 
 
   cDtraceStub = rb_define_class("DtraceStub", rb_cObject);
-  rb_define_method(cDtraceStub, "addr",       dtracestub_addr,  0); // in dtrace_stub.c
-  rb_define_method(cDtraceStub, "call",       dtracestub_call, -1); // in dtrace_stub.c
-  rb_define_method(cDtraceStub, "initialize", dtracestub_init,  1); //in dtrace_stub.c
+  rb_define_method(cDtraceStub, "initialize",  dtracestub_init,       1); // in dtrace_stub.c
+  rb_define_method(cDtraceStub, "addr",        dtracestub_addr,       0); // in dtrace_stub.c
+  rb_define_method(cDtraceStub, "fire",        dtracestub_fire,      -1); // in dtrace_stub.c
+  rb_define_method(cDtraceStub, "is_enabled?", dtracestub_is_enabled, 0); // in dtrace_stub.c
   rb_define_alloc_func(cDtraceStub, dtracestub_alloc);
   
   eDtraceException = rb_define_class("DtraceException", rb_eStandardError);

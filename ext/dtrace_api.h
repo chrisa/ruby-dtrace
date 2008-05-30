@@ -39,9 +39,12 @@ typedef struct dtrace_handle {
 } dtrace_handle_t;
 
 /* Struct wrapping a "stub", a handcrafted function created to be a
-   probe trigger point. */
+   probe trigger point, and its corresponding is_enabled tracepoint.
+
+   This is actually a pointer to the is_enabled function (the probe
+   function is after) so it's declared to take no args, and return
+   int. */
 typedef struct dtrace_stub {
-  void *mem;
   int (*func)();
 } dtrace_stub_t;
 
@@ -137,6 +140,7 @@ VALUE dtraceerrdata_msg(VALUE self);
 VALUE dtracestub_alloc(VALUE klass);
 VALUE dtracestub_init(VALUE self, VALUE argc);
 VALUE dtracestub_addr(VALUE self);
-VALUE dtracestub_call(int argc, VALUE *argv, VALUE self);
+VALUE dtracestub_fire(int argc, VALUE *argv, VALUE self);
+VALUE dtracestub_is_enabled(VALUE self);
 
 VALUE dtracehelper_loaddof(VALUE self, VALUE dof);

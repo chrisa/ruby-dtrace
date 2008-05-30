@@ -12,16 +12,21 @@ class TestDofHelper < Test::Unit::TestCase
   include Dtrace::Dof::Constants
   
   def test_stub
-    s = DtraceStub.new
+    s = DtraceStub.new(0)
   end
 
-  def test_call_stub
-    s = DtraceStub.new
-    s.call
+  def test_fire_stub
+    s = DtraceStub.new(0)
+    s.fire
+  end
+
+  def test_is_stub_not_enabled
+    s = DtraceStub.new(0)
+    assert_equal 0, s.is_enabled?
   end
 
   def test_fire_probe_no_args
-    stub = DtraceStub.new
+    stub = DtraceStub.new(0)
     addr = stub.addr
 
     f = Dtrace::Dof::File.new
@@ -52,7 +57,7 @@ class TestDofHelper < Test::Unit::TestCase
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 0 ]
+    s.data = [ 38 ]
     f.sections << s
     
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
@@ -88,7 +93,7 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
 
-    stub.call
+    stub.fire
 
     data = []
     c.consume_once do |d|
@@ -100,7 +105,7 @@ EOD
   end
 
   def test_fire_probe_two_int_args
-    stub = DtraceStub.new
+    stub = DtraceStub.new(2)
     addr = stub.addr
 
     f = Dtrace::Dof::File.new
@@ -129,11 +134,11 @@ EOD
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
-    s.data = [ 1, 2 ]
+    s.data = [ 0, 1 ]
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 0 ]
+    s.data = [ 44 ]
     f.sections << s
     
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
@@ -175,7 +180,7 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
 
-    stub.call(41, 42)
+    stub.fire(41, 42)
 
     data = []
     c.consume_once do |d|
@@ -188,7 +193,7 @@ EOD
   end
 
   def test_fire_probe_two_charstar_args
-    stub = DtraceStub.new
+    stub = DtraceStub.new(2)
     addr = stub.addr
 
     f = Dtrace::Dof::File.new
@@ -217,11 +222,11 @@ EOD
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
-    s.data = [ 1, 2 ]
+    s.data = [ 0, 1 ]
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 0 ]
+    s.data = [ 44 ]
     f.sections << s
     
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
@@ -263,7 +268,7 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
 
-    stub.call('foo', 'bar')
+    stub.fire('foo', 'bar')
 
     data = []
     c.consume_once do |d|
@@ -273,6 +278,93 @@ EOD
     assert_equal 1, data.length
     assert_equal 'foo', data[0].data[0].value
     assert_equal 'bar', data[0].data[1].value
+  end
+
+  def test_probe_is_enabled
+    stub = DtraceStub.new(0)
+
+    f = Dtrace::Dof::File.new
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
+    s.data = ['test', 'main', 'tes4']
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
+    s.data = [
+              {
+                :noffs    => 1,
+                :enoffidx => 0,
+                :argidx   => 0,
+                :name     => 1,
+                :nenoffs  => 1,
+                :offidx   => 0,
+                :addr     => stub.addr,
+                :nargc    => 0,
+                :func     => 6,
+                :xargc    => 0
+              },
+             ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
+    s.data = [ 0 ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
+    s.data = [ 38 ] # 32 (is_enabled len) + 6 (probe func entry, no args)
+    f.sections << s
+    
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ 8 ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
+    s.data = {
+      :strtab   => 0,
+      :probes   => 1,
+      :prargs   => 2,
+      :proffs   => 3,
+      :prenoffs => 4,
+      :name     => 11,
+      :provattr => { :name => 5, :data => 5, :class => 5 },
+      :modattr  => { :name => 1, :data => 1, :class => 5 },
+      :funcattr => { :name => 1, :data => 1, :class => 5 },
+      :nameattr => { :name => 5, :data => 5, :class => 5 },
+      :argsattr => { :name => 5, :data => 5, :class => 5 }
+    }
+    f.sections << s
+
+    dof = f.generate
+    Dtrace.loaddof(dof)
+
+    assert_equal 0, stub.is_enabled?
+
+    t = Dtrace.new 
+    t.setopt("bufsize", "4m")
+
+    progtext = <<EOD
+tes4*:testmodule:main:test
+{
+  trace("fired!");
+}
+EOD
+    
+    prog = t.compile progtext
+    prog.execute
+    t.go
+    
+    assert_equal 1, stub.is_enabled?
+    
+    stub.fire
+
+    c = DtraceConsumer.new(t)
+    data = []
+    c.consume_once do |d|
+      data << d
+    end
+
+    assert_equal 1, data.length
+    assert_equal 'fired!', data[0].data[0].value
   end
 
 end
