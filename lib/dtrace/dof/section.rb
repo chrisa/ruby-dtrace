@@ -15,6 +15,7 @@ class Dtrace::Dof::Section
     @section_type  = type
     @index         = index
     @flags         = 1 # DOF_SECF_LOAD
+    @data          = {}
   end
 
   def generate

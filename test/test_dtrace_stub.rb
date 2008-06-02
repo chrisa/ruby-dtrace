@@ -6,33 +6,32 @@
 require 'dtrace'
 require 'dtrace/dof'
 require 'test/unit'
-require 'pp'
 
-class TestDofHelper < Test::Unit::TestCase
+class TestDtraceProbe < Test::Unit::TestCase
   include Dtrace::Dof::Constants
   
-  def test_stub
-    s = DtraceStub.new(0)
+  def test_probe
+    p = Dtrace::Probe.new(0)
   end
 
-  def test_fire_stub
-    s = DtraceStub.new(0)
-    s.fire
+  def test_fire_probe
+    p = Dtrace::Probe.new(0)
+    p.fire
   end
 
-  def test_is_stub_not_enabled
-    s = DtraceStub.new(0)
-    assert_equal 0, s.is_enabled?
+  def test_is_probe_not_enabled
+    p = Dtrace::Probe.new(0)
+    assert_equal 0, p.is_enabled?
   end
 
   def test_fire_probe_no_args
-    stub = DtraceStub.new(0)
-    addr = stub.addr
+    probe = Dtrace::Probe.new(0)
+    addr = probe.addr
 
     f = Dtrace::Dof::File.new
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['test', 'main', 'test']
+    s.data = ['args', 'main', 'test']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
@@ -82,7 +81,7 @@ class TestDofHelper < Test::Unit::TestCase
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-test*:testmodule:main:test
+test*:testmodule:main:args
 {
   trace("fired!");
 }
@@ -93,7 +92,7 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
 
-    stub.fire
+    probe.fire
 
     data = []
     c.consume_once do |d|
@@ -105,8 +104,8 @@ EOD
   end
 
   def test_fire_probe_two_int_args
-    stub = DtraceStub.new(2)
-    addr = stub.addr
+    probe = Dtrace::Probe.new(2)
+    addr = probe.addr
 
     f = Dtrace::Dof::File.new
 
@@ -180,7 +179,7 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
 
-    stub.fire(41, 42)
+    probe.fire(41, 42)
 
     data = []
     c.consume_once do |d|
@@ -193,8 +192,8 @@ EOD
   end
 
   def test_fire_probe_two_charstar_args
-    stub = DtraceStub.new(2)
-    addr = stub.addr
+    probe = Dtrace::Probe.new(2)
+    addr = probe.addr
 
     f = Dtrace::Dof::File.new
 
@@ -268,7 +267,7 @@ EOD
     t.go
     c = DtraceConsumer.new(t)
 
-    stub.fire('foo', 'bar')
+    probe.fire('foo', 'bar')
 
     data = []
     c.consume_once do |d|
@@ -281,7 +280,7 @@ EOD
   end
 
   def test_probe_is_enabled
-    stub = DtraceStub.new(0)
+    probe = Dtrace::Probe.new(0)
 
     f = Dtrace::Dof::File.new
 
@@ -298,7 +297,7 @@ EOD
                 :name     => 1,
                 :nenoffs  => 1,
                 :offidx   => 0,
-                :addr     => stub.addr,
+                :addr     => probe.addr,
                 :nargc    => 0,
                 :func     => 6,
                 :xargc    => 0
@@ -337,7 +336,7 @@ EOD
     dof = f.generate
     Dtrace.loaddof(dof)
 
-    assert_equal 0, stub.is_enabled?
+    assert_equal 0, probe.is_enabled?
 
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -353,9 +352,9 @@ EOD
     prog.execute
     t.go
     
-    assert_equal 1, stub.is_enabled?
+    assert_equal 1, probe.is_enabled?
     
-    stub.fire
+    probe.fire
 
     c = DtraceConsumer.new(t)
     data = []

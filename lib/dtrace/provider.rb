@@ -3,7 +3,7 @@
 # (c) 2008 Chris Andrews <chris@nodnol.org>
 #
 
-require 'dtrace/probe'
+require 'dtrace'
 require 'dtrace/dof'
 
 class Dtrace

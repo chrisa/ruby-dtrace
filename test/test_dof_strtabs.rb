@@ -11,36 +11,25 @@ class TestDofStrtabs < Test::Unit::TestCase
   include Dtrace::Dof::Constants
   
   def test_strtab_stridxs
-    strings = ['foo', 'bar', 'baz']
-    sec = Dtrace::Dof::Section::Strtab.new(strings, 1)
-    
+    sec = Dtrace::Dof::Section::Strtab.new(1)
     assert sec
-    assert_equal 1, sec.stridx('foo')
-    assert_equal 5, sec.stridx('bar')
-    assert_equal 9, sec.stridx('baz')
-  end
-
-  def test_strtab_stridxs_uniq
-    strings = ['foo', 'bar', 'foo']
-    sec = Dtrace::Dof::Section::Strtab.new(strings, 1)
     
-    assert sec
-    assert_equal 1, sec.stridx('foo')
-    assert_equal 5, sec.stridx('bar')
+    assert_equal 1, sec.add('foo')
+    assert_equal 5, sec.add('bar')
+    assert_equal 9, sec.add('baz')
   end
 
   def test_strtab_dof
     f = Dtrace::Dof::File.new
 
-    strings = ['test', 'main', 'test']
-    strtab = Dtrace::Dof::Section::Strtab.new(strings, 0)
+    strtab = Dtrace::Dof::Section::Strtab.new(0)
     f.sections << strtab
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
     s.data = [
               {
-                :name     => strtab.stridx('test'),
-                :func     => strtab.stridx('main'),
+                :name     => strtab.add('test'),
+                :func     => strtab.add('main'),
                 :noffs    => 1,
                 :enoffidx => 0,
                 :argidx   => 0,
@@ -67,7 +56,7 @@ class TestDofStrtabs < Test::Unit::TestCase
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
-      :name => strtab.stridx('test'),
+      :name => strtab.add('test'),
       :provattr => { 
         :name  => DTRACE_STABILITY_EVOLVING,
         :data  => DTRACE_STABILITY_EVOLVING,

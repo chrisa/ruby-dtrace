@@ -18,7 +18,7 @@ class TestDisabledProbeEffect < Test::Unit::TestCase
       x.report "noprobes:" do 
         # First time a loop with no probes created
         (1..n).each do |i|
-          i
+          # no op
         end
       end
       
@@ -29,10 +29,7 @@ class TestDisabledProbeEffect < Test::Unit::TestCase
         end
         
         (1..n).each do |i|
-          i
-          Dtrace::Probe::Dpe.p1 do |p|
-            p.fire
-          end
+          Dtrace::Probe::Dpe.p1 { |p| p.fire }
         end
       end
     
@@ -52,10 +49,7 @@ EOD
         t.go
         
         (1..n).each do |i|
-          i
-          Dtrace::Probe::Dpe.p1 do |p|
-            p.fire
-          end
+          Dtrace::Probe::Dpe.p1 { |p| p.fire }
         end
       end
     end
