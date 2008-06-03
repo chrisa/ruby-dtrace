@@ -6,6 +6,10 @@
  * in the same directory as ruby.h, and we must avoid loading that...
  */
 #include "/usr/include/dtrace.h"
+
+/* undefine _FILE_OFFSET_BITS: we want the definition from ruby. */
+#undef _FILE_OFFSET_BITS
+
 #include "ruby.h"
 
 /* Used to pass three Ruby VALUEs as the void *arg of dtrace_work() to
@@ -38,15 +42,15 @@ typedef struct dtrace_handle {
   VALUE drop;
 } dtrace_handle_t;
 
-/* Struct wrapping a "stub", a handcrafted function created to be a
+/* Struct wrapping a probe, a handcrafted function created to be a
    probe trigger point, and its corresponding is_enabled tracepoint.
 
    This is actually a pointer to the is_enabled function (the probe
    function is after) so it's declared to take no args, and return
    int. */
-typedef struct dtrace_stub {
+typedef struct dtrace_probe {
   int (*func)();
-} dtrace_stub_t;
+} dtrace_probe_t;
 
 /* Handle missing RARRAY_LEN etc */
 #ifdef RARRAY_LEN
@@ -88,12 +92,12 @@ VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer_proc);
 VALUE dtrace_hdl_createprocess(VALUE self, VALUE argv);
 VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid);
 
-VALUE dtraceprobe_init(VALUE self);
-VALUE dtraceprobe_probe_id(VALUE self);
-VALUE dtraceprobe_provider(VALUE self);
-VALUE dtraceprobe_mod(VALUE self);
-VALUE dtraceprobe_func(VALUE self);
-VALUE dtraceprobe_name(VALUE self);
+VALUE dtraceprobedesc_init(VALUE self);
+VALUE dtraceprobedesc_probe_id(VALUE self);
+VALUE dtraceprobedesc_provider(VALUE self);
+VALUE dtraceprobedesc_mod(VALUE self);
+VALUE dtraceprobedesc_func(VALUE self);
+VALUE dtraceprobedesc_name(VALUE self);
 
 VALUE dtraceprobedata_init(VALUE self);
 VALUE dtraceprobedata_epid(VALUE self);
@@ -137,10 +141,10 @@ VALUE dtraceerrdata_fault(VALUE self);
 VALUE dtraceerrdata_addr(VALUE self);
 VALUE dtraceerrdata_msg(VALUE self);
 
-VALUE dtracestub_alloc(VALUE klass);
-VALUE dtracestub_init(VALUE self, VALUE argc);
-VALUE dtracestub_addr(VALUE self);
-VALUE dtracestub_fire(int argc, VALUE *argv, VALUE self);
-VALUE dtracestub_is_enabled(VALUE self);
+VALUE dtraceprobe_alloc(VALUE klass);
+VALUE dtraceprobe_init(VALUE self, VALUE argc);
+VALUE dtraceprobe_addr(VALUE self);
+VALUE dtraceprobe_fire(int argc, VALUE *argv, VALUE self);
+VALUE dtraceprobe_is_enabled(VALUE self);
 
 VALUE dtracehelper_loaddof(VALUE self, VALUE dof);

@@ -22,7 +22,7 @@ class TestDtraceProfile < Test::Unit::TestCase
     t.go
     sleep 2
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     i = 0
@@ -65,7 +65,7 @@ EOD
     t.go
     sleep 2
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     i = 0
     c.consume do |d|
@@ -74,7 +74,7 @@ EOD
       assert_equal "profile:::profile-10", d.probe.to_s
 
       d.data.each do |r|
-        assert_equal DtraceAggregateSet, r.class
+        assert_equal Dtrace::AggregateSet, r.class
         r.data.each do |a|
           assert_not_nil a.value
           assert_not_nil a.tuple
@@ -107,7 +107,7 @@ EOD
     t.go
     sleep 2
     
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     i = 0
     c.consume do |d|
@@ -146,7 +146,7 @@ EOD
     sleep 2
     
     i = 0
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     c.consume_once do |d|
       i = i + 1
       assert d
@@ -154,7 +154,7 @@ EOD
       assert_equal "dtrace:::END", d.probe.to_s
       
       d.data.each do |r|
-        assert_equal DtraceAggregateSet, r.class
+        assert_equal Dtrace::AggregateSet, r.class
         r.data.each do |a|
           assert_not_nil a.value
           assert_not_nil a.tuple
@@ -178,7 +178,7 @@ EOD
     t.go
     sleep 2
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     i = 0
     c.consume do |d|
       assert d
@@ -186,8 +186,8 @@ EOD
       assert_equal "profile:::profile-1", d.probe.to_s
 
       assert_equal 2, d.data.length
-      assert_equal DtraceRecord, d.data[0].class
-      assert_equal DtraceStackRecord, d.data[1].class
+      assert_equal Dtrace::Record, d.data[0].class
+      assert_equal Dtrace::StackRecord, d.data[1].class
       
       i = i + 1
       if i > 10
@@ -210,7 +210,7 @@ EOD
     t.go
     sleep 2
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     i = 0
     c.consume do |d|
       assert d
@@ -218,8 +218,8 @@ EOD
       assert_equal "profile:::profile-1", d.probe.to_s
 
       assert_equal 2, d.data.length
-      assert_equal DtraceRecord, d.data[0].class
-      assert_equal DtraceStackRecord, d.data[1].class
+      assert_equal Dtrace::Record, d.data[0].class
+      assert_equal Dtrace::StackRecord, d.data[1].class
 
       i = i + 1
       if i > 10

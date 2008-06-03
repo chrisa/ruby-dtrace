@@ -7,7 +7,7 @@
 RUBY_EXTERN VALUE eDtraceException;
 
 RUBY_EXTERN VALUE cDtrace;
-RUBY_EXTERN VALUE cDtraceProbe;
+RUBY_EXTERN VALUE cDtraceProbeDesc;
 RUBY_EXTERN VALUE cDtraceProgram;
 RUBY_EXTERN VALUE cDtraceRecDesc;
 RUBY_EXTERN VALUE cDtraceProbeData;
@@ -97,7 +97,7 @@ int _dtrace_next_probe(dtrace_hdl_t *hdl, const dtrace_probedesc_t *pdp, void *a
 {
   VALUE probe;
 
-  probe = Data_Wrap_Struct(cDtraceProbe, 0, NULL, (dtrace_probedesc_t *)pdp);
+  probe = Data_Wrap_Struct(cDtraceProbeDesc, 0, NULL, (dtrace_probedesc_t *)pdp);
 
   rb_yield(probe);
   return 0;

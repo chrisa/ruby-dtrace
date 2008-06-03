@@ -23,7 +23,7 @@ EOD
     prog.execute
     t.go
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     # Leopard's ruby-probe is DTracer, Solaris's is Tracer.
     begin

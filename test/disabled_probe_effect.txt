@@ -1,0 +1,19 @@
+solaris-devx:~/ruby-dtrace-dof/ruby-dtrace chris$ ruby -Iext:lib test/test_disabled_probe_effect.rb
+Loaded suite test/test_disabled_probe_effect
+Started
+      user     system      total        real
+noprobes:  0.020000   0.020000   0.040000 (  0.042108)
+disabled:  0.120000   0.110000   0.230000 (  0.231237)
+enabled:   2.670000   0.260000   2.930000 (  2.940411)
+.
+Finished in 3.220336 seconds.
+
+1 tests, 1 assertions, 0 failures, 0 errors
+
+merge Dtrace::Probe and Dtrace::Stub:
+
+Started
+      user     system      total        real
+noprobes:  0.000000   0.010000   0.010000 (  0.020863)
+disabled:  0.090000   0.090000   0.180000 (  0.170912)
+enabled:   2.690000   0.330000   3.020000 (  3.027719)

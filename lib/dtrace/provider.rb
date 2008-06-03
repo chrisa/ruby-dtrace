@@ -134,7 +134,7 @@ class Dtrace
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
       s.data = Array.new
       @probe_defs.each_value do |args|
-        # compute offset into stub: see dtrace_stub.c
+        # compute offset into stub: see dtrace_probe.c
         #
         # 32 bytes - length of is_enabled function
         # +

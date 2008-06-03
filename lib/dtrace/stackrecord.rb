@@ -16,14 +16,16 @@
 #            "libruby.1.dylib`rb_apply+0x392",
 #            "libruby.1.dylib`rb_eval_string_wrap+0xe82"]>
 #
-class DtraceStackRecord
-  attr_reader :value
+class Dtrace
+  class StackRecord
+    attr_reader :value
 
-  # Given a stack as a string returned from DTrace, set the value of
-  # this record to a list of stack frames.
-  def parse(raw)
-    frames = raw.split(/\n/)
-    @value = frames.map {|f| f.lstrip }.select {|f| f.length > 0 }
+    # Given a stack as a string returned from DTrace, set the value of
+    # this record to a list of stack frames.
+    def parse(raw)
+      frames = raw.split(/\n/)
+      @value = frames.map {|f| f.lstrip }.select {|f| f.length > 0 }
+    end
+
   end
-
 end

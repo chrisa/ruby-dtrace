@@ -28,7 +28,7 @@ class TestDtraceRepeat < Test::Unit::TestCase
       # Let some activity happen.
       sleep 1
 
-      c = DtraceConsumer.new(t)
+      c = Dtrace::Consumer.new(t)
       assert c
 
       i = 0

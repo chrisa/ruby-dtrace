@@ -4,15 +4,16 @@
 #
 
 require 'dtrace_api'
-require 'dtracerecord'
+require 'dtrace/record'
+require 'dtrace/consumer'
 require 'dtraceconsumer'
-require 'dtraceaggregate'
-require 'dtraceaggregateset'
-require 'dtraceprobedata'
-require 'dtraceprobe'
-require 'dtracestackrecord'
-require 'dtraceprintfrecord'
-require 'dtracedata'
+require 'dtrace/aggregate'
+require 'dtrace/aggregateset'
+require 'dtrace/probedata'
+require 'dtrace/probedesc'
+require 'dtrace/stackrecord'
+require 'dtrace/printfrecord'
+require 'dtrace/data'
 
 # A DTrace handle. Provides methods for inspecting available probes,
 # compiling and running programs, and for setting up callbacks to
@@ -22,10 +23,10 @@ require 'dtracedata'
 #
 # * Create a handle with Dtrace.new
 # * Set options
-# * Compile the program, possibly inspecting the return DtraceProgramInfo
+# * Compile the program, possibly inspecting the return Dtrace::ProgramInfo
 # * Execute the program
 # * Start tracing
-# * Consume data, either directly by setting up callbacks, or using a DtraceConsumer.
+# * Consume data, either directly by setting up callbacks, or using a Dtrace::Consumer.
 # * Stop tracing
 #
 # === Listing probes
@@ -57,7 +58,7 @@ require 'dtracedata'
 #   t.go
 #   p.continue
 #
-#   c = DtraceConsumer.new(t)
+#   c = Dtrace::Consumer.new(t)
 #   c.consume do |d|
 #     ..
 #   end

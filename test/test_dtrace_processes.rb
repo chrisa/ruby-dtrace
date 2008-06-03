@@ -33,7 +33,7 @@ EOD
     p.continue
 
     i = 0
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     c.consume do |d|
       assert d
       assert_equal "pid#{d.data[0].value}", d.probe.provider
@@ -72,7 +72,7 @@ EOD
     sleep 3
 
     i = 0
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     c.consume_once do |d|
       assert d
       assert_equal "pid#{pid}", d.probe.provider

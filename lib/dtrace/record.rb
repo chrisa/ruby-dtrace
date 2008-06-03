@@ -4,6 +4,8 @@
 #
 # A scalar DTrace record. Its value is as set by the DTrace action
 # which triggered it.
-class DtraceRecord
-  attr_accessor :value
+class Dtrace
+  class Record
+    attr_accessor :value
+  end
 end

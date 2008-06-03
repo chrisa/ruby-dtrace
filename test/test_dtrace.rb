@@ -102,7 +102,7 @@ class TestDtrace < Test::Unit::TestCase
   def test_bad_program
     t = Dtrace.new
     progtext = "blah blahb albhacasfas"
-    e = assert_raise DtraceException do
+    e = assert_raise Dtrace::Exception do
       prog = t.compile progtext
     end
     assert_equal "probe description :::blah does not match any probes", e.message

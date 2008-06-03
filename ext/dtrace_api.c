@@ -5,7 +5,7 @@
 #include "dtrace_api.h"
 
 VALUE cDtrace;
-VALUE cDtraceProbe;
+VALUE cDtraceProbeDesc;
 VALUE cDtraceProgram;
 VALUE cDtraceProgramInfo;
 VALUE cDtraceAggData;
@@ -15,7 +15,7 @@ VALUE cDtraceBufData;
 VALUE cDtraceProcess;
 VALUE cDtraceDropData;
 VALUE cDtraceErrData;
-VALUE cDtraceStub;
+VALUE cDtraceProbe;
 
 VALUE eDtraceException;
 
@@ -40,19 +40,19 @@ void Init_dtrace_api() {
   rb_define_singleton_method(cDtrace, "loaddof", dtracehelper_loaddof,     1); // in dtrace_helper.c
   rb_define_alloc_func(cDtrace, dtrace_hdl_alloc);
 
-  cDtraceProcess = rb_define_class("DtraceProcess", rb_cObject);
+  cDtraceProcess = rb_define_class_under(cDtrace, "Process", rb_cObject);
   rb_define_method(cDtraceProcess, "initialize",    dtrace_process_init,     0); // in dtrace_process.c
   rb_define_method(cDtraceProcess, "continue",      dtrace_process_continue, 0); // in dtrace_process.c
 
-  cDtraceProbe = rb_define_class("DtraceProbe", rb_cObject);
-  rb_define_method(cDtraceProbe, "initialize", dtraceprobe_init,     0); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "probe_id",   dtraceprobe_probe_id, 0); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "provider",   dtraceprobe_provider, 0); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "mod",        dtraceprobe_mod,      0); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "func",       dtraceprobe_func,     0); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "name",       dtraceprobe_name,     0); // in dtrace_probe.c
+  cDtraceProbeDesc = rb_define_class_under(cDtrace, "ProbeDesc", rb_cObject);
+  rb_define_method(cDtraceProbeDesc, "initialize", dtraceprobedesc_init,     0); // in dtrace_probedesc.c
+  rb_define_method(cDtraceProbeDesc, "probe_id",   dtraceprobedesc_probe_id, 0); // in dtrace_probedesc.c
+  rb_define_method(cDtraceProbeDesc, "provider",   dtraceprobedesc_provider, 0); // in dtrace_probedesc.c
+  rb_define_method(cDtraceProbeDesc, "mod",        dtraceprobedesc_mod,      0); // in dtrace_probedesc.c
+  rb_define_method(cDtraceProbeDesc, "func",       dtraceprobedesc_func,     0); // in dtrace_probedesc.c
+  rb_define_method(cDtraceProbeDesc, "name",       dtraceprobedesc_name,     0); // in dtrace_probedesc.c
 
-  cDtraceProbeData = rb_define_class("DtraceProbeData", rb_cObject);
+  cDtraceProbeData = rb_define_class_under(cDtrace, "ProbeData", rb_cObject);
   rb_define_method(cDtraceProbeData, "initialize",  dtraceprobedata_init,        0); // in dtrace_probedata.c
   rb_define_method(cDtraceProbeData, "epid",        dtraceprobedata_epid,        0); // in dtrace_probedata.c
   rb_define_method(cDtraceProbeData, "probe",       dtraceprobedata_probe,       0); // in dtrace_probedata.c
@@ -62,34 +62,34 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceProbeData, "flow",        dtraceprobedata_flow,        0); // in dtrace_probedata.c
   rb_define_method(cDtraceProbeData, "each_record", dtraceprobedata_each_record, 0); // in dtrace_probedata.c
 
-  cDtraceBufData = rb_define_class("DtraceBufData", rb_cObject);
+  cDtraceBufData = rb_define_class_under(cDtrace, "BufData", rb_cObject);
   rb_define_method(cDtraceBufData, "initialize",  dtracebufdata_init,   0); // in dtrace_bufdata.c
   rb_define_method(cDtraceBufData, "epid",        dtracebufdata_epid,   0); // in dtrace_bufdata.c
   rb_define_method(cDtraceBufData, "probe",       dtracebufdata_probe,  0); // in dtrace_bufdata.c
   rb_define_method(cDtraceBufData, "record",      dtracebufdata_record, 0); // in dtrace_bufdata.c
 
-  cDtraceProgram = rb_define_class("DtraceProgram", rb_cObject);
+  cDtraceProgram = rb_define_class_under(cDtrace, "Program", rb_cObject);
   rb_define_method(cDtraceProgram, "initialize",         dtraceprogram_init, 0); // in dtrace_program.c
   rb_define_method(cDtraceProgram, "execute",            dtraceprogram_exec, 0); // in dtrace_program.c
   rb_define_method(cDtraceProgram, "info",               dtraceprogram_info, 0); // in dtrace_program.c
 
-  cDtraceProgramInfo = rb_define_class("DtraceProgramInfo", rb_cObject);
+  cDtraceProgramInfo = rb_define_class_under(cDtrace, "ProgramInfo", rb_cObject);
   rb_define_method(cDtraceProgramInfo, "initialize",         dtraceprograminfo_init,               0); // in dtrace_programinfo.c 
   rb_define_method(cDtraceProgramInfo, "aggregates_count",   dtraceprograminfo_aggregates_count,   0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "recgens_count",      dtraceprograminfo_recgens_count,      0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "matches_count",      dtraceprograminfo_matches_count,      0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "speculations_count", dtraceprograminfo_speculations_count, 0); // in dtrace_programinfo.c
 
-  cDtraceAggData = rb_define_class("DtraceAggData", rb_cObject);
+  cDtraceAggData = rb_define_class_under(cDtrace, "AggData", rb_cObject);
   rb_define_method(cDtraceAggData, "initialize",         dtraceaggdata_init,    0); // in dtrace_aggdata.c 
   rb_define_method(cDtraceAggData, "value",              dtraceaggdata_value,   0); // in dtrace_aggdata.c
   rb_define_method(cDtraceAggData, "aggtype",            dtraceaggdata_aggtype, 0); // in dtrace_aggdata.c
 
-  cDtraceRecDesc = rb_define_class("DtraceRecDesc", rb_cObject);
+  cDtraceRecDesc = rb_define_class_under(cDtrace, "RecDesc", rb_cObject);
   rb_define_method(cDtraceRecDesc, "initialize",         dtracerecdesc_init,   0); // in dtrace_recdesc.c 
   rb_define_method(cDtraceRecDesc, "action",             dtracerecdesc_action, 0); // in dtrace_recdesc.c 
 
-  cDtraceDropData = rb_define_class("DtraceDropData", rb_cObject);
+  cDtraceDropData = rb_define_class_under(cDtrace, "DropData", rb_cObject);
   rb_define_method(cDtraceDropData, "initialize",  dtracedropdata_init,   0); // in dtrace_dropdata.c 
   rb_define_method(cDtraceDropData, "cpu",         dtracedropdata_cpu,    0); // in dtrace_dropdata.c 
   rb_define_method(cDtraceDropData, "drops",       dtracedropdata_drops,  0); // in dtrace_dropdata.c 
@@ -97,7 +97,7 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceDropData, "msg",         dtracedropdata_msg,    0); // in dtrace_dropdata.c 
   rb_define_method(cDtraceDropData, "kind",        dtracedropdata_kind,   0); // in dtrace_dropdata.c 
 
-  cDtraceErrData = rb_define_class("DtraceErrData", rb_cObject);
+  cDtraceErrData = rb_define_class_under(cDtrace, "ErrData", rb_cObject);
   rb_define_method(cDtraceErrData, "initialize",  dtraceerrdata_init,    0); // in dtrace_errdata.c 
   rb_define_method(cDtraceErrData, "cpu",         dtraceerrdata_cpu,     0); // in dtrace_errdata.c 
   rb_define_method(cDtraceErrData, "action",      dtraceerrdata_action,  0); // in dtrace_errdata.c 
@@ -106,13 +106,13 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceErrData, "addr",        dtraceerrdata_addr,    0); // in dtrace_errdata.c 
   rb_define_method(cDtraceErrData, "msg",         dtraceerrdata_msg,     0); // in dtrace_errdata.c 
 
-  cDtraceStub = rb_define_class_under(cDtrace, "Probe", rb_cObject);
-  rb_define_method(cDtraceStub, "initialize",  dtracestub_init,       1); // in dtrace_stub.c
-  rb_define_method(cDtraceStub, "addr",        dtracestub_addr,       0); // in dtrace_stub.c
-  rb_define_method(cDtraceStub, "fire",        dtracestub_fire,      -1); // in dtrace_stub.c
-  rb_define_method(cDtraceStub, "is_enabled?", dtracestub_is_enabled, 0); // in dtrace_stub.c
-  rb_define_alloc_func(cDtraceStub, dtracestub_alloc);
+  cDtraceProbe = rb_define_class_under(cDtrace, "Probe", rb_cObject);
+  rb_define_method(cDtraceProbe, "initialize",  dtraceprobe_init,       1); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "addr",        dtraceprobe_addr,       0); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "fire",        dtraceprobe_fire,      -1); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "is_enabled?", dtraceprobe_is_enabled, 0); // in dtrace_probe.c
+  rb_define_alloc_func(cDtraceProbe, dtraceprobe_alloc);
   
-  eDtraceException = rb_define_class("DtraceException", rb_eStandardError);
+  eDtraceException = rb_define_class_under(cDtrace, "Exception", rb_eStandardError);
 }
 

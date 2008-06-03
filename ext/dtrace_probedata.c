@@ -5,7 +5,7 @@
 #include "dtrace_api.h"
 
 RUBY_EXTERN VALUE eDtraceException;
-RUBY_EXTERN VALUE cDtraceProbe;
+RUBY_EXTERN VALUE cDtraceProbeDesc;
 
 /* :nodoc: */
 VALUE dtraceprobedata_init(VALUE self)
@@ -117,7 +117,7 @@ VALUE dtraceprobedata_probe(VALUE self)
   pd = data->dtpda_pdesc;
 
   if (pd) {
-    dtraceprobe = Data_Wrap_Struct(cDtraceProbe, 0, NULL, (dtrace_probedesc_t *)pd);
+    dtraceprobe = Data_Wrap_Struct(cDtraceProbeDesc, 0, NULL, (dtrace_probedesc_t *)pd);
     return dtraceprobe;
   }
 
@@ -255,7 +255,7 @@ VALUE dtraceprobedata_each_record(VALUE self)
       }
 	
       if (v) {
-	dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("DtraceRecord"));
+	dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("Dtrace::Record"));
 	rb_iv_set(dtracerecord, "@value", v);
 	rb_iv_set(dtracerecord, "@from", rb_str_new2("probedata"));
 	rb_iv_set(dtracerecord, "@index", INT2FIX(i));

@@ -8,7 +8,7 @@ require 'test/unit'
 
 # Tests using the DTrace profile provider.
 
-class TestDtraceAggregates < Test::Unit::TestCase
+class TestLegacyConsumer < Test::Unit::TestCase
   def test_aggregate_group
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -34,7 +34,7 @@ EOD
 
     sleep 3
 
-    c = Dtrace::Consumer.new(t)
+    c = DtraceConsumer.new(t)
     assert c
 
     data = []

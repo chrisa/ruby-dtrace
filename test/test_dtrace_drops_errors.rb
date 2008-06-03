@@ -34,7 +34,7 @@ EOD
     prog = t.compile progtext
     prog.execute
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     i = 0
@@ -70,12 +70,12 @@ EOD
     prog.execute
     t.go 
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     # since we've already said "go", we now can't apply an error
     # handler (DTrace will let us, but won't call it).
-    assert_raise(DtraceException) do
+    assert_raise(Dtrace::Exception) do
       c.errhandler do |d|
         # nothing
       end
@@ -98,7 +98,7 @@ EOD
     prog = t.compile progtext
     prog.execute
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     i = 0
@@ -148,7 +148,7 @@ EOD
     prog = t.compile progtext
     prog.execute
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     errors = 0

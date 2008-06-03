@@ -36,20 +36,20 @@ EOD
 
     sleep 1
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     data = []
-    c.consume_once(DtraceAggregateSet) do |d|
+    c.consume_once(Dtrace::AggregateSet) do |d|
       data << d
     end
     
     assert data.length > 0
     data.each do |d|
       assert d
-      assert_equal DtraceData, d.class
+      assert_equal Dtrace::Data, d.class
       d.data.each do |agg|
-        assert_equal DtraceAggregateSet, agg.class
+        assert_equal Dtrace::AggregateSet, agg.class
       end
     end
 
@@ -82,23 +82,23 @@ EOD
 
     sleep 1
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     assert c
 
     data = []
-    c.consume_once(DtraceAggregateSet, DtracePrintfRecord) do |d|
+    c.consume_once(Dtrace::AggregateSet, Dtrace::PrintfRecord) do |d|
       data << d
     end
     
     assert data.length > 0
     data.each do |d|
       assert d
-      assert_equal DtraceData, d.class
+      assert_equal Dtrace::Data, d.class
       d.data.each do |r|
         if r.respond_to?(:add_aggregate)
-          assert_equal DtraceAggregateSet, r.class
+          assert_equal Dtrace::AggregateSet, r.class
         else
-          assert_equal DtracePrintfRecord, r.class
+          assert_equal Dtrace::PrintfRecord, r.class
         end
       end
     end

@@ -27,7 +27,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     Dtrace::Probe::Foo1.bar do |p|
       p.fire
@@ -61,7 +61,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     Dtrace::Probe::Foo2.bar do |p|
       p.fire(42)
@@ -101,7 +101,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     Dtrace::Probe::Foo3.bar do |p|
       p.fire(42)
@@ -148,7 +148,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     Dtrace::Probe::Foo4.bar do |p|
       p.fire(42, 27)
@@ -267,7 +267,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     
     Dtrace::Probe::Foo5.bar1 do |p|
       p.fire(11)
@@ -373,7 +373,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     Dtrace::Probe::Foo6.bar do |p|
       p.fire('one',  'two', 'three', 'four',

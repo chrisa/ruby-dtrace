@@ -90,7 +90,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     probe.fire
 
@@ -177,7 +177,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     probe.fire(41, 42)
 
@@ -265,7 +265,7 @@ EOD
     prog = t.compile progtext
     prog.execute
     t.go
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
 
     probe.fire('foo', 'bar')
 
@@ -356,7 +356,7 @@ EOD
     
     probe.fire
 
-    c = DtraceConsumer.new(t)
+    c = Dtrace::Consumer.new(t)
     data = []
     c.consume_once do |d|
       data << d
