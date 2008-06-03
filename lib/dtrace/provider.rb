@@ -60,18 +60,18 @@ class Dtrace
     # :string  (char *)
     # :integer (int)
     #
-    # The probe will be named based on the provider name and the
-    # probe's name:
+    # Providing an options hash as the second argument allows you to
+    # override the function name, otherwise it will be taken from the
+    # caller of this function:
     #
-    #   provider_name:*:*:probe-name
-    #
+    #   p.probe :foo, { :function => 'somefunction' }, :int, ...
     #
     def probe(name, *types) 
       options = {}
       if types[0].respond_to? :keys
         options = types.shift
       end
-      options[:function] ||= :main
+      options[:function] ||= Kernel.caller[0].match(/`(.*)'/)[1]
 
       pd = Dtrace::Provider::ProbeDef.new(name, options[:function])
       types.each do |t|

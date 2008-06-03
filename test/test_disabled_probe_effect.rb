@@ -39,7 +39,7 @@ class TestDisabledProbeEffect < Test::Unit::TestCase
         t.setopt("bufsize", "4m")
         
         progtext = <<EOD
-dpe*:ruby:main:p1
+dpe*:ruby:test_probe_no_args:p1
 {
 }
 EOD

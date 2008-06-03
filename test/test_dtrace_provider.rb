@@ -17,7 +17,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test0#{$$}:test1module:main:test"
+      if p.to_s == "test0#{$$}:test1module:test_provider_with_module:test"
         matches += 1
       end
     end
@@ -62,7 +62,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test1#{$$}:ruby:main:test"
+      if p.to_s == "test1#{$$}:ruby:test_probe_no_args:test"
         matches += 1
       end
     end
@@ -77,7 +77,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test2#{$$}:ruby:main:test"
+      if p.to_s == "test2#{$$}:ruby:test_probe_with_char_arg:test"
         matches += 1
       end
     end
@@ -92,7 +92,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test3#{$$}:ruby:main:test"
+      if p.to_s == "test3#{$$}:ruby:test_probe_with_int_arg:test"
         matches += 1
       end
     end
@@ -107,7 +107,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test4#{$$}:ruby:main:test"
+      if p.to_s == "test4#{$$}:ruby:test_probe_with_two_args:test"
         matches += 1
       end
     end
@@ -123,7 +123,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s =~ /^test5#{$$}:ruby:main:test/
+      if p.to_s =~ /^test5#{$$}:ruby:test_multiple_probes_with_two_args:test/
         matches += 1
       end
     end
@@ -142,7 +142,7 @@ class TestDtraceProvider < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s =~ /^test6#{$$}:ruby:main:test/
+      if p.to_s =~ /^test6#{$$}:ruby:test_multiple_probes:test/
         matches += 1
       end
     end

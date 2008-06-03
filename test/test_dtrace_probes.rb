@@ -18,7 +18,7 @@ class TestDtraceProbes < Test::Unit::TestCase
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo1*:ruby:main:bar
+foo1*:ruby:test_probe_no_args:bar
 {
   trace("fired");
 }
@@ -52,7 +52,7 @@ EOD
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo2*:ruby:main:bar
+foo2*:ruby:test_probe_one_int_arg:bar
 {
   trace(arg0);
 }
@@ -87,12 +87,12 @@ EOD
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo3*:ruby:main:bar
+foo3*:ruby:*:bar
 {
   trace(arg0);
 }
 
-foo3*:ruby:main:baz
+foo3*:ruby:*:baz
 {
   trace(copyinstr(arg0));
 }
@@ -132,13 +132,13 @@ EOD
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo4*:ruby:main:bar
+foo4*:ruby:*:bar
 {
   trace(arg0);
   trace(arg1);
 }
 
-foo4*:ruby:main:baz
+foo4*:ruby:*:baz
 {
   trace(copyinstr(arg0));
   trace(copyinstr(arg1));
@@ -191,20 +191,20 @@ EOD
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo5*:ruby:main:bar1
+foo5*:ruby:*:bar1
 {
   trace(arg0);
 
 }
 
-foo5*:ruby:main:bar2
+foo5*:ruby:*:bar2
 {
   trace(arg0);
   trace(arg1);
 
 }
 
-foo5*:ruby:main:bar3
+foo5*:ruby:*:bar3
 {
   trace(arg0);
   trace(arg1);
@@ -212,7 +212,7 @@ foo5*:ruby:main:bar3
 
 }
 
-foo5*:ruby:main:bar4
+foo5*:ruby:*:bar4
 {
   trace(arg0);
   trace(arg1);
@@ -221,7 +221,7 @@ foo5*:ruby:main:bar4
 
 }
 
-foo5*:ruby:main:bar5
+foo5*:ruby:*:bar5
 {
   trace(arg0);
   trace(arg1);
@@ -230,7 +230,7 @@ foo5*:ruby:main:bar5
   trace(arg4);
 }
 
-foo5*:ruby:main:bar6
+foo5*:ruby:*:bar6
 {
   trace(arg0);
   trace(arg1);
@@ -240,7 +240,7 @@ foo5*:ruby:main:bar6
   trace(arg5);
 }
 
-foo5*:ruby:main:bar7
+foo5*:ruby:*:bar7
 {
   trace(arg0);
   trace(arg1);
@@ -251,7 +251,7 @@ foo5*:ruby:main:bar7
   trace(arg6);
 }
 
-foo5*:ruby:main:bar8
+foo5*:ruby:*:bar8
 {
   trace(arg0);
   trace(arg1);
@@ -357,7 +357,7 @@ EOD
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
-foo6*:ruby:main:bar
+foo6*:ruby:*:bar
 {
   trace(copyinstr(arg0));
   trace(copyinstr(arg1));
