@@ -10,11 +10,34 @@
 
 RUBY_EXTERN VALUE eDtraceException;
 
-/* ignore Sol10 GA ... */
 #ifdef __APPLE__
 static const char *helper = "/dev/dtracehelper";
-#else
+
+int _loaddof(int fd, dof_helper_t *dh)
+{
+  int ret;
+  uint8_t buffer[sizeof(dof_ioctl_data_t) + sizeof(dof_helper_t)];
+  dof_ioctl_data_t* ioctlData = (dof_ioctl_data_t*)buffer;
+
+  ioctlData->dofiod_count = 1LL;
+  memcpy(&ioctlData->dofiod_helpers[0], dh, sizeof(dof_helper_t));
+
+  user_addr_t val = (user_addr_t)(unsigned long)ioctlData;
+  ret = ioctl(fd, DTRACEHIOC_ADDDOF, &val);
+  
+  return ret;
+}
+
+#else /* Solaris */
+
+/* ignore Sol10 GA ... */
 static const char *helper = "/dev/dtrace/helper";
+
+int _loaddof(int fd, dof_helper_t *dh)
+{
+  return ioctl(fd, DTRACEHIOC_ADDDOF, dh);
+}
+
 #endif
 
 VALUE dtracehelper_loaddof(VALUE self, VALUE rdof, VALUE module_name)
@@ -37,7 +60,6 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof, VALUE module_name)
 
   dh.dofhp_dof  = (uintptr_t)dof;
   dh.dofhp_addr = (uintptr_t)dof;
-  
   (void) snprintf(dh.dofhp_mod, sizeof (dh.dofhp_mod), RSTRING(module_name)->ptr);
 
   if ((fd = open(helper, O_RDWR)) < 0) {
@@ -46,9 +68,9 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof, VALUE module_name)
     return Qnil;
   }
   else {
-    if ((gen = ioctl(fd, DTRACEHIOC_ADDDOF, &dh)) < 0)
+    if ((gen = _loaddof(fd, &dh)) < 0)
       rb_raise(eDtraceException, "DTrace ioctl failed: %s", strerror(errno));
-    
+
     (void) close(fd);
   }
 
