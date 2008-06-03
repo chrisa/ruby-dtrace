@@ -25,7 +25,10 @@ task :extensions do
   Dir.chdir('ext')
   system("ruby extconf.rb")
   system("make")
-  Dir.chdir('..')
+  Dir.chdir('dof')
+  system("ruby extconf.rb")
+  system("make")  
+  Dir.chdir('../..')
 end
 
 # vim: syntax=Ruby

@@ -33,8 +33,15 @@ class Dtrace
     # create yields a Provider for the current platform, on which you
     # can call probe, to create the individual probes. 
     # 
-    def self.create(name)
-      provider = Dtrace::Provider.new(name)
+    # You can override the module name in the created probes, by
+    # passing in an hash:
+    #
+    #   Dtrace::Provider.create :foo, { :module => 'somemodule' } do |p|
+    #     p.probe...
+    #   end
+    def self.create(name, options={})
+      options[:module] ||= 'ruby'
+      provider = Dtrace::Provider.new(name, options[:module])
       yield provider
       provider.enable
     end
@@ -68,9 +75,10 @@ class Dtrace
       end
     end
 
-    def initialize(name)
-      @name       = name.to_s
-      @class      = camelize(name)
+    def initialize(provider_name, module_name)
+      @name       = provider_name.to_s
+      @module     = module_name.to_s
+      @class      = camelize(provider_name)
       @probe_defs = {}
     end
 
@@ -197,7 +205,7 @@ class Dtrace
       f.sections << s
       
       dof = f.generate
-      Dtrace.loaddof(dof)
+      Dtrace.loaddof(dof, @module)
 
       c = Class.new
       c.class_eval do

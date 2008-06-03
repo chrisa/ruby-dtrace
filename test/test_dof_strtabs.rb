@@ -88,7 +88,7 @@ class TestDofStrtabs < Test::Unit::TestCase
     dof = f.generate
     assert dof
 
-    Dtrace.loaddof(dof)    
+    Dtrace.loaddof(dof, 'testmodule')
   end
 
 end

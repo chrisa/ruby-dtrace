@@ -60,7 +60,7 @@ class TestDofProviders < Test::Unit::TestCase
     dof = f.generate
     assert dof
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -125,7 +125,7 @@ class TestDofProviders < Test::Unit::TestCase
     dof = f.generate
     assert dof
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -194,7 +194,7 @@ class TestDofProviders < Test::Unit::TestCase
       io.puts dof
     end
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -262,7 +262,7 @@ class TestDofProviders < Test::Unit::TestCase
     dof = f.generate
     assert dof
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new
     matches = 0

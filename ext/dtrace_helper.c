@@ -17,7 +17,7 @@ static const char *helper = "/dev/dtracehelper";
 static const char *helper = "/dev/dtrace/helper";
 #endif
 
-VALUE dtracehelper_loaddof(VALUE self, VALUE rdof)
+VALUE dtracehelper_loaddof(VALUE self, VALUE rdof, VALUE module_name)
 {
   dof_hdr_t *dof = NULL;
   dof_helper_t dh;
@@ -38,7 +38,7 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof)
   dh.dofhp_dof  = (uintptr_t)dof;
   dh.dofhp_addr = (uintptr_t)dof;
   
-  (void) snprintf(dh.dofhp_mod, sizeof (dh.dofhp_mod), "testmodule");
+  (void) snprintf(dh.dofhp_mod, sizeof (dh.dofhp_mod), RSTRING(module_name)->ptr);
 
   if ((fd = open(helper, O_RDWR)) < 0) {
     rb_raise(eDtraceException, "failed to open helper device %s: %s", 

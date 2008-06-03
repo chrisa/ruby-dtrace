@@ -6,7 +6,6 @@
 require 'dtrace'
 require 'dtrace/dof'
 require 'test/unit'
-require 'pp'
 
 $dof_dir = File.dirname(__FILE__)
 
@@ -15,7 +14,7 @@ class TestDofHelper < Test::Unit::TestCase
   
   def test_sun_dof
     dof = File.read("#{$dof_dir}/dof")
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -104,7 +103,7 @@ class TestDofHelper < Test::Unit::TestCase
     dof = f.generate
     assert dof
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new
     matches = 0

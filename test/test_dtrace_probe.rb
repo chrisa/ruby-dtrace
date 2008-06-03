@@ -75,7 +75,7 @@ class TestDtraceProbe < Test::Unit::TestCase
     f.sections << s
 
     dof = f.generate
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
   
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -161,7 +161,7 @@ EOD
       io.puts dof
     end
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -249,7 +249,7 @@ EOD
       io.puts dof
     end
 
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -334,7 +334,7 @@ EOD
     f.sections << s
 
     dof = f.generate
-    Dtrace.loaddof(dof)
+    Dtrace.loaddof(dof, 'testmodule')
 
     assert_equal 0, probe.is_enabled?
 

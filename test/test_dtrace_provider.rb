@@ -7,8 +7,23 @@ require 'dtrace'
 require 'dtrace/provider'
 require 'test/unit'
 
-class TestDtraceProviders < Test::Unit::TestCase
+class TestDtraceProvider < Test::Unit::TestCase
   
+  def test_provider_with_module
+    Dtrace::Provider.create :test0, { :module => 'test1module' } do |p|
+      p.probe :test
+    end
+
+    t = Dtrace.new
+    matches = 0
+    t.each_probe do |p|
+      if p.to_s == "test0#{$$}:test1module:main:test"
+        matches += 1
+      end
+    end
+    assert_equal 1, matches
+  end
+
   def test_probe_no_args
     Dtrace::Provider.create :test1 do |p|
       p.probe :test
@@ -17,7 +32,7 @@ class TestDtraceProviders < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test1#{$$}:testmodule:main:test"
+      if p.to_s == "test1#{$$}:ruby:main:test"
         matches += 1
       end
     end
@@ -32,7 +47,7 @@ class TestDtraceProviders < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test2#{$$}:testmodule:main:test"
+      if p.to_s == "test2#{$$}:ruby:main:test"
         matches += 1
       end
     end
@@ -47,7 +62,7 @@ class TestDtraceProviders < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test3#{$$}:testmodule:main:test"
+      if p.to_s == "test3#{$$}:ruby:main:test"
         matches += 1
       end
     end
@@ -62,7 +77,7 @@ class TestDtraceProviders < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s == "test4#{$$}:testmodule:main:test"
+      if p.to_s == "test4#{$$}:ruby:main:test"
         matches += 1
       end
     end
@@ -78,7 +93,7 @@ class TestDtraceProviders < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s =~ /^test5#{$$}:testmodule:main:test/
+      if p.to_s =~ /^test5#{$$}:ruby:main:test/
         matches += 1
       end
     end
@@ -97,7 +112,7 @@ class TestDtraceProviders < Test::Unit::TestCase
     t = Dtrace.new
     matches = 0
     t.each_probe do |p|
-      if p.to_s =~ /^test6#{$$}:testmodule:main:test/
+      if p.to_s =~ /^test6#{$$}:ruby:main:test/
         matches += 1
       end
     end
