@@ -5,6 +5,7 @@
 
 require 'dtrace'
 require 'dtrace/dof'
+require 'dtrace/provider/probedef'
 
 class Dtrace
 
@@ -16,6 +17,8 @@ class Dtrace
   #
   class Provider
     include Dtrace::Dof::Constants
+
+    Typemap = { :string => 'char *', :integer => 'int' } 
 
     # Creates a DTrace provider.
     #
@@ -64,22 +67,29 @@ class Dtrace
     #
     #
     def probe(name, *types) 
-      typemap = { :string => 'char *', :integer => 'int' } 
-      @probe_defs[name] = []
+      options = {}
+      if types[0].respond_to? :keys
+        options = types.shift
+      end
+      options[:function] ||= :main
+
+      pd = Dtrace::Provider::ProbeDef.new(name, options[:function])
       types.each do |t|
-        if typemap[t].nil?
-          raise DtraceException.new("type '#{t}' invalid")
+        if Typemap[t].nil?
+          raise Dtrace::Exception.new("type '#{t}' invalid")
         else
-          @probe_defs[name] << typemap[t]
+          pd.args << Typemap[t]
         end
       end
+
+      @probe_defs << pd
     end
 
     def initialize(provider_name, module_name)
       @name       = provider_name.to_s
       @module     = module_name.to_s
       @class      = camelize(provider_name)
-      @probe_defs = {}
+      @probe_defs = []
     end
 
     def enable
@@ -93,11 +103,11 @@ class Dtrace
       stubs = Hash.new
       argidx = 0
       offidx = 0
-      @probe_defs.each_key do |name|
-        argc = @probe_defs[name].length
+      @probe_defs.each do |pd|
+        argc = pd.argc
         
         argv = 0
-        @probe_defs[name].each do |type|
+        pd.args.each do |type|
           i = strtab.add(type)
           argv = i if argv == 0
         end
@@ -105,8 +115,8 @@ class Dtrace
         probe = Dtrace::Probe.new(argc)
         probes <<
           {
-          :name     => strtab.add(name),
-          :func     => strtab.add('main'), # XXX
+          :name     => strtab.add(pd.name),
+          :func     => strtab.add(pd.function),
           :noffs    => 1,
           :enoffidx => offidx,
           :argidx   => argidx,
@@ -119,7 +129,7 @@ class Dtrace
           :xargv    => argv,
         }
         
-        stubs[name] = probe
+        stubs[pd.name] = probe
         argidx += argc
         offidx += 1
       end
@@ -129,8 +139,8 @@ class Dtrace
       s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
       s.data = Array.new
 
-      @probe_defs.each_value do |args|
-        args.each_with_index do |arg, i|
+      @probe_defs.each do |pd|
+        pd.args.each_with_index do |arg, i|
           s.data << i
         end
       end
@@ -141,7 +151,7 @@ class Dtrace
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
       s.data = Array.new
-      @probe_defs.each_value do |args|
+      @probe_defs.each do |pd|
         # compute offset into stub: see dtrace_probe.c
         #
         # 32 bytes - length of is_enabled function
@@ -150,7 +160,7 @@ class Dtrace
         # +
         # 3 bytes per argument - arg->stack push
         #
-        offset = 32 + 6 + 3 * args.length
+        offset = 32 + 6 + 3 * pd.argc
         s.data << offset
       end
       if s.data.empty?
@@ -160,7 +170,7 @@ class Dtrace
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
       s.data = Array.new
-      @probe_defs.each_value do |args|
+      @probe_defs.each do |pd|
         s.data << 8
       end
       if s.data.empty?
@@ -211,6 +221,7 @@ class Dtrace
       c.class_eval do
         @@probes = stubs
         def self.method_missing(name)
+          name = name.to_s
           unless @@probes[name].nil?
             if @@probes[name].is_enabled?
               yield @@probes[name]

@@ -24,6 +24,36 @@ class TestDtraceProvider < Test::Unit::TestCase
     assert_equal 1, matches
   end
 
+  def test_probe_with_function_no_args
+    Dtrace::Provider.create :test10 do |p|
+      p.probe :test, { :function => :foo }
+    end
+
+    t = Dtrace.new
+    matches = 0
+    t.each_probe do |p|
+      if p.to_s == "test10#{$$}:ruby:foo:test"
+        matches += 1
+      end
+    end
+    assert_equal 1, matches
+  end
+
+  def test_probe_with_function_and_args
+    Dtrace::Provider.create :test11 do |p|
+      p.probe :test, { :function => :foo }, :integer, :integer
+    end
+
+    t = Dtrace.new
+    matches = 0
+    t.each_probe do |p|
+      if p.to_s == "test11#{$$}:ruby:foo:test"
+        matches += 1
+      end
+    end
+    assert_equal 1, matches
+  end
+
   def test_probe_no_args
     Dtrace::Provider.create :test1 do |p|
       p.probe :test
