@@ -1,16 +1,24 @@
 ruby-dtrace is Ruby bindings for Dtrace, which lets you write D-based
-programs in Ruby. It doesn't provide D probes for Ruby, but you can
-use it with the probes found in the Joyent and Apple builds of Ruby.
+programs in Ruby, and add probes to your Ruby programs.
 
 == FEATURES
   
+Consumer:
+
 * Access to the D API
 * Probe metadata
 * Run D programs
 * Access aggregates
 * Consume output from D programs
 
+Probes:
+
+* Create USDT providers from Ruby
+* No code-generation or gcc/linker dependency
+
 == SYNOPSIS
+
+Consumer:
 
     t = Dtrace.new 
     progtext = 'ruby$1:::function-entry{ @a[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); } END { printa(@a); }'
@@ -26,10 +34,31 @@ use it with the probes found in the Joyent and Apple builds of Ruby.
       # handle records
     end
 
+Probes:
+
+    Dtrace::Provider.create :rubyprog do |p|
+      p.probe :foo, :string, :string
+      p.probe :bar, :integer, :integer
+    end
+
+    Dtrace::Probe::Rubyprog.foo do |p|
+      p.fire('fired!', 'again')
+    end    
+
+    Dtrace::Probe::Rubyprog.bar do |p|
+      p.fire(42, 27)
+    end    
+
 == REQUIREMENTS
 
-* A platform with Dtrace support (OpenSolaris, Mac OS X 10.5 Leopard tested, possibly also FreeBSD).
-* root, or some/all of the dtrace privileges on Solaris: dtrace_user, dtrace_proc and dtrace_kernel.
+* For the consumer API, platform with DTrace support (OpenSolaris, Mac
+  OS X 10.5 Leopard tested, possibly also FreeBSD).
+
+* For the probe API, a platform with DTrace support, on i386. Mac OS X
+  on PowerPC, Solaris on SPARC and FreeBSD on anything to come).
+
+* root, or some/all of the dtrace privileges on Solaris: dtrace_user,
+  dtrace_proc and dtrace_kernel.
 
 == INSTALL
 
