@@ -40,6 +40,8 @@ int _loaddof(int fd, dof_helper_t *dh)
 
 #endif
 
+/* Load the given Dtrace::Dof::File into the kernel, against the given
+   module name. */
 VALUE dof_loaddof(VALUE self, VALUE dof_file, VALUE module_name)
 {
   dof_helper_t dh;

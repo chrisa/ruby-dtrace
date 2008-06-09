@@ -329,8 +329,8 @@ _dof_parse_unknown(VALUE self, char *dof, dof_sec_t *sec)
   return section_data;
 }
 
-VALUE
-dof_parse(VALUE self, VALUE rdof)
+/* Parse the given DOF */
+VALUE dof_parse(VALUE self, VALUE rdof)
 {
   VALUE dof_data;
   VALUE sec_data;

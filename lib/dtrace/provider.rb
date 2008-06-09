@@ -50,10 +50,6 @@ class Dtrace
       provider.enable
     end
 
-    def self.unload(name)
-      
-    end
-
     # Creates a DTrace USDT probe. Arguments are the probe name, and
     # then the argument types it will accept. The following argument
     # types are supported:

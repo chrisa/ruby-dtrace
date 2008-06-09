@@ -148,6 +148,9 @@ VALUE dtraceprobe_alloc(VALUE klass)
   return obj;
 }
 
+/*
+ * Returns the address of the probe's generated code.
+ */
 VALUE dtraceprobe_addr(VALUE self)
 {
   dtrace_probe_t *probe;
@@ -156,6 +159,10 @@ VALUE dtraceprobe_addr(VALUE self)
   return INT2FIX(probe->func);
 }
 
+/*
+ * Returns whether or not this probe is currently enabled, by invoking
+ * the is-enabled tracepoint attached to the probe.
+ */
 VALUE dtraceprobe_is_enabled(VALUE self)
 {
   dtrace_probe_t *probe;
@@ -164,6 +171,10 @@ VALUE dtraceprobe_is_enabled(VALUE self)
   return INT2FIX((int)(*probe->func)());
 }
 
+/*
+ * Fires the probe, converting arguments based on the data provided -
+ * no validation is done against the probe's declared types.
+ */
 VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
   dtrace_probe_t *probe;
   int i;
@@ -229,6 +240,10 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
   return Qnil;
 }
 
+/* 
+ * Returns the offset for this probe in the PROFFS section, based on
+ * the location of the DOF, and the location of this probe.
+ */
 VALUE dtraceprobe_probe_offset(VALUE self, VALUE file_addr, VALUE argc)
 {
   void *probe_addr;
@@ -248,6 +263,11 @@ VALUE dtraceprobe_probe_offset(VALUE self, VALUE file_addr, VALUE argc)
   return INT2FIX((int)probe_addr - (int)FIX2INT(file_addr) + offset);
 }
 
+/* 
+ * Returns the offset for this probe's is-enabled tracepoint in the
+ * PRENOFFS section, based on the location of the DOF, and the
+ * location of this probe.
+ */
 VALUE dtraceprobe_is_enabled_offset(VALUE self, VALUE file_addr)
 {
   void *probe_addr;

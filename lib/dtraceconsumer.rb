@@ -5,5 +5,5 @@
 
 require 'dtrace/consumer'
 
-# Interface preservation
+# Interface preservation - see Dtrace::Consumer.
 class DtraceConsumer < Dtrace::Consumer; end

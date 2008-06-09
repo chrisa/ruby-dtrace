@@ -14,6 +14,7 @@ static VALUE dof_file_free(void *arg)
     free(file);
 }
 
+/* :nodoc: */
 VALUE dof_file_alloc(VALUE klass)
 {
   VALUE obj;
@@ -27,6 +28,7 @@ VALUE dof_file_alloc(VALUE klass)
   return obj;
 }
 
+/* Appends the given string to the DOF file. */
 VALUE dof_file_append(VALUE self, VALUE data)
 {
   dof_file_t *file;
@@ -36,6 +38,7 @@ VALUE dof_file_append(VALUE self, VALUE data)
   file->offset += RSTRING(data)->len;
 }
 
+/* Returns the memory address of the DOF file. */
 VALUE dof_file_addr(VALUE self)
 {
   dof_file_t *file;
@@ -43,6 +46,7 @@ VALUE dof_file_addr(VALUE self)
   return INT2FIX(file->dof);
 }
 
+/* Returns the DOF itself. */
 VALUE dof_file_data(VALUE self)
 {
   dof_file_t *file;
