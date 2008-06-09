@@ -18,6 +18,11 @@ VALUE dof_generate_header(VALUE self) {
   VALUE hdr_data;
   uint8_t dof_version;
 
+  /* DOF versioning: Apple always needs version 3, but Solaris can use
+     1 or 2 depending on whether is-enabled probes are needed. */
+#ifdef __APPLE__
+  dof_version = DOF_VERSION_3;
+#else
   switch(FIX2INT(rb_iv_get(self, "@dof_version"))) {
   case 1:
     dof_version = DOF_VERSION_1;
@@ -28,6 +33,7 @@ VALUE dof_generate_header(VALUE self) {
   default:
     dof_version = DOF_VERSION;
   }
+#endif
   
   memset(&hdr, 0, sizeof(hdr));
   

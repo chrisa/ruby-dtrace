@@ -85,10 +85,8 @@ class TestDofStrtabs < Test::Unit::TestCase
     }
     f.sections << s
 
-    dof = f.generate
-    assert dof
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
   end
 
 end

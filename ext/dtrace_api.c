@@ -37,7 +37,6 @@ void Init_dtrace_api() {
   rb_define_method(cDtrace, "err_consumer",    dtrace_hdl_err_consumer,    1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "createprocess",   dtrace_hdl_createprocess,   1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "grabprocess",     dtrace_hdl_grabprocess,     1); // in dtrace_hdl.c
-  rb_define_singleton_method(cDtrace, "loaddof", dtracehelper_loaddof,     2); // in dtrace_helper.c
   rb_define_alloc_func(cDtrace, dtrace_hdl_alloc);
 
   cDtraceProcess = rb_define_class_under(cDtrace, "Process", rb_cObject);
@@ -107,10 +106,12 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceErrData, "msg",         dtraceerrdata_msg,     0); // in dtrace_errdata.c 
 
   cDtraceProbe = rb_define_class_under(cDtrace, "Probe", rb_cObject);
-  rb_define_method(cDtraceProbe, "initialize",  dtraceprobe_init,       1); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "addr",        dtraceprobe_addr,       0); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "fire",        dtraceprobe_fire,      -1); // in dtrace_probe.c
-  rb_define_method(cDtraceProbe, "is_enabled?", dtraceprobe_is_enabled, 0); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "initialize",        dtraceprobe_init,              1); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "addr",              dtraceprobe_addr,              0); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "fire",              dtraceprobe_fire,             -1); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "is_enabled?",       dtraceprobe_is_enabled,        0); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "probe_offset",      dtraceprobe_probe_offset,      2); // in dtrace_probe.c
+  rb_define_method(cDtraceProbe, "is_enabled_offset", dtraceprobe_is_enabled_offset, 1); // in dtrace_probe.c
   rb_define_alloc_func(cDtraceProbe, dtraceprobe_alloc);
   
   eDtraceException = rb_define_class_under(cDtrace, "Exception", rb_eStandardError);

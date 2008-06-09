@@ -14,7 +14,9 @@ class TestDofHelper < Test::Unit::TestCase
   
   def test_sun_dof
     dof = File.read("#{$dof_dir}/dof")
-    Dtrace.loaddof(dof, 'testmodule')
+    f = Dtrace::Dof::File.new
+    f << dof
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -57,37 +59,24 @@ class TestDofHelper < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
     s.data = [ 36 ]
     f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ 0 ]
+    f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
+      :prenoffs => 4,
       :name => 25,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
       :funcattr => { :name => 1, :data => 1, :class => 5 },
       :nameattr => { :name => 5, :data => 5, :class => 5 },
       :argsattr => { :name => 5, :data => 5, :class => 5 }
-    }
-    f.sections << s
-
-    s = Dtrace::Dof::Section.new(DOF_SECT_RELTAB, 5)
-    s.data = [
-              { :name   => 20, # main
-                :type   => 1,  # setx?
-                :offset => 0,
-                :data   => 0,
-              }
-             ]
-    f.sections << s
-
-    s = Dtrace::Dof::Section.new(DOF_SECT_URELHDR, 6)
-    s.data = {
-      :strtab => 0,
-      :relsec => 5,
-      :tgtsec => 1,
     }
     f.sections << s
 
@@ -100,10 +89,8 @@ class TestDofHelper < Test::Unit::TestCase
     s.flags = 0 # no load
     f.sections << s
 
-    dof = f.generate
-    assert dof
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new
     matches = 0

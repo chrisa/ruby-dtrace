@@ -288,7 +288,7 @@ _dof_parse_uint32_t_array(VALUE self, char *dof, dof_sec_t *sec)
 
   memcpy(&array, data, len * sizeof(uint32_t));
   for (i = 0; i < len; i++) {
-    rb_ary_push(ary_data, INT2FIX(array[i]));
+    rb_ary_push(ary_data, INT2FIX((unsigned int)array[i]));
   }
 
   return ary_data;

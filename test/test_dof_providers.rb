@@ -41,13 +41,18 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
     s.data = [ 36 ]
     f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ 0 ]
+    f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
+      :prenoffs => 4,
       :name   => 11,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
@@ -57,10 +62,8 @@ class TestDofProviders < Test::Unit::TestCase
     }
     f.sections << s
 
-    dof = f.generate
-    assert dof
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -106,13 +109,18 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
     s.data = [ 36 ]
     f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ 0 ]
+    f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
+      :prenoffs => 4,
       :name   => 25,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
@@ -122,10 +130,8 @@ class TestDofProviders < Test::Unit::TestCase
     }
     f.sections << s
 
-    dof = f.generate
-    assert dof
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -171,13 +177,18 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
     s.data = [ 36 ]
     f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ 36 ]
+    f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
+      :prenoffs => 4,
       :name   => 19,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
@@ -187,14 +198,8 @@ class TestDofProviders < Test::Unit::TestCase
     }
     f.sections << s
 
-    dof = f.generate
-    assert dof
-
-    File.open('testdof', 'w') do |io|
-      io.puts dof
-    end
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new
     matches = 0
@@ -259,10 +264,8 @@ class TestDofProviders < Test::Unit::TestCase
     }
     f.sections << s
 
-    dof = f.generate
-    assert dof
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new
     matches = 0

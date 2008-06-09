@@ -2,13 +2,13 @@
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
 
-#include "dtrace_api.h"
+#include "dof.h"
 
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
 
-RUBY_EXTERN VALUE eDtraceException;
+RUBY_EXTERN VALUE eDtraceDofException;
 
 #ifdef __APPLE__
 static const char *helper = "/dev/dtracehelper";
@@ -40,21 +40,22 @@ int _loaddof(int fd, dof_helper_t *dh)
 
 #endif
 
-VALUE dtracehelper_loaddof(VALUE self, VALUE rdof, VALUE module_name)
+VALUE dof_loaddof(VALUE self, VALUE dof_file, VALUE module_name)
 {
-  dof_hdr_t *dof = NULL;
   dof_helper_t dh;
   int fd;
   int gen;
+  dof_file_t *file;
+  dof_hdr_t *dof;
 
-  dof = (dof_hdr_t *)ALLOC_N(char, RSTRING(rdof)->len);
-  memcpy(dof, RSTRING(rdof)->ptr, RSTRING(rdof)->len);
+  Data_Get_Struct(dof_file, dof_file_t, file);
+  dof = (dof_hdr_t *)file->dof;
 
   if (dof->dofh_ident[DOF_ID_MAG0] != DOF_MAG_MAG0 ||
       dof->dofh_ident[DOF_ID_MAG1] != DOF_MAG_MAG1 ||
       dof->dofh_ident[DOF_ID_MAG2] != DOF_MAG_MAG2 ||
       dof->dofh_ident[DOF_ID_MAG3] != DOF_MAG_MAG3) {
-    rb_raise(eDtraceException, "DOF corrupt: bad magic");
+    rb_raise(eDtraceDofException, "DOF corrupt: bad magic");
     return Qnil;
   }
 
@@ -63,13 +64,13 @@ VALUE dtracehelper_loaddof(VALUE self, VALUE rdof, VALUE module_name)
   (void) snprintf(dh.dofhp_mod, sizeof (dh.dofhp_mod), RSTRING(module_name)->ptr);
 
   if ((fd = open(helper, O_RDWR)) < 0) {
-    rb_raise(eDtraceException, "failed to open helper device %s: %s", 
+    rb_raise(eDtraceDofException, "failed to open helper device %s: %s", 
 	     helper, strerror(errno));
     return Qnil;
   }
   else {
     if ((gen = _loaddof(fd, &dh)) < 0)
-      rb_raise(eDtraceException, "DTrace ioctl failed: %s", strerror(errno));
+      rb_raise(eDtraceDofException, "DTrace ioctl failed: %s", strerror(errno));
 
     (void) close(fd);
   }

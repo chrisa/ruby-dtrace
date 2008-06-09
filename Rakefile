@@ -31,4 +31,13 @@ task :extensions do
   Dir.chdir('../..')
 end
 
+desc "Clean all extensions"
+task :clean_extensions do
+  Dir.chdir('ext')
+  system("make clean")
+  Dir.chdir('dof')
+  system("make clean")  
+  Dir.chdir('../..')
+end
+
 # vim: syntax=Ruby

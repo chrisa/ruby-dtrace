@@ -9,11 +9,14 @@ VALUE cDtraceDofParser;
 VALUE cDtraceDofGenerator;
 VALUE cDtraceDofSection;
 VALUE cDtraceDofHeader;
+VALUE cDtraceDofFile;
 VALUE eDtraceDofException;
 
 void Init_dof_api() {
   VALUE dtrace = rb_define_class("Dtrace", rb_cObject);
   VALUE dof    = rb_define_class_under(dtrace, "Dof", rb_cObject);
+
+  rb_define_singleton_method(dof, "loaddof", dof_loaddof, 2); // in dof_helper.c
   
   eDtraceDofException = rb_define_class_under(dof, "Exception", rb_eStandardError);
 
@@ -43,6 +46,12 @@ void Init_dof_api() {
   rb_define_attr(cDtraceDofHeader, "dof_version", 0, 1);
   rb_define_method(cDtraceDofHeader, "generate", dof_generate_header, 0); // in header.c
   rb_define_method(cDtraceDofHeader, "hdrlen",   dof_header_len,      0); // in header.c
+
+  cDtraceDofFile = rb_define_class_under(dof, "File", rb_cObject);
+  rb_define_alloc_func(cDtraceDofFile, dof_file_alloc);           // in file.c
+  rb_define_method(cDtraceDofFile, "<<",     dof_file_append, 1); // in file.c
+  rb_define_method(cDtraceDofFile, "addr",   dof_file_addr,   0); // in file.c
+  rb_define_method(cDtraceDofFile, "data",   dof_file_data,   0); // in file.c
 
   _init_constants(dof);
 }

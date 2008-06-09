@@ -41,7 +41,7 @@ class TestDtraceProbe < Test::Unit::TestCase
                 :enoffidx => 0,
                 :argidx   => 0,
                 :name     => 1,
-                :nenoffs  => 0,
+                :nenoffs  => 1,
                 :offidx   => 0,
                 :addr     => addr,
                 :nargc    => 0,
@@ -56,16 +56,21 @@ class TestDtraceProbe < Test::Unit::TestCase
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 38 ]
+    s.data = [ probe.probe_offset(f.addr, 0) ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
-      :strtab => 0,
-      :probes => 1,
-      :prargs => 2,
-      :proffs => 3,
-      :name   => 11,
+      :strtab   => 0,
+      :probes   => 1,
+      :prargs   => 2,
+      :proffs   => 3,
+      :prenoffs => 4,
+      :name     => 11,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
       :funcattr => { :name => 1, :data => 1, :class => 5 },
@@ -74,11 +79,19 @@ class TestDtraceProbe < Test::Unit::TestCase
     }
     f.sections << s
 
-    dof = f.generate
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
   
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
+
+    matches = 0
+    t.each_probe do |p|
+      if p.to_s == "test#{$$}:testmodule:main:args"
+        matches += 1
+      end
+    end
+    assert_equal 1, matches
 
     progtext = <<EOD
 test*:testmodule:main:args
@@ -86,7 +99,7 @@ test*:testmodule:main:args
   trace("fired!");
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -122,7 +135,7 @@ EOD
                 :enoffidx => 0,
                 :argidx   => 0,
                 :name     => 1,
-                :nenoffs  => 0,
+                :nenoffs  => 1,
                 :offidx   => 0,
                 :addr     => addr,
                 :nargc    => 2,
@@ -137,16 +150,21 @@ EOD
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 44 ]
+    s.data = [ probe.probe_offset(f.addr, 2) ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
-      :strtab => 0,
-      :probes => 1,
-      :prargs => 2,
-      :proffs => 3,
-      :name   => 11,
+      :strtab   => 0,
+      :probes   => 1,
+      :prargs   => 2,
+      :proffs   => 3,
+      :prenoffs => 4,
+      :name     => 11,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
       :funcattr => { :name => 1, :data => 1, :class => 5 },
@@ -155,13 +173,8 @@ EOD
     }
     f.sections << s
 
-    dof = f.generate
-
-    File.open('testdof', 'w') do |io|
-      io.puts dof
-    end
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -210,7 +223,7 @@ EOD
                 :enoffidx => 0,
                 :argidx   => 0,
                 :name     => 1,
-                :nenoffs  => 0,
+                :nenoffs  => 1,
                 :offidx   => 0,
                 :addr     => addr,
                 :nargc    => 2,
@@ -225,16 +238,21 @@ EOD
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 44 ]
+    s.data = [ probe.probe_offset(f.addr, 2) ]
+    f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
-      :strtab => 0,
-      :probes => 1,
-      :prargs => 2,
-      :proffs => 3,
-      :name   => 11,
+      :strtab   => 0,
+      :probes   => 1,
+      :prargs   => 2,
+      :proffs   => 3,
+      :prenoffs => 4,
+      :name     => 11,
       :provattr => { :name => 5, :data => 5, :class => 5 },
       :modattr  => { :name => 1, :data => 1, :class => 5 },
       :funcattr => { :name => 1, :data => 1, :class => 5 },
@@ -243,13 +261,8 @@ EOD
     }
     f.sections << s
 
-    dof = f.generate
-
-    File.open('testdof', 'w') do |io|
-      io.puts dof
-    end
-
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -281,6 +294,7 @@ EOD
 
   def test_probe_is_enabled
     probe = Dtrace::Probe.new(0)
+    addr = probe.addr
 
     f = Dtrace::Dof::File.new
 
@@ -297,7 +311,7 @@ EOD
                 :name     => 1,
                 :nenoffs  => 1,
                 :offidx   => 0,
-                :addr     => probe.addr,
+                :addr     => addr,
                 :nargc    => 0,
                 :func     => 6,
                 :xargc    => 0
@@ -310,11 +324,11 @@ EOD
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
-    s.data = [ 38 ] # 32 (is_enabled len) + 6 (probe func entry, no args)
+    s.data = [ probe.probe_offset(f.addr, 0) ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
-    s.data = [ 8 ]
+    s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
@@ -333,8 +347,8 @@ EOD
     }
     f.sections << s
 
-    dof = f.generate
-    Dtrace.loaddof(dof, 'testmodule')
+    f.generate
+    Dtrace::Dof.loaddof(f, 'testmodule')
 
     assert_equal 0, probe.is_enabled?
 

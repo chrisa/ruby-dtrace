@@ -5,6 +5,7 @@
 
 require 'dtrace'
 require 'dtrace/dof'
+require 'dtrace/probe'
 require 'dtrace/provider/probedef'
 
 class Dtrace
@@ -138,7 +139,6 @@ class Dtrace
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PRARGS, 2)
       s.data = Array.new
-
       @probe_defs.each do |pd|
         pd.args.each_with_index do |arg, i|
           s.data << i
@@ -152,16 +152,7 @@ class Dtrace
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
       s.data = Array.new
       @probe_defs.each do |pd|
-        # compute offset into stub: see dtrace_probe.c
-        #
-        # 32 bytes - length of is_enabled function
-        # +
-        # 6 bytes - function entry
-        # +
-        # 3 bytes per argument - arg->stack push
-        #
-        offset = 32 + 6 + 3 * pd.argc
-        s.data << offset
+        s.data << stubs[pd.name].probe_offset(f.addr, pd.argc)
       end
       if s.data.empty?
         s.data = [ 0 ]
@@ -171,7 +162,7 @@ class Dtrace
       s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
       s.data = Array.new
       @probe_defs.each do |pd|
-        s.data << 8
+        s.data << stubs[pd.name].is_enabled_offset(f.addr)
       end
       if s.data.empty?
         s.data = [ 0 ]
@@ -214,8 +205,8 @@ class Dtrace
       }
       f.sections << s
       
-      dof = f.generate
-      Dtrace.loaddof(dof, @module)
+      f.generate
+      Dtrace::Dof.loaddof(f, @module)
 
       c = Class.new
       c.class_eval do

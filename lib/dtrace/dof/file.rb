@@ -48,19 +48,16 @@ class Dtrace::Dof::File
     hdr.filesz = filesz
     hdr.dof_version = dof_version
 
-    dof = String.new
-    dof << hdr.generate
+    self << hdr.generate
     
     @sections.each do |s|
-      dof << s.generate_header
+      self << s.generate_header
     end
       
     @sections.each do |s|
-      dof << s.pad if s.pad
-      dof << s.dof
+      self << s.pad if s.pad
+      self << s.dof
     end
-
-    dof
   end
 end
   

@@ -146,5 +146,5 @@ VALUE dtraceprobe_init(VALUE self, VALUE argc);
 VALUE dtraceprobe_addr(VALUE self);
 VALUE dtraceprobe_fire(int argc, VALUE *argv, VALUE self);
 VALUE dtraceprobe_is_enabled(VALUE self);
-
-VALUE dtracehelper_loaddof(VALUE self, VALUE dof, VALUE module_name);
+VALUE dtraceprobe_probe_offset(VALUE self, VALUE rfile, VALUE argc);
+VALUE dtraceprobe_is_enabled_offset(VALUE self, VALUE rfile);

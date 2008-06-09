@@ -271,28 +271,28 @@ EOD
     
     Dtrace::Probe::Foo5.bar1 do |p|
       p.fire(11)
-    end    
+    end
     Dtrace::Probe::Foo5.bar2 do |p|
       p.fire(21, 22)
-    end    
+    end
     Dtrace::Probe::Foo5.bar3 do |p|
       p.fire(31, 32, 33)
-    end    
+    end
     Dtrace::Probe::Foo5.bar4 do |p|
       p.fire(41, 42, 43, 44)
-    end    
+    end
     Dtrace::Probe::Foo5.bar5 do |p|
       p.fire(51, 52, 53, 54, 55)
-    end    
+    end
     Dtrace::Probe::Foo5.bar6 do |p|
       p.fire(61, 62, 63, 64, 65, 66)
-    end    
+    end
     Dtrace::Probe::Foo5.bar7 do |p|
       p.fire(71, 72, 73, 74, 75, 76, 77)
-    end    
-    Dtrace::Probe::Foo5.bar8 do |p|
-      p.fire(81, 82, 83, 84, 85, 86, 87, 88)
-    end    
+    end
+   Dtrace::Probe::Foo5.bar8 do |p|
+     p.fire(81, 82, 83, 84, 85, 86, 87, 88)
+   end
 
     data = []
     c.consume_once do |d|
