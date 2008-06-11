@@ -1,3 +1,6 @@
+$:<<'./lib'
+require 'dtrace'
+
 Gem::Specification.new do |s|
   
   s.name = 'ruby-dtrace'
