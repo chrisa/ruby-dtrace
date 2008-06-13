@@ -14,6 +14,7 @@ require 'dtrace/probedesc'
 require 'dtrace/stackrecord'
 require 'dtrace/printfrecord'
 require 'dtrace/data'
+require 'dtrace/version'
 
 # A DTrace handle. Provides methods for inspecting available probes,
 # compiling and running programs, and for setting up callbacks to
@@ -64,8 +65,6 @@ require 'dtrace/data'
 #   end
 
 class Dtrace
-  VERSION = '0.2.0'
-
   STATUS_NONE    = 0
   STATUS_OKAY    = 1
   STATUS_EXITED  = 2

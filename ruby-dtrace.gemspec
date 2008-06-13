@@ -1,5 +1,5 @@
 $:<<'./lib'
-require 'dtrace'
+require 'dtrace/version'
 
 Gem::Specification.new do |s|
   

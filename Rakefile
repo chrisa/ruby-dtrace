@@ -8,7 +8,7 @@ require 'rake/gempackagetask'
 require 'rake/contrib/rubyforgepublisher'
 
 $: << './lib'
-require 'dtrace'
+require 'dtrace/version'
 
 desc "Uses extconf.rb and make to build the extension"
 task :extensions do
