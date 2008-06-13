@@ -1,17 +1,16 @@
-$:<<'./lib'
-require 'dtrace/version'
+#$:<<'./lib'
+#require 'dtrace/version'
 
 Gem::Specification.new do |s|
   
   s.name = 'ruby-dtrace'
-  s.version = Dtrace::VERSION
+  s.version = '0.2.0' #Dtrace::VERSION
   s.platform = Gem::Platform::RUBY
   s.summary = <<-DESC.strip.gsub(/\n\s+/, " ")
                 ruby-dtrace is Ruby bindings for Dtrace, which lets you write D-based
                 programs in Ruby, and add probes to your Ruby programs.
 	  DESC
   
-  s.files = Dir.glob("{examples,ext,lib,plugin,test}/**/*") + %w(README.txt History.txt Manifest.txt Rakefile)
   s.require_path = 'lib'
   s.has_rdoc = true
   
@@ -19,5 +18,117 @@ Gem::Specification.new do |s|
   s.email = "chris@nodnol.org"
   s.homepage = "http://ruby-dtrace.rubyforge.org"
   s.rubyforge_project = "ruby-dtrace"
-  
+  s.files = ["examples/scsi.rb",
+             "ext/dof",
+             "ext/dof/constants.c",
+             "ext/dof/dof.h",
+             "ext/dof/dof_api.c",
+             "ext/dof/dof_helper.c",
+             "ext/dof/extconf.rb",
+             "ext/dof/file.c",
+             "ext/dof/generator.c",
+             "ext/dof/header.c",
+             "ext/dof/Makefile",
+             "ext/dof/mkmf.log",
+             "ext/dof/parser.c",
+             "ext/dof/parser.h",
+             "ext/dof/section.c",
+             "ext/dtrace_aggdata.c",
+             "ext/dtrace_api.c",
+             "ext/dtrace_api.h",
+             "ext/dtrace_bufdata.c",
+             "ext/dtrace_dropdata.c",
+             "ext/dtrace_errdata.c",
+             "ext/dtrace_hdl.c",
+             "ext/dtrace_probe.c",
+             "ext/dtrace_probedata.c",
+             "ext/dtrace_probedesc.c",
+             "ext/dtrace_process.c",
+             "ext/dtrace_program.c",
+             "ext/dtrace_programinfo.c",
+             "ext/dtrace_recdesc.c",
+             "ext/dtrace_util.c",
+             "ext/extconf.rb",
+             "ext/i386-solaris2.11",
+             "ext/i386-solaris2.11/dtrace_probe.c",
+             "ext/i686-darwin8.10.1",
+             "ext/i686-darwin8.10.1/dtrace_probe.c",
+             "ext/sparc-solaris2.10",
+             "ext/sparc-solaris2.10/dtrace_probe.c",
+             "ext/stubs.txt",
+             "lib/dtrace",
+             "lib/dtrace/aggregate.rb",
+             "lib/dtrace/aggregateset.rb",
+             "lib/dtrace/consumer.rb",
+             "lib/dtrace/data.rb",
+             "lib/dtrace/dof",
+             "lib/dtrace/dof/file.rb",
+             "lib/dtrace/dof/section",
+             "lib/dtrace/dof/section/strtab.rb",
+             "lib/dtrace/dof/section.rb",
+             "lib/dtrace/dof.rb",
+             "lib/dtrace/printfrecord.rb",
+             "lib/dtrace/probe.rb",
+             "lib/dtrace/probedata.rb",
+             "lib/dtrace/probedesc.rb",
+             "lib/dtrace/provider",
+             "lib/dtrace/provider/probedef.rb",
+             "lib/dtrace/provider.rb",
+             "lib/dtrace/record.rb",
+             "lib/dtrace/stackrecord.rb",
+             "lib/dtrace/tracer.rb",
+             "lib/dtrace/version.rb",
+             "lib/dtrace/version.rb~",
+             "lib/dtrace.rb",
+             "lib/dtraceconsumer.rb",
+             "plugin/dtrace",
+             "plugin/dtrace/bin",
+             "plugin/dtrace/bin/dtracer.rb",
+             "plugin/dtrace/init.rb",
+             "plugin/dtrace/lib",
+             "plugin/dtrace/lib/dtrace_helper.rb",
+             "plugin/dtrace/lib/dtrace_report.rb",
+             "plugin/dtrace/lib/dtracer.rb",
+             "plugin/dtrace/lib/dtracer_client.rb",
+             "plugin/dtrace/public",
+             "plugin/dtrace/public/stylesheets",
+             "plugin/dtrace/public/stylesheets/dtrace.css",
+             "plugin/dtrace/Rakefile",
+             "plugin/dtrace/README",
+             "plugin/dtrace/scripts",
+             "plugin/dtrace/scripts/default.d",
+             "plugin/dtrace/scripts/rails_mysql.d",
+             "plugin/dtrace/tasks",
+             "plugin/dtrace/tasks/dtrace.rake",
+             "plugin/dtrace/test",
+             "plugin/dtrace/test/dtrace_test.rb",
+             "plugin/dtrace/views",
+             "plugin/dtrace/views/dtrace",
+             "plugin/dtrace/views/dtrace/_report.rhtml",
+             "test/apple-dof",
+             "test/disabled_probe_effect.txt",
+             "test/dof",
+             "test/dof2",
+             "test/test_disabled_probe_effect.rb",
+             "test/test_dof_generator.rb",
+             "test/test_dof_helper.rb",
+             "test/test_dof_parser.rb",
+             "test/test_dof_providers.rb",
+             "test/test_dof_strtabs.rb",
+             "test/test_dtrace.rb",
+             "test/test_dtrace_aggregates.rb",
+             "test/test_dtrace_drops_errors.rb",
+             "test/test_dtrace_probe.rb",
+             "test/test_dtrace_probes.rb",
+             "test/test_dtrace_processes.rb",
+             "test/test_dtrace_profile.rb",
+             "test/test_dtrace_provider.rb",
+             "test/test_dtrace_repeat.rb",
+             "test/test_dtrace_rubyprobe.rb",
+             "test/test_dtrace_typefilter.rb",
+             "test/test_legacy_consumer.rb",
+             "README.txt",
+             "History.txt",
+             "Manifest.txt",
+             "Rakefile"]
 end
