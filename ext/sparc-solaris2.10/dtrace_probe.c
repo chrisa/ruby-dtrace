@@ -25,22 +25,6 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
   Data_Get_Struct(self, dtrace_probe_t, probe);
 
   /* First initialise the is_enabled tracepoint */
-
-  /* 9d e3 bf 98 01 00 00 00  |.........<E3><BF>.....|
-00000110  90 10 00 00 10 80 00 02  d0 27 bf fc e0 07 bf fc  |........<D0>'<BF><FC><E0>.<BF><FC>|
-00000120  b0 14 00 00 81 c7 e0 08  81 e8 00 00 
-
-        [ 4]      108:  save        %sp, -104, %sp
-        [ 4]      10c:  nop         
-        [ 4]      110:  clr         %o0
-        [ 4]      114:  ba          0x11c
-        [ 4]      118:  st          %o0, [%fp - 4]
-        [ 4]      11c:  ld          [%fp - 4], %l0
-        [ 4]      120:  or          %l0, %g0, %i0
-        [ 4]      124:  ret         
-        [ 4]      128:  restore    
-*/
-
   uint8_t insns[FUNC_SIZE] = {
     /* save        %sp, -104, %sp */
     0x9d, 0xe3, 0xbf, 0xa0, 
