@@ -9,6 +9,7 @@
 
 RUBY_EXTERN eDtraceDofException;
 
+/* :nodoc: */
 VALUE dof_generate_section_header(VALUE self) {
   VALUE hdr_data;
   dof_sec_t hdr;
@@ -30,6 +31,7 @@ VALUE dof_generate_section_header(VALUE self) {
   return hdr_data;
 }
 
+/* :nodoc: */
 VALUE dof_generate_comments(VALUE self) {
   VALUE dof;
   VALUE comments = rb_iv_get(self, "@data");
@@ -45,6 +47,7 @@ VALUE dof_generate_comments(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_probes(VALUE self) {
   VALUE dof;
   VALUE probes = rb_iv_get(self, "@data");
@@ -88,6 +91,7 @@ VALUE dof_generate_probes(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_strtab(VALUE self) {
   VALUE dof;
   VALUE strings = rb_iv_get(self, "@data");
@@ -114,6 +118,7 @@ VALUE dof_generate_strtab(VALUE self) {
   return dof;
 }
   
+/* :nodoc: */
 VALUE dof_generate_utsname(VALUE self) {
   VALUE dof;
   struct utsname u;
@@ -127,6 +132,7 @@ VALUE dof_generate_utsname(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_prargs(VALUE self) {
   VALUE dof;
   VALUE args = rb_iv_get(self, "@data");
@@ -154,6 +160,7 @@ VALUE dof_generate_prargs(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_proffs(VALUE self) {
   VALUE dof;
   VALUE args = rb_iv_get(self, "@data");
@@ -179,6 +186,7 @@ VALUE dof_generate_proffs(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_prenoffs(VALUE self) {
   VALUE dof;
   VALUE args = rb_iv_get(self, "@data");
@@ -220,6 +228,7 @@ dof_attr_t _dof_generate_dof_attr_t(VALUE data) {
   return attr;
 }
 
+/* :nodoc: */
 VALUE dof_generate_provider(VALUE self) {
   VALUE dof;
   VALUE provider = rb_iv_get(self, "@data");
@@ -247,6 +256,7 @@ VALUE dof_generate_provider(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_reltab(VALUE self) {
   VALUE dof;
   VALUE relos = rb_iv_get(self, "@data");
@@ -281,6 +291,7 @@ VALUE dof_generate_reltab(VALUE self) {
   return dof;
 }
 
+/* :nodoc: */
 VALUE dof_generate_relhdr(VALUE self) {
   VALUE dof;
   VALUE relhdr = rb_iv_get(self, "@data");

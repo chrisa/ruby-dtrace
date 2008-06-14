@@ -9,6 +9,7 @@
 
 RUBY_EXTERN eDtraceDofException;
 
+/* :nodoc: */
 VALUE dof_generate_header(VALUE self) {
   dof_hdr_t hdr;
   uint32_t secnum;
@@ -69,6 +70,7 @@ VALUE dof_generate_header(VALUE self) {
   return hdr_data;
 }
 
+/* :nodoc: */
 VALUE dof_header_len(VALUE self) {
   uint64_t hdrlen;
   uint32_t secnum;
