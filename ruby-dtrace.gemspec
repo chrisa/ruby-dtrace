@@ -1,14 +1,15 @@
 Gem::Specification.new do |s|
   
   s.name = 'ruby-dtrace'
-  s.version = '0.2.0' #Dtrace::VERSION
+  s.version = '0.2.1'
   s.platform = Gem::Platform::RUBY
   s.summary = <<-DESC.strip.gsub(/\n\s+/, " ")
-                ruby-dtrace is Ruby bindings for Dtrace, which lets you write D-based
-                programs in Ruby, and add probes to your Ruby programs.
+Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
+DTrace probes to your Ruby programs, and to write D-based programs
+with Ruby.
 	  DESC
   
-  s.require_path = 'lib'
+  s.require_path = 'lib:ext'
   s.has_rdoc = true
   
   s.author = "Chris Andrews"
@@ -46,12 +47,10 @@ Gem::Specification.new do |s|
              "ext/dtrace_recdesc.c",
              "ext/dtrace_util.c",
              "ext/extconf.rb",
-             "ext/i386-solaris2.11",
-             "ext/i386-solaris2.11/dtrace_probe.c",
-             "ext/i686-darwin8.10.1",
-             "ext/i686-darwin8.10.1/dtrace_probe.c",
-             "ext/sparc-solaris2.10",
-             "ext/sparc-solaris2.10/dtrace_probe.c",
+             "ext/i386-solaris",
+             "ext/i386-solaris/dtrace_probe.c",
+             "ext/i386-darwin",
+             "ext/i386-darwin/dtrace_probe.c",
              "ext/stubs.txt",
              "lib/dtrace",
              "lib/dtrace/aggregate.rb",
