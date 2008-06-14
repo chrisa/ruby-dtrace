@@ -1,4 +1,4 @@
-== 0.2.3 / 2008-06-14
+== 0.2.4 / 2008-06-14
 
  * Rework Dtrace::Provider to directly create USDT providers by 
    generating DOF and stub functions.

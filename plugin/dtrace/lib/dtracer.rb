@@ -15,7 +15,7 @@ class Dtracer
       @d = Dtrace.new
       @d.setopt("aggsize", "4m")
       @d.setopt("bufsize", "4m")
-    rescue DtraceException => e
+    rescue Dtrace::Exception => e
       @logger.warn("DTrace start setup: #{e.message}")
       return
     end
@@ -24,7 +24,7 @@ class Dtracer
       prog = @d.compile(@dprogram, pid.to_s)
       prog.execute
       @d.go
-    rescue DtraceException => e
+    rescue Dtrace::Exception => e
       @logger.warn("DTrace start compile: #{e.message}")
     end
   end
@@ -35,11 +35,11 @@ class Dtracer
 
     dtrace_data = nil
     begin
-      c = DtraceConsumer.new(@d)
+      c = Dtrace::Consumer.new(@d)
       c.consume_once do |d|
         dtrace_data = d
       end
-    rescue DtraceException => e
+    rescue Dtrace::Exception => e
       @logger.warn("DTrace end: #{e.message}")
     end
     
