@@ -1,3 +1,8 @@
+== 0.2.2 / 2008-06-14
+
+ * Rework Dtrace::Provider to directly create USDT providers by 
+   generating DOF and stub functions.
+
 == 0.0.6 / 2008-02-17
 
  * Add Dtrace::Provider, which allows creation of USDT providers from
