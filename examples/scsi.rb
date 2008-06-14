@@ -381,7 +381,7 @@ prog.execute
 t.go
 
 begin
-  c = DtraceConsumer.new(t)
+  c = Dtrace::Consumer.new(t)
   
   c.consume do |d|
     records = d.data
