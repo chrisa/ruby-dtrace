@@ -9,9 +9,12 @@ DTrace probes to your Ruby programs, and to write D-based programs
 with Ruby.
 	  DESC
   
-  s.require_path = 'lib:ext'
   s.has_rdoc = true
   
+  s.extensions << "ext/extconf.rb"
+  s.extensions << "ext/dof/extconf.rb"
+  s.require_paths << 'ext'
+
   s.author = "Chris Andrews"
   s.email = "chris@nodnol.org"
   s.homepage = "http://ruby-dtrace.rubyforge.org"
@@ -38,7 +41,6 @@ with Ruby.
              "ext/dtrace_dropdata.c",
              "ext/dtrace_errdata.c",
              "ext/dtrace_hdl.c",
-             "ext/dtrace_probe.c",
              "ext/dtrace_probedata.c",
              "ext/dtrace_probedesc.c",
              "ext/dtrace_process.c",
