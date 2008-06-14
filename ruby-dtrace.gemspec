@@ -74,7 +74,6 @@ with Ruby.
              "lib/dtrace/stackrecord.rb",
              "lib/dtrace/tracer.rb",
              "lib/dtrace/version.rb",
-             "lib/dtrace/version.rb~",
              "lib/dtrace.rb",
              "lib/dtraceconsumer.rb",
              "plugin/dtrace",
