@@ -10,6 +10,7 @@ with Ruby.
 	  DESC
   
   s.has_rdoc = true
+  s.extra_rdoc_files << 'README.txt'
   
   s.extensions << "ext/extconf.rb"
   s.extensions << "ext/dof/extconf.rb"

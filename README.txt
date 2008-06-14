@@ -1,5 +1,6 @@
-ruby-dtrace is Ruby bindings for Dtrace, which lets you write D-based
-programs in Ruby, and add probes to your Ruby programs.
+Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
+DTrace probes to your Ruby programs, and to write D-based programs
+with Ruby.
 
 == FEATURES
   
@@ -13,12 +14,14 @@ Consumer:
 
 Probes:
 
-* Create USDT providers from Ruby
+* Create USDT providers from Ruby, at runtime.
 * No code-generation or gcc/linker dependency
 
 == SYNOPSIS
 
-Consumer:
+Consumer: see Dtrace
+
+    require 'Dtrace'
 
     t = Dtrace.new 
     progtext = 'ruby$1:::function-entry{ @a[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); } END { printa(@a); }'
@@ -34,7 +37,9 @@ Consumer:
       # handle records
     end
 
-Probes:
+Probes: see Dtrace::Provider
+
+    require 'dtrace/provider'
 
     Dtrace::Provider.create :rubyprog do |p|
       p.probe :foo, :string, :string
@@ -62,11 +67,11 @@ Probes:
 
 == INSTALL
 
- $ sudo gem install ruby-dtrace
+ $ sudo gem install chrisa-ruby-dtrace --source=http://gems.github.com
 
 == LICENSE
 
-Copyright (c) 2007 Chris Andrews <chris@nodnol.org>
+Copyright (c) 2008 Chris Andrews <chris@nodnol.org>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
