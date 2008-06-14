@@ -16,6 +16,9 @@ have_library("dtrace", "dtrace_open")
 cpu = Config::CONFIG['target_cpu']
 os  = Config::CONFIG['target_os']
 
+cpu.gsub! /^i[4-6]86/, 'i386'
+os.gsub!  /[0-9.]+$/, ''
+
 dir = "#{cpu}-#{os}"
 symlink "#{dir}/dtrace_probe.c", "dtrace_probe.c"
 
