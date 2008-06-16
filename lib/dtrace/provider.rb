@@ -68,7 +68,12 @@ class Dtrace
       if types[0].respond_to? :keys
         options = types.shift
       end
-      options[:function] ||= Kernel.caller[0].match(/`(.*)'/)[1]
+      caller = Kernel.caller[0].match(/`(.*)'/)
+      if caller
+        options[:function] ||= caller[1]
+      else
+        options[:function] ||= name
+      end
 
       pd = Dtrace::Provider::ProbeDef.new(name, options[:function])
       types.each do |t|
