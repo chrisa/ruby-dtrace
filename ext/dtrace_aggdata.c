@@ -96,13 +96,13 @@ VALUE dtraceaggdata_value(VALUE self)
       case DTRACEAGG_COUNT:
 	if (value < 0)
 	  rb_raise(eDtraceException, "count value is negative");
-	v = INT2NUM(value);
+	v = LL2NUM(value);
 	break;
       case DTRACEAGG_AVG:
       case DTRACEAGG_MIN:
       case DTRACEAGG_MAX:
       case DTRACEAGG_SUM:
-	v = INT2NUM(value);
+	v = LL2NUM(value);
 	break;
       default:
 	v = Qnil;
