@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   
   s.name = 'ruby-dtrace'
-  s.version = '0.2.5'
+  s.version = '0.2.6'
   s.platform = Gem::Platform::RUBY
   s.summary = <<-DESC.strip.gsub(/\n\s+/, " ")
 Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
