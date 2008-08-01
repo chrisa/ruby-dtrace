@@ -209,20 +209,21 @@ class Dtrace
       f.generate
       Dtrace::Dof.loaddof(f, @module)
 
-      c = Class.new
-      c.class_eval do
-        @@probes = stubs
-        def self.method_missing(name)
-          name = name.to_s
-          unless @@probes[name].nil?
-            if @@probes[name].is_enabled?
-              yield @@probes[name]
-            end
-          end
-        end
+      eval "
+class Dtrace::Probe::#{@class}
+  def self.stubs=(s)
+    @@probes = s
+  end
+  def self.method_missing(name)
+    name = name.to_s
+    unless @@probes[name].nil?
+      if @@probes[name].is_enabled?
+        yield @@probes[name]
       end
-      eval "Dtrace::Probe::#{@class} = c"
-
+    end
+  end
+end"
+      eval "Dtrace::Probe::#{@class}.stubs = stubs"
     end
 
     private

@@ -78,8 +78,6 @@ EOD
       data << d
     end
 
-    p data
-
     assert_equal 2, data.length
     assert_equal 'fired 1', data[0].data[0].value
     assert_equal 'fired 2', data[1].data[0].value    
