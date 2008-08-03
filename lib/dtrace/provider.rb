@@ -216,7 +216,9 @@ class Dtrace::Probe::#{@class}
   end
   def self.method_missing(name)
     name = name.to_s
-    unless @@probes[name].nil?
+    if @@probes[name].nil?
+      raise Dtrace::Exception.new(\"no such probe in \#{self.to_s}: \#{name}\")
+    else
       if @@probes[name].is_enabled?
         yield @@probes[name]
       end
