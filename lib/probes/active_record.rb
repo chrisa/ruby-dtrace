@@ -4,7 +4,7 @@ module Probes
     module Base
       module ClassMethods
         def find_by_sql_with_probes(sql)
-          Dtrace::Probe::ActionController.find_by_sql_start do |p|
+          Dtrace::Probe::ActiveRecord.find_by_sql_start do |p|
             p.fire(sql)
           end
           results = find_by_sql_without_probes(sql)
