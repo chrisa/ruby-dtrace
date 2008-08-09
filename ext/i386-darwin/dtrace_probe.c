@@ -15,7 +15,8 @@ RUBY_EXTERN VALUE eDtraceException;
 #define IS_ENABLED_FUNC_LEN 32
 
 /* :nodoc: */
-VALUE dtraceprobe_init(VALUE self, VALUE rargc)
+VALUE 
+dtraceprobe_init(VALUE self, VALUE rargc)
 {
   dtrace_probe_t *probe;
   uint8_t *ip;
@@ -128,6 +129,7 @@ VALUE dtraceprobe_free(void *arg)
   dtrace_probe_t *probe = (dtrace_probe_t *)arg;
   
   if (probe) {
+    free(probe->func);
     free(probe);
   }
 }

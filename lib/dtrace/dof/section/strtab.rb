@@ -18,4 +18,7 @@ class Dtrace::Dof::Section::Strtab < Dtrace::Dof::Section
     return idx
   end
 
+  def length
+    return @idx
+  end
 end

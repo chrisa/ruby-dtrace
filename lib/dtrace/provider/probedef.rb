@@ -10,7 +10,7 @@ class Dtrace
       attr_accessor :args
 
       def initialize(name, function)
-        @name = name.to_s
+        @name = name.to_sym
         @function = function.to_s
         @args = []
       end

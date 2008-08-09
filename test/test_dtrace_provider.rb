@@ -9,6 +9,24 @@ require 'test/unit'
 
 class TestDtraceProvider < Test::Unit::TestCase
   
+  def test_massive_provider
+    probecount = 2950
+    Dtrace::Provider.create :test_massive1 do |p|
+      (1 .. probecount).each do |i|
+        p.probe "#{i}".to_sym
+      end
+    end
+    
+    t = Dtrace.new
+    matches = 0
+    t.each_probe do |p|
+      if p.to_s =~ /^test_massive1#{$$}:ruby:test_massive_provider:probe/
+        matches += 1
+      end
+    end
+    assert_equal probecount, matches
+  end
+
   def test_provider_with_module
     Dtrace::Provider.create :test0, { :module => 'test1module' } do |p|
       p.probe :test

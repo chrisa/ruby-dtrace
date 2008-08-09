@@ -10,6 +10,14 @@ _init_constants(VALUE dtrace_dof)
 {
   VALUE c = rb_define_module_under(dtrace_dof, "Constants");
 
+  rb_define_const(c, "DOF_DOFHDR_SIZE",   INT2FIX(sizeof(dof_hdr_t)));
+  rb_define_const(c, "DOF_SECHDR_SIZE",   INT2FIX(sizeof(dof_sec_t)));
+  rb_define_const(c, "DOF_PROBE_SIZE",    INT2FIX(sizeof(dof_probe_t)));
+  rb_define_const(c, "DOF_PRARGS_SIZE",   INT2FIX(sizeof(uint8_t)));
+  rb_define_const(c, "DOF_PROFFS_SIZE",   INT2FIX(sizeof(uint32_t)));
+  rb_define_const(c, "DOF_PRENOFFS_SIZE", INT2FIX(sizeof(uint32_t)));
+  rb_define_const(c, "DOF_PROVIDER_SIZE", INT2FIX(sizeof(dof_provider_t)));
+
   rb_define_const(c, "DOF_SECT_NONE",      INT2FIX(DOF_SECT_NONE));
   rb_define_const(c, "DOF_SECT_COMMENTS",  INT2FIX(DOF_SECT_COMMENTS));
   rb_define_const(c, "DOF_SECT_SOURCE",    INT2FIX(DOF_SECT_SOURCE));

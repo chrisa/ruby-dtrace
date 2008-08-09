@@ -12,6 +12,7 @@ class TestDofProviders < Test::Unit::TestCase
   
   def test_probe_no_args
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'main', 'test1']
@@ -78,6 +79,7 @@ class TestDofProviders < Test::Unit::TestCase
 
   def test_probe_with_char_arg
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'char *', 'char *', 'main', 'test2']
@@ -146,6 +148,7 @@ class TestDofProviders < Test::Unit::TestCase
 
   def test_probe_with_int_arg
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'int', 'int', 'main', 'test3']
@@ -214,6 +217,7 @@ class TestDofProviders < Test::Unit::TestCase
 
   def test_probe_is_enabled
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'main', 'test4']

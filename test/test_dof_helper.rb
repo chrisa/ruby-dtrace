@@ -15,6 +15,7 @@ class TestDofHelper < Test::Unit::TestCase
   def test_sun_dof
     dof = File.read("#{$dof_dir}/dof")
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
     f << dof
     Dtrace::Dof.loaddof(f, 'testmodule')
 
@@ -30,6 +31,7 @@ class TestDofHelper < Test::Unit::TestCase
   
   def test_file
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'char *', 'char *', 'main', 'test']

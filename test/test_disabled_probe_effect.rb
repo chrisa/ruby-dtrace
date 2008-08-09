@@ -37,9 +37,9 @@ class TestDisabledProbeEffect < Test::Unit::TestCase
         # Third time a loop with probes enabled
         t = Dtrace.new 
         t.setopt("bufsize", "4m")
-        
+
         progtext = <<EOD
-dpe*:ruby:test_probe_no_args:p1
+dpe*:ruby::p1
 {
 }
 EOD

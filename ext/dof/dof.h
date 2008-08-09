@@ -24,6 +24,7 @@ static inline VALUE *rb_ary_ptr(VALUE s) {return  RARRAY(s)->ptr;}
 /* Struct to contain Dof::File allocated memory */
 typedef struct dof_file {
   char *dof;
+  uint32_t len;
   uint32_t offset;
 } dof_file_t;
 
@@ -47,6 +48,7 @@ VALUE dof_generate_header(VALUE self);
 VALUE dof_header_len(VALUE self);
 
 VALUE dof_file_alloc(VALUE klass);
+VALUE dof_file_allocate_dof(VALUE self, VALUE size);
 VALUE dof_file_append(VALUE self, VALUE data);
 VALUE dof_file_addr(VALUE self);
 VALUE dof_file_data(VALUE self);

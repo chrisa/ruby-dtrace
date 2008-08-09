@@ -94,11 +94,38 @@ class Dtrace
       @probe_defs = []
     end
 
-    def enable
-      f = Dtrace::Dof::File.new
+    # attempt to turn the probe_count into the eventual size of DOF
+    # we'll need, based on the current state of the strtab.
+    def dof_size
+      probes = @probe_defs.length
+      args = (@probe_defs.inject(0) {|sum, pd| sum + pd.args.length }) + 1
       
-      strtab = Dtrace::Dof::Section::Strtab.new(0)
-      f.sections << strtab
+      size = 0
+      [
+       DOF_DOFHDR_SIZE,
+       DOF_SECHDR_SIZE *  6,          # we have 6 sections, see provider.rb
+       @strtab.length,                # we're told the size of the string table
+       (DOF_PROBE_SIZE * probes),     # probes
+       (DOF_PRARGS_SIZE * args),      # prargs
+       (DOF_PROFFS_SIZE * probes),    # proffs
+       (DOF_PRENOFFS_SIZE * probes),  # prenoffs
+       DOF_PROVIDER_SIZE              # provider
+      ].each do |sec|
+        size += sec
+        i = size.to_f % 8 # assume longest alignment, 8, will overestimate but not by much
+        if i > 0
+          size += (8 - i).to_i
+        end
+      end
+      size
+    end
+
+    def enable
+      @strtab = Dtrace::Dof::Section::Strtab.new(0)
+      provider_name_idx = @strtab.add(@name)
+
+      f = Dtrace::Dof::File.new
+      f.sections << @strtab
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
       probes = Array.new
@@ -110,15 +137,15 @@ class Dtrace
         
         argv = 0
         pd.args.each do |type|
-          i = strtab.add(type)
+          i = @strtab.add(type)
           argv = i if argv == 0
         end
         
         probe = Dtrace::Probe.new(argc)
         probes <<
           {
-          :name     => strtab.add(pd.name),
-          :func     => strtab.add(pd.function),
+          :name     => @strtab.add(pd.name),
+          :func     => @strtab.add(pd.function),
           :noffs    => 1,
           :enoffidx => offidx,
           :argidx   => argidx,
@@ -149,6 +176,9 @@ class Dtrace
         s.data = [ 0 ]
       end
       f.sections << s
+      
+      # After last addition to strtab, but before first offset!
+      f.allocate(self.dof_size)
 
       s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
       s.data = Array.new
@@ -177,7 +207,7 @@ class Dtrace
         :prargs => 2,
         :proffs => 3,
         :prenoffs => 4,
-        :name => strtab.add(@name),
+        :name => provider_name_idx,
         :provattr => { 
           :name  => DTRACE_STABILITY_EVOLVING,
           :data  => DTRACE_STABILITY_EVOLVING,
@@ -205,27 +235,33 @@ class Dtrace
         },
       }
       f.sections << s
-      
+
       f.generate
       Dtrace::Dof.loaddof(f, @module)
 
-      eval "
+      classdef = "
 class Dtrace::Probe::#{@class}
   def self.stubs=(s)
     @@probes = s
   end
-  def self.method_missing(name)
-    name = name.to_s
+  def self.method_missing(name, *args, &block)
+    options = {}
+    if args[0].respond_to? :keys
+      options = args.shift
+    end
     if @@probes[name].nil?
-      raise Dtrace::Exception.new(\"no such probe in \#{self.to_s}: \#{name}\")
+      raise Dtrace::Exception.new(\"no such probe in \#{self.to_s}: \#{name.to_s}\")
     else
       if @@probes[name].is_enabled?
-        yield @@probes[name]
+        block.call @@probes[name]
       end
     end
   end
 end"
+
+      eval classdef
       eval "Dtrace::Probe::#{@class}.stubs = stubs"
+
     end
 
     private

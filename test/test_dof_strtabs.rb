@@ -21,6 +21,7 @@ class TestDofStrtabs < Test::Unit::TestCase
 
   def test_strtab_dof
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     strtab = Dtrace::Dof::Section::Strtab.new(0)
     f.sections << strtab

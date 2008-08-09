@@ -49,9 +49,10 @@ void Init_dof_api() {
 
   cDtraceDofFile = rb_define_class_under(dof, "File", rb_cObject);
   rb_define_alloc_func(cDtraceDofFile, dof_file_alloc);           // in file.c
-  rb_define_method(cDtraceDofFile, "<<",     dof_file_append, 1); // in file.c
-  rb_define_method(cDtraceDofFile, "addr",   dof_file_addr,   0); // in file.c
-  rb_define_method(cDtraceDofFile, "data",   dof_file_data,   0); // in file.c
+  rb_define_method(cDtraceDofFile, "allocate", dof_file_allocate_dof, 1); // in file.c
+  rb_define_method(cDtraceDofFile, "<<",       dof_file_append,       1); // in file.c
+  rb_define_method(cDtraceDofFile, "addr",     dof_file_addr,         0); // in file.c
+  rb_define_method(cDtraceDofFile, "data",     dof_file_data,         0); // in file.c
 
   _init_constants(dof);
 }

@@ -29,6 +29,7 @@ class TestDtraceProbe < Test::Unit::TestCase
     addr = probe.addr
 
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['args', 'main', 'test']
@@ -121,6 +122,7 @@ EOD
     addr = probe.addr
 
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'main', 'tes2', 'int', 'int', 'int', 'int']
@@ -209,6 +211,7 @@ EOD
     addr = probe.addr
 
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'main', 'tes3', 'char *', 'char *', 'char *', 'char *']
@@ -297,6 +300,7 @@ EOD
     addr = probe.addr
 
     f = Dtrace::Dof::File.new
+    f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
     s.data = ['test', 'main', 'tes4']
