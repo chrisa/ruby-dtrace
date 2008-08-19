@@ -54,16 +54,22 @@ class Dtrace::Dof::Section
       @dof = ''
     end
 
-    begin
-      if @data.class == Array
-        @entsize = @dof.length / @data.length
-      else
-        @entsize = 0
-      end
-    rescue ZeroDivisionError
-      @entsize = 0
-    end
-
+    @entsize = compute_entsize
+    
     return @dof.length
   end
+
+  def compute_entsize
+    begin
+      if @data.class == Array
+        entsize = @dof.length / @data.length
+      else
+        entsize = 0
+      end
+    rescue ZeroDivisionError
+      entsize = 0
+    end
+    entsize
+  end
+
 end

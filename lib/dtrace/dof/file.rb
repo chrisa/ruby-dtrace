@@ -37,10 +37,10 @@ class Dtrace::Dof::File
         end
       end
 
-      s.size = length + pad
+      s.size = length
 
-      loadsz += s.size if (s.flags & 1) == 1 # DOF_SECF_LOAD
-      filesz += s.size
+      loadsz += (s.size + pad) if (s.flags & 1) == 1 # DOF_SECF_LOAD
+      filesz += (s.size + pad)
 
     end
     
@@ -58,6 +58,7 @@ class Dtrace::Dof::File
       self << s.pad if s.pad
       self << s.dof
     end
+
   end
 end
   

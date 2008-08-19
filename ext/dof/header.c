@@ -56,14 +56,11 @@ VALUE dof_generate_header(VALUE self) {
   secnum = FIX2INT(rb_iv_get(self, "@secnum"));
   hdr.dofh_secnum = secnum;
 
-  loadsz = FIX2INT(rb_iv_get(self, "@loadsz"));
-  filesz = FIX2INT(rb_iv_get(self, "@filesz"));
+  hdr.dofh_loadsz = FIX2INT(rb_iv_get(self, "@loadsz"));
+  hdr.dofh_filesz = FIX2INT(rb_iv_get(self, "@filesz"));
   
   hdrlen = (sizeof(dof_hdr_t) + secnum * sizeof(dof_sec_t));
   rb_iv_set(self, "@hdrlen", INT2FIX(hdrlen));
-
-  hdr.dofh_loadsz = loadsz + hdrlen;
-  hdr.dofh_filesz = filesz + hdrlen;
   hdr.dofh_secoff = sizeof(dof_hdr_t);
 
   hdr_data = rb_str_new((const char *)&hdr, sizeof(hdr));

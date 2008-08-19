@@ -16,7 +16,6 @@ VALUE dof_generate_section_header(VALUE self) {
   uint32_t type;
   uint64_t offset;
   uint64_t size;
-  VALUE data;
   uint32_t entsize;
 
   memset(&hdr, 0, sizeof(hdr));

@@ -245,10 +245,6 @@ class Dtrace::Probe::#{@class}
     @@probes = s
   end
   def self.method_missing(name, *args, &block)
-    options = {}
-    if args[0].respond_to? :keys
-      options = args.shift
-    end
     if @@probes[name].nil?
       raise Dtrace::Exception.new(\"no such probe in \#{self.to_s}: \#{name.to_s}\")
     else

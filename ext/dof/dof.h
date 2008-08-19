@@ -4,7 +4,6 @@
  */
 
 #include <ruby.h>
-#include <sys/dtrace.h>
 #include <sys/utsname.h>
 #include <sys/dtrace.h>
 

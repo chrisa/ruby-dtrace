@@ -21,4 +21,8 @@ class Dtrace::Dof::Section::Strtab < Dtrace::Dof::Section
   def length
     return @idx
   end
+
+  def compute_entsize 
+    0
+  end
 end
