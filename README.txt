@@ -2,6 +2,10 @@ Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
 DTrace probes to your Ruby programs, and to write D-based programs
 with Ruby.
 
+== FEEDBACK
+
+Rubyforge mailing list: http://rubyforge.org/mailman/listinfo/ruby-dtrace-users
+
 == FEATURES
   
 Consumer:
