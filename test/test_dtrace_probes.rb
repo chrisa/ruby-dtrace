@@ -9,6 +9,20 @@ require 'test/unit'
 
 class TestDtraceProbes < Test::Unit::TestCase
 
+  def test_is_not_enabled
+    Dtrace::Provider.create :foo0 do |p|
+      p.probe :bar
+    end
+    
+    data = 'not fired'
+    Dtrace::Probe::Foo0.bar do |p|
+      data = 'fired'
+      p.fire
+    end    
+
+    assert_equal 'not fired', data
+  end
+
   def test_probe_no_args
     Dtrace::Provider.create :foo1 do |p|
       p.probe :bar
