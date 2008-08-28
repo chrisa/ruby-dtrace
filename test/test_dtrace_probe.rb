@@ -87,10 +87,8 @@ class TestDtraceProbe < Test::Unit::TestCase
     t.setopt("bufsize", "4m")
 
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:args"
-        matches += 1
-      end
+    t.each_probe("test#{$$}:testmodule:main:args") do |p|
+      matches += 1
     end
     assert_equal 1, matches
 

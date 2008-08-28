@@ -28,6 +28,43 @@ class TestDtrace < Test::Unit::TestCase
     assert probe_count
   end
 
+  def test_list_probes_match
+    t = Dtrace.new
+    probe_count = 0
+    t.each_probe('syscall:::') do |probe|
+      assert probe.provider
+      assert probe.mod
+      assert probe.func
+      assert probe.name
+      probe_count += 1
+    end
+    assert probe_count
+  end
+
+  def test_list_probes_match_usdt
+    t = Dtrace.new
+    probe_count = 0
+    t.each_probe("pid#{$$}:::return") do |probe|
+      puts probe
+      assert probe.provider
+      assert probe.mod
+      assert probe.func
+      assert probe.name
+      probe_count += 1
+    end
+    assert probe_count
+  end
+
+  def test_list_probes_match_badpattern
+    t = Dtrace.new
+    probe_count = 0
+    assert_raises Dtrace::Exception do 
+      t.each_probe('syscall') do |probe|
+        nil
+      end
+    end
+  end
+
   def test_compile
     t = Dtrace.new
 

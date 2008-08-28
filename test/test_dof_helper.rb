@@ -21,10 +21,8 @@ class TestDofHelper < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:test"
-        matches += 1
-      end
+    t.each_probe("test#{$$}:testmodule:main:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -96,10 +94,8 @@ class TestDofHelper < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test#{$$}:testmodule:main:test"
-        matches += 1
-      end
+    t.each_probe("test#{$$}:testmodule:main:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
 

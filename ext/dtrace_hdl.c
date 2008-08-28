@@ -109,12 +109,36 @@ int _dtrace_next_probe(dtrace_hdl_t *hdl, const dtrace_probedesc_t *pdp, void *a
  *
  * Each probe is represented by a DtraceProbe object
  */
-VALUE dtrace_each_probe(VALUE self)
+VALUE dtrace_each_probe_all(VALUE self)
 {
   dtrace_handle_t *handle;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
   (void) dtrace_probe_iter(handle->hdl, NULL, _dtrace_next_probe, NULL);
+
+  return self;
+}
+
+/*
+ * Yields each probe found on the system, matching against a 
+ * partial name.
+ * (equivalent to dtrace -l -n ...)
+ *
+ * Each probe is represented by a DtraceProbe object
+ */
+VALUE dtrace_each_probe_match(VALUE self, VALUE provider, VALUE mod, VALUE func, VALUE name)
+{
+  dtrace_handle_t *handle;
+
+  dtrace_probedesc_t desc;
+  desc.dtpd_id = 0;
+  strcpy(desc.dtpd_provider, RSTRING(provider)->ptr);
+  strcpy(desc.dtpd_mod,      RSTRING(mod)->ptr);
+  strcpy(desc.dtpd_func,     RSTRING(func)->ptr);
+  strcpy(desc.dtpd_name,     RSTRING(name)->ptr);
+
+  Data_Get_Struct(self, dtrace_handle_t, handle);
+  (void) dtrace_probe_iter(handle->hdl, &desc, _dtrace_next_probe, NULL);
 
   return self;
 }

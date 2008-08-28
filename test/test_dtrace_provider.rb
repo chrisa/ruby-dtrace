@@ -19,10 +19,8 @@ class TestDtraceProvider < Test::Unit::TestCase
     
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s =~ /^test_massive1#{$$}:ruby:test_massive_provider:probe/
-        matches += 1
-      end
+    t.each_probe("test_massive1#{$$}:ruby:test_massive_provider:") do |p|
+      matches += 1
     end
     assert_equal probecount, matches
   end
@@ -34,10 +32,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test0#{$$}:test1module:test_provider_with_module:test"
-        matches += 1
-      end
+    t.each_probe("test0#{$$}:test1module:test_provider_with_module:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -49,10 +45,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test10#{$$}:ruby:foo:test"
-        matches += 1
-      end
+    t.each_probe("test10#{$$}:ruby:foo:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -64,10 +58,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test11#{$$}:ruby:foo:test"
-        matches += 1
-      end
+    t.each_probe("test11#{$$}:ruby:foo:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -79,10 +71,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test1#{$$}:ruby:test_probe_no_args:test"
-        matches += 1
-      end
+    t.each_probe("test1#{$$}:ruby:test_probe_no_args:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -94,10 +84,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test2#{$$}:ruby:test_probe_with_char_arg:test"
-        matches += 1
-      end
+    t.each_probe("test2#{$$}:ruby:test_probe_with_char_arg:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -109,10 +97,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test3#{$$}:ruby:test_probe_with_int_arg:test"
-        matches += 1
-      end
+    t.each_probe("test3#{$$}:ruby:test_probe_with_int_arg:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -124,10 +110,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test4#{$$}:ruby:test_probe_with_two_args:test"
-        matches += 1
-      end
+    t.each_probe("test4#{$$}:ruby:test_probe_with_two_args:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
   end
@@ -140,10 +124,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s =~ /^test5#{$$}:ruby:test_multiple_probes_with_two_args:test/
-        matches += 1
-      end
+    t.each_probe("test5#{$$}:ruby:test_multiple_probes_with_two_args:") do |p|
+      matches += 1
     end
     assert_equal 2, matches
   end
@@ -159,10 +141,8 @@ class TestDtraceProvider < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s =~ /^test6#{$$}:ruby:test_multiple_probes:test/
-        matches += 1
-      end
+    t.each_probe("test6#{$$}:ruby:test_multiple_probes:") do |p|
+      matches += 1
     end
     assert_equal 5, matches
   end

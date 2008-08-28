@@ -25,7 +25,7 @@ class TestDtraceMultiProvider < Test::Unit::TestCase
     matches[:multi2] = 0
 
     t = Dtrace.new
-    t.each_probe do |p|
+    t.each_probe(":ruby::") do |p|
       if p.to_s =~ /^multi1#{$$}:ruby:/
         matches[:multi1] += 1
       end

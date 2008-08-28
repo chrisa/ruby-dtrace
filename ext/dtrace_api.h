@@ -77,7 +77,8 @@ VALUE dtraceaggdata_aggtype(VALUE self);
 
 VALUE dtrace_init(VALUE self);
 VALUE dtrace_hdl_alloc(VALUE klass);
-VALUE dtrace_each_probe(VALUE self);
+VALUE dtrace_each_probe_all(VALUE self);
+VALUE dtrace_each_probe_match(VALUE self, VALUE provider, VALUE mod, VALUE func, VALUE name);
 VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self);
 VALUE dtrace_hdl_go(VALUE self);
 VALUE dtrace_hdl_status(VALUE self);

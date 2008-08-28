@@ -68,10 +68,8 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test1#{$$}:testmodule:main:test"
-        matches += 1
-      end
+    t.each_probe("test1#{$$}:testmodule:main:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
 
@@ -137,13 +135,11 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test2#{$$}:testmodule:main:test"
-        matches += 1
-      end
+    t.each_probe("test2#{$$}:testmodule:main:test") do |p|
+      matches += 1
     end
-    assert_equal 1, matches
 
+    assert_equal 1, matches
   end
 
   def test_probe_with_int_arg
@@ -206,10 +202,8 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test3#{$$}:testmodule:main:test"
-        matches += 1
-      end
+    t.each_probe("test3#{$$}:testmodule:main:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
 
@@ -273,10 +267,8 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe do |p|
-      if p.to_s == "test4#{$$}:testmodule:main:test"
-        matches += 1
-      end
+    t.each_probe("test4#{$$}:testmodule:main:test") do |p|
+      matches += 1
     end
     assert_equal 1, matches
 

@@ -21,22 +21,23 @@ VALUE eDtraceException;
 
 void Init_dtrace_api() {
 
-  cDtrace = rb_define_class("Dtrace",          rb_cObject);
-  rb_define_method(cDtrace, "initialize",      dtrace_init,                0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "each_probe",      dtrace_each_probe,          0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "compile",         dtrace_strcompile,         -1); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "stop",            dtrace_hdl_stop,            0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "status",          dtrace_hdl_status,          0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "go",              dtrace_hdl_go,              0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "error",           dtrace_hdl_error,           0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "setopt",          dtrace_hdl_setopt,          2); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "sleep",           dtrace_hdl_sleep,           0); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "work",            dtrace_hdl_work,           -1); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "buf_consumer",    dtrace_hdl_buf_consumer,    1); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "drop_consumer",   dtrace_hdl_drop_consumer,   1); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "err_consumer",    dtrace_hdl_err_consumer,    1); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "createprocess",   dtrace_hdl_createprocess,   1); // in dtrace_hdl.c
-  rb_define_method(cDtrace, "grabprocess",     dtrace_hdl_grabprocess,     1); // in dtrace_hdl.c
+  cDtrace = rb_define_class("Dtrace",           rb_cObject);
+  rb_define_method(cDtrace, "initialize",       dtrace_init,                0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "each_probe_all",   dtrace_each_probe_all,      0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "each_probe_match", dtrace_each_probe_match,    4); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "compile",          dtrace_strcompile,         -1); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "stop",             dtrace_hdl_stop,            0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "status",           dtrace_hdl_status,          0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "go",               dtrace_hdl_go,              0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "error",            dtrace_hdl_error,           0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "setopt",           dtrace_hdl_setopt,          2); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "sleep",            dtrace_hdl_sleep,           0); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "work",             dtrace_hdl_work,           -1); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "buf_consumer",     dtrace_hdl_buf_consumer,    1); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "drop_consumer",    dtrace_hdl_drop_consumer,   1); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "err_consumer",     dtrace_hdl_err_consumer,    1); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "createprocess",    dtrace_hdl_createprocess,   1); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "grabprocess",      dtrace_hdl_grabprocess,     1); // in dtrace_hdl.c
   rb_define_alloc_func(cDtrace, dtrace_hdl_alloc);
 
   cDtraceProcess = rb_define_class_under(cDtrace, "Process", rb_cObject);

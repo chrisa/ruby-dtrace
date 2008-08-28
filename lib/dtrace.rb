@@ -70,5 +70,26 @@ class Dtrace
   STATUS_EXITED  = 2
   STATUS_FILLED  = 3
   STATUS_STOPPED = 4
+
+  # Yields each probe on the system, optionally matching against a
+  # probe specification:
+  # 
+  # e.g.
+  # syscall:::      -> all probes in the syscall provider
+  # pid123:::return -> all return probes in pid 123.
+  #
+  def each_probe(match=nil, &block)
+    if match
+      parts = match.split(':', 4)
+      begin
+        each_probe_match(*parts, &block)
+      rescue ArgumentError => e
+        raise Dtrace::Exception.new("each_probe: probe specification expected (e.g. 'provider:::')")
+      end
+    else
+      each_probe_all(&block)
+    end
+  end
+
 end
 
