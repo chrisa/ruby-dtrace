@@ -8,7 +8,7 @@ require 'dtrace/provider'
 require 'test/unit'
 
 class TestDtraceProvider < Test::Unit::TestCase
-  
+
   def test_massive_provider
     probecount = 2950
     Dtrace::Provider.create :test_massive1 do |p|
@@ -23,19 +23,6 @@ class TestDtraceProvider < Test::Unit::TestCase
       matches += 1
     end
     assert_equal probecount, matches
-  end
-
-  def test_provider_with_module
-    Dtrace::Provider.create :test0, { :module => 'test1module' } do |p|
-      p.probe :test
-    end
-
-    t = Dtrace.new
-    matches = 0
-    t.each_probe("test0#{$$}:test1module:test_provider_with_module:test") do |p|
-      matches += 1
-    end
-    assert_equal 1, matches
   end
 
   def test_probe_with_function_no_args
@@ -64,14 +51,14 @@ class TestDtraceProvider < Test::Unit::TestCase
     assert_equal 1, matches
   end
 
-  def test_probe_no_args
-    Dtrace::Provider.create :test1 do |p|
+  def test_probe_no_args_module
+    Dtrace::Provider.create :test1, { :module => 'testmodule' } do |p|
       p.probe :test
     end
 
     t = Dtrace.new
     matches = 0
-    t.each_probe("test1#{$$}:ruby:test_probe_no_args:test") do |p|
+    t.each_probe("test1#{$$}:testmodule:test_probe_no_args_module:test") do |p|
       matches += 1
     end
     assert_equal 1, matches

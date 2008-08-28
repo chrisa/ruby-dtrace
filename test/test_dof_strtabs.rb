@@ -50,14 +50,19 @@ class TestDofStrtabs < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PROFFS, 3)
     s.data = [ 36 ]
     f.sections << s
+
+    s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
+    s.data = [ 36 ]
+    f.sections << s
     
-    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 4)
+    s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
       :probes => 1,
       :prargs => 2,
       :proffs => 3,
-      :name => strtab.add('test'),
+      :prenoffs => 4,
+      :name => strtab.add('teststrtabs'),
       :provattr => { 
         :name  => DTRACE_STABILITY_EVOLVING,
         :data  => DTRACE_STABILITY_EVOLVING,

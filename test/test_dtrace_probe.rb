@@ -32,7 +32,7 @@ class TestDtraceProbe < Test::Unit::TestCase
     f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['args', 'main', 'test']
+    s.data = ['args', 'main', 'testprobe']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
@@ -87,7 +87,7 @@ class TestDtraceProbe < Test::Unit::TestCase
     t.setopt("bufsize", "4m")
 
     matches = 0
-    t.each_probe("test#{$$}:testmodule:main:args") do |p|
+    t.each_probe("testprobe#{$$}:testmodule:main:args") do |p|
       matches += 1
     end
     assert_equal 1, matches

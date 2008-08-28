@@ -13,6 +13,8 @@ class TestDofHelper < Test::Unit::TestCase
   include Dtrace::Dof::Constants
   
   def test_sun_dof
+    flunk # platform test for Solaris
+
     dof = File.read("#{$dof_dir}/dof")
     f = Dtrace::Dof::File.new
     f.allocate(4096)

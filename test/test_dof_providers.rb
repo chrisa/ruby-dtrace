@@ -15,7 +15,7 @@ class TestDofProviders < Test::Unit::TestCase
     f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['test', 'main', 'test1']
+    s.data = ['test', 'main', 'test1dof']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
@@ -68,7 +68,7 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe("test1#{$$}:testmodule:main:test") do |p|
+    t.each_probe("test1dof#{$$}:testmodule:main:test") do |p|
       matches += 1
     end
     assert_equal 1, matches
@@ -80,7 +80,7 @@ class TestDofProviders < Test::Unit::TestCase
     f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['test', 'char *', 'char *', 'main', 'test2']
+    s.data = ['test', 'char *', 'char *', 'main', 'test2dof']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
@@ -135,7 +135,7 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe("test2#{$$}:testmodule:main:test") do |p|
+    t.each_probe("test2dof#{$$}:testmodule:main:test") do |p|
       matches += 1
     end
 
@@ -147,7 +147,7 @@ class TestDofProviders < Test::Unit::TestCase
     f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['test', 'int', 'int', 'main', 'test3']
+    s.data = ['test', 'int', 'int', 'main', 'test3dof']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
@@ -202,7 +202,7 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe("test3#{$$}:testmodule:main:test") do |p|
+    t.each_probe("test3dof#{$$}:testmodule:main:test") do |p|
       matches += 1
     end
     assert_equal 1, matches
@@ -214,7 +214,7 @@ class TestDofProviders < Test::Unit::TestCase
     f.allocate(4096)
 
     s = Dtrace::Dof::Section.new(DOF_SECT_STRTAB, 0)
-    s.data = ['test', 'main', 'test4']
+    s.data = ['test', 'main', 'test4dof']
     f.sections << s
 
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 1)
@@ -267,7 +267,7 @@ class TestDofProviders < Test::Unit::TestCase
 
     t = Dtrace.new
     matches = 0
-    t.each_probe("test4#{$$}:testmodule:main:test") do |p|
+    t.each_probe("test4dof#{$$}:testmodule:main:test") do |p|
       matches += 1
     end
     assert_equal 1, matches

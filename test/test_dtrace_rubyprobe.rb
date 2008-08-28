@@ -8,6 +8,8 @@ require 'test/unit'
 
 class TestDtrace < Test::Unit::TestCase
   def test_rubyprobe
+    flunk # platform test for Joyent patched Ruby
+
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
 
