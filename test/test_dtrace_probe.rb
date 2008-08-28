@@ -21,7 +21,7 @@ class TestDtraceProbe < Test::Unit::TestCase
 
   def test_is_probe_not_enabled
     p = Dtrace::Probe.new(0)
-    assert_equal 0, p.is_enabled?
+    assert !p.is_enabled?
   end
 
   def test_fire_probe_no_args
@@ -354,7 +354,7 @@ EOD
     f.generate
     Dtrace::Dof.loaddof(f, 'testmodule')
 
-    assert_equal 0, probe.is_enabled?
+    assert !probe.is_enabled?
 
     t = Dtrace.new 
     t.setopt("bufsize", "4m")
@@ -370,7 +370,7 @@ EOD
     prog.execute
     t.go
     
-    assert_equal 1, probe.is_enabled?
+    assert probe.is_enabled?
     
     probe.fire
 

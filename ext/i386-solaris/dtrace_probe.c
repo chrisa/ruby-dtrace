@@ -136,7 +136,7 @@ VALUE dtraceprobe_is_enabled(VALUE self)
   dtrace_probe_t *probe;
   
   Data_Get_Struct(self, dtrace_probe_t, probe);
-  return INT2FIX((int)(*probe->func)());
+  return ((int)(*probe->func)()) ? Qtrue : Qfalse;
 }
 
 VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
