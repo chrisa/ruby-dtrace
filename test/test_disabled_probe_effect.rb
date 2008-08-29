@@ -22,27 +22,23 @@ class TestDisabledProbeEffect < Test::Unit::TestCase
         end
       end
       
+      Dtrace::Provider.create :dpe do |p|
+        p.probe :p1
+      end
+      
       x.report "disabled:" do 
         # Second time a loop with probes created but not enabled.
-        Dtrace::Provider.create :dpe do |p|
-          p.probe :p1
-        end
-        
         (1..n).each do |i|
           Dtrace::Probe::Dpe.p1 { |p| p.fire }
         end
       end
-    
+
       x.report "enabled: " do
         # Third time a loop with probes enabled
         t = Dtrace.new 
         t.setopt("bufsize", "4m")
 
-        progtext = <<EOD
-dpe*:ruby::p1
-{
-}
-EOD
+        progtext = "dpe#{$$}:::p1 { }"
         
         prog = t.compile progtext
         prog.execute
