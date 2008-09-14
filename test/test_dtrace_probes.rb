@@ -55,6 +55,9 @@ EOD
 foo2*:ruby:test_probe_one_int_arg:bar
 {
   trace(arg0);
+  trace(arg1);
+  trace(arg2);
+  trace(arg3);
 }
 EOD
     

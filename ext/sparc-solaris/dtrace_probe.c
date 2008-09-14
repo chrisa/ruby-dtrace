@@ -10,9 +10,20 @@
 
 RUBY_EXTERN VALUE eDtraceException;
 
-#define FUNC_SIZE 80 /* 32 bytes of is_enabled, plus then good for 16
-			arguments: 16 + 3 * argc */
+#define FUNC_SIZE 256
 #define IS_ENABLED_FUNC_LEN 48
+
+void install_insns(uint8_t *probe_insns, uint8_t *insns, int count)
+{
+  int i,j;
+  uint8_t *ip;
+  ip = insns;
+  for (j = 1; j <= count; j++) {
+    for (i = 0; i < 4; i++) {
+      *ip++ = *probe_insns++;
+    }
+  }
+}
 
 /* :nodoc: */
 VALUE dtraceprobe_init(VALUE self, VALUE rargc)
@@ -21,13 +32,14 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
   uint8_t *ip;
   int i;
   int argc = FIX2INT(rargc);
+  uint8_t probe_insns[FUNC_SIZE];
 
   Data_Get_Struct(self, dtrace_probe_t, probe);
 
   /* First initialise the is_enabled tracepoint */
   uint8_t insns[FUNC_SIZE] = {
     /* save        %sp, -104, %sp */
-    0x9d, 0xe3, 0xbf, 0xa0, 
+    0x9d, 0xe3, 0xbf, 0x98, 
     /* nop */
     0x01, 0x00, 0x00, 0x00,   
     /* clr         %o0 */
@@ -48,17 +60,384 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     0x00, 0x01, 0x00, 0x00,   
     0x00, 0x01, 0x00, 0x00,   
     0x00, 0x01, 0x00, 0x00,   
-
-    0x9d, 0xe3, 0xbf, 0x90, 
-    0x82, 0x10, 0x20, 0x01, 
-    0xb0, 0x10, 0x00, 0x01, 
-    0x81, 0xc7, 0xe0, 0x08, 
-    0x81, 0xe8, 0x00, 0x00,
-    
-    0x00, 0x01, 0x00, 0x00,   
-    0x00, 0x01, 0x00, 0x00,   
-    0x00, 0x01, 0x00, 0x00,   
   };
+
+  /* Now build probe tracepoint */
+  switch (argc) {
+
+  case 0:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0x90, 
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,   
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,   
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08, 
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 8);
+    }
+    break;
+
+  case 1:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0, 
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,   
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 12);
+    }
+    break;
+
+  case 2:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 12);
+    }
+    break;
+
+  case 3:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* st          %i2, [%fp + 76] */
+        0xf4, 0x27, 0xa0, 0x4c,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* ld          [%fp + 76], %l2 */
+        0xe4, 0x07, 0xa0, 0x4c,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* or          %l2, %g0, %o2 */
+        0x94, 0x14, 0x80, 0x00,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 16);
+    }
+    break;
+
+  case 4:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* st          %i2, [%fp + 76] */
+        0xf4, 0x27, 0xa0, 0x4c,
+        /* st          %i3, [%fp + 80] */
+        0xf6, 0x27, 0xa0, 0x50,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* ld          [%fp + 76], %l2 */
+        0xe4, 0x07, 0xa0, 0x4c,
+        /* ld          [%fp + 80], %l3 */
+        0xe6, 0x07, 0xa0, 0x50,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* or          %l2, %g0, %o2 */
+        0x94, 0x14, 0x80, 0x00,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* or          %l3, %g0, %o3 */
+        0x96, 0x14, 0x00, 0x00,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 16);
+    }
+    break;
+
+  case 5:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* st          %i2, [%fp + 76] */
+        0xf4, 0x27, 0xa0, 0x4c,
+        /* st          %i3, [%fp + 80] */
+        0xf6, 0x27, 0xa0, 0x50,
+        /* st          %i4, [%fp + 84] */
+        0xf8, 0x27, 0xa0, 0x54,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* ld          [%fp + 76], %l2 */
+        0xe4, 0x07, 0xa0, 0x4c,
+        /* ld          [%fp + 80], %l3 */
+        0xe6, 0x07, 0xa0, 0x50,
+        /* ld          [%fp + 84], %l4 */
+        0xe8, 0x07, 0xa0, 0x54,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* or          %l2, %g0, %o2 */
+        0x94, 0x14, 0x80, 0x00,
+        /* or          %l3, %g0, %o3 */
+        0x96, 0x14, 0xc0, 0x00,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* or          %l4, %g0, %o4 */
+        0x98, 0x15, 0x00, 0x00,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 20);
+    }
+    break;
+
+  case 6:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* st          %i2, [%fp + 76] */
+        0xf4, 0x27, 0xa0, 0x4c,
+        /* st          %i3, [%fp + 80] */
+        0xf6, 0x27, 0xa0, 0x50,
+        /* st          %i4, [%fp + 84] */
+        0xf8, 0x27, 0xa0, 0x54,
+        /* st          %i5, [%fp + 88] */
+        0xfa, 0x27, 0xa0, 0x58,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* ld          [%fp + 76], %l2 */
+        0xe4, 0x07, 0xa0, 0x4c,
+        /* ld          [%fp + 80], %l3 */
+        0xe6, 0x07, 0xa0, 0x50,
+        /* ld          [%fp + 84], %l5 */
+        0xea, 0x07, 0xa0, 0x54,
+        /* ld          [%fp + 88], %l4 */
+        0xe8, 0x07, 0xa0, 0x58,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* or          %l2, %g0, %o2 */
+        0x94, 0x14, 0x80, 0x00,
+        /* or          %l3, %g0, %o3 */
+        0x96, 0x14, 0xc0, 0x00,
+        /* or          %l5, %g0, %o4 */
+        0x98, 0x15, 0x40, 0x00,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* or          %l4, %g0, %o5 */
+        0x9a, 0x15, 0x00, 0x00,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 24);
+    }
+    break;
+
+  case 7:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0xa0,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* st          %i2, [%fp + 76] */
+        0xf4, 0x27, 0xa0, 0x4c,
+        /* st          %i3, [%fp + 80] */
+        0xf6, 0x27, 0xa0, 0x50,
+        /* st          %i4, [%fp + 84] */
+        0xf8, 0x27, 0xa0, 0x54,
+        /* st          %i5, [%fp + 88] */
+        0xfa, 0x27, 0xa0, 0x58,
+        /* ld          [%fp + 92], %l0 */
+        0xe0, 0x07, 0xa0, 0x5c,
+        /* st          %l0, [%fp + 92] */
+        0xe0, 0x27, 0xa0, 0x5c,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* ld          [%fp + 76], %l2 */
+        0xe4, 0x07, 0xa0, 0x4c,
+        /* ld          [%fp + 80], %l3 */
+        0xe6, 0x07, 0xa0, 0x50,
+        /* ld          [%fp + 84], %l5 */
+        0xea, 0x07, 0xa0, 0x54,
+        /* ld          [%fp + 88], %l4 */
+        0xec, 0x07, 0xa0, 0x58,
+        /* ld          [%fp + 92], %l5 */
+        0xe8, 0x07, 0xa0, 0x5c,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* or          %l2, %g0, %o2 */
+        0x94, 0x14, 0x80, 0x00,
+        /* or          %l3, %g0, %o3 */
+        0x96, 0x14, 0xc0, 0x00,
+        /* or          %l5, %g0, %o4 */
+        0x98, 0x15, 0x40, 0x00,
+        /* or          %l6, %g0, %o5 */
+        0x9a, 0x15, 0x80, 0x00,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* st          %l4, [%sp + 92] */
+        0xe8, 0x23, 0xa0, 0x5c,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 28);
+    }
+    break;
+
+  case 8:
+    {
+      uint8_t probe_insns[FUNC_SIZE] = {
+        /* save        %sp, -96, %sp */
+        0x9d, 0xe3, 0xbf, 0x98,
+        /* st          %i0, [%fp + 68] */
+        0xf0, 0x27, 0xa0, 0x44,
+        /* st          %i1, [%fp + 72] */
+        0xf2, 0x27, 0xa0, 0x48 ,
+        /* st          %i2, [%fp + 76] */
+        0xf4, 0x27, 0xa0, 0x4c,
+        /* st          %i3, [%fp + 80] */
+        0xf6, 0x27, 0xa0, 0x50,
+        /* st          %i4, [%fp + 84] */
+        0xf8, 0x27, 0xa0, 0x54,
+        /* st          %i5, [%fp + 88] */
+        0xfa, 0x27, 0xa0, 0x58,
+        /* ld          [%fp + 92], %l0 */
+        0xe0, 0x07, 0xa0, 0x5c,
+        /* st          %l0, [%fp + 92] */
+        0xe0, 0x27, 0xa0, 0x5c,
+        /* ld          [%fp + 96], %l0 */
+        0xe0, 0x07, 0xa0, 0x60,
+        /* st          %l0, [%fp + 96] */
+        0xe0, 0x27, 0xa0, 0x60,
+        /* ld          [%fp + 68], %l0 */
+        0xe0, 0x07, 0xa0, 0x44,
+        /* ld          [%fp + 72], %l1 */
+        0xe2, 0x07, 0xa0, 0x48,
+        /* ld          [%fp + 76], %l2 */
+        0xe4, 0x07, 0xa0, 0x4c,
+        /* ld          [%fp + 80], %l3 */
+        0xe6, 0x07, 0xa0, 0x50,
+        /* ld          [%fp + 84], %l5 */
+        0xea, 0x07, 0xa0, 0x54,
+        /* ld          [%fp + 88], %l6 */
+        0xec, 0x07, 0xa0, 0x58,
+        /* ld          [%fp + 92], %l7 */
+        0xee, 0x07, 0xa0, 0x5c,
+        /* ld          [%fp + 96], %l4 */
+        0xe8, 0x07, 0xa0, 0x60,
+        /* or          %l0, %g0, %o0 */
+        0x90, 0x14, 0x00, 0x00,
+        /* or          %l1, %g0, %o1 */
+        0x92, 0x14, 0x40, 0x00,
+        /* or          %l2, %g0, %o2 */
+        0x94, 0x14, 0x80, 0x00,
+        /* or          %l3, %g0, %o3 */
+        0x96, 0x14, 0xc0, 0x00,
+        /* or          %l5, %g0, %o4 */
+        0x98, 0x15, 0x40, 0x00,
+        /* or          %l6, %g0, %o5 */
+        0x9a, 0x15, 0x80, 0x00,
+        /* st          %l7, [%sp + 92] */
+        0xee, 0x23, 0xa0, 0x5c,
+        /* nop */
+        0x01, 0x00, 0x00, 0x00,
+        /* st          %l4, [%sp + 96] */
+        0xe8, 0x23, 0xa0, 0x60,
+        /* ret */
+        0x81, 0xc7, 0xe0, 0x08,
+        /* restore */
+        0x81, 0xe8, 0x00, 0x00,      
+      };
+      install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 32);
+    }
+    break;
+
+  default:
+    rb_raise(eDtraceException, "probe argc max is 8");
+    return Qnil;
+    break;
+  }
 
   /* allocate memory on a page boundary, for mprotect */
   probe->func = (void *)memalign(PAGESIZE, FUNC_SIZE);
@@ -164,19 +543,19 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     break;
   case 5:
     (void)(*func)(argv[0], argv[1], argv[2], argv[3], 
-		  argv[4]);
+                  argv[4]);
     break;
   case 6:
     (void)(*func)(argv[0], argv[1], argv[2], argv[3],
-		  argv[4], argv[5]);
+                  argv[4], argv[5]);
     break;
   case 7:
     (void)(*func)(argv[0], argv[1], argv[2], argv[3],
-		  argv[4], argv[5], argv[6]);
+                  argv[4], argv[5], argv[6]);
     break;
   case 8:
     (void)(*func)(argv[0], argv[1], argv[2], argv[3],
-		  argv[4], argv[5], argv[6], argv[7]);
+                  argv[4], argv[5], argv[6], argv[7]);
     break;
   default:
     rb_raise(eDtraceException, "probe argc max is 8");
@@ -191,14 +570,14 @@ VALUE dtraceprobe_probe_offset(VALUE self, VALUE rfile, VALUE argc)
   /*
    * compute offset into stub: see dtrace_probe.c
    *
-   * 32 bytes - length of is_enabled function
+   * 48 bytes - length of is_enabled function
    * +
-   * 6 bytes - function entry
+   * 3 instrs function entry - 12 bytes
    * +
-   * 3 bytes per argument - arg->stack push
+   * 3 instrs per argument - 12 bytes
    *
    */
-  return INT2FIX(0);
+  return INT2FIX(IS_ENABLED_FUNC_LEN + 12 + (FIX2INT(argc) * 12));
 }
 
 VALUE dtraceprobe_is_enabled_offset(VALUE self, VALUE rfile)
