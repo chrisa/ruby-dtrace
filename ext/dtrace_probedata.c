@@ -246,7 +246,7 @@ VALUE dtraceprobedata_each_record(VALUE self)
 	  v = INT2FIX(*((int32_t *)addr));
 	  break;
 	case 8:
-	  v = INT2FIX(*((int64_t *)addr));
+	  v = LL2NUM(*((int64_t *)addr));
 	  break;
 	default:
 	  v = handle_bytedata(addr, rec->dtrd_size);
