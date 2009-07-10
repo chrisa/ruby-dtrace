@@ -93,6 +93,7 @@ VALUE dtrace_init(VALUE self)
     return Qnil;
 }
 
+static
 int _dtrace_next_probe(dtrace_hdl_t *hdl, const dtrace_probedesc_t *pdp, void *arg)
 {
   VALUE probe;
@@ -122,7 +123,7 @@ VALUE dtrace_each_probe_all(VALUE self)
 /*
  * Yields each probe found on the system, matching against a 
  * partial name.
- * (equivalent to dtrace -l -n ...)
+ * (equivalent to dtrace -l -n 'probe:::spec')
  *
  * Each probe is represented by a DtraceProbe object
  */
@@ -142,6 +143,44 @@ VALUE dtrace_each_probe_match(VALUE self, VALUE provider, VALUE mod, VALUE func,
 
   return self;
 }
+
+static int
+_dtrace_next_stmt(dtrace_hdl_t *hdl, dtrace_prog_t *program,
+		  dtrace_stmtdesc_t *stp, dtrace_ecbdesc_t **last)
+{
+  dtrace_ecbdesc_t *edp = stp->dtsd_ecbdesc;
+  
+  if (edp == *last)
+    return 0;
+
+  if (dtrace_probe_iter(hdl, &edp->dted_probe, _dtrace_next_probe, NULL) != 0) {
+    rb_raise(eDtraceException, "failed to match %s:%s:%s:%s: %s\n",
+	     edp->dted_probe.dtpd_provider, edp->dted_probe.dtpd_mod,
+	     edp->dted_probe.dtpd_func, edp->dted_probe.dtpd_name,
+	     dtrace_errmsg(hdl, dtrace_errno(hdl)));
+  
+  }
+  
+  *last = edp;
+  return 0;
+}
+ 
+/*
+ * Yields each probe enabled by the given D program.
+ * (equivalent to dtrace -n -s program.d)
+ */
+VALUE dtrace_each_probe_prog(VALUE self, VALUE program)
+{
+  dtrace_handle_t *handle;
+  dtrace_prog_t *prog;
+  dtrace_ecbdesc_t *last = NULL;
+  
+  Data_Get_Struct(self, dtrace_handle_t, handle);
+  Data_Get_Struct(program, dtrace_prog_t, prog);
+ 
+  (void) dtrace_stmt_iter(handle->hdl, prog, (dtrace_stmt_f *)_dtrace_next_stmt, &last);
+  return Qnil;
+} 
 
 /*
  * Compile a D program. 

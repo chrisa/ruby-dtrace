@@ -25,6 +25,7 @@ void Init_dtrace_api() {
   rb_define_method(cDtrace, "initialize",       dtrace_init,                0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "each_probe_all",   dtrace_each_probe_all,      0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "each_probe_match", dtrace_each_probe_match,    4); // in dtrace_hdl.c
+  rb_define_method(cDtrace, "each_probe_prog",  dtrace_each_probe_prog,     1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "compile",          dtrace_strcompile,         -1); // in dtrace_hdl.c
   rb_define_method(cDtrace, "stop",             dtrace_hdl_stop,            0); // in dtrace_hdl.c
   rb_define_method(cDtrace, "status",           dtrace_hdl_status,          0); // in dtrace_hdl.c

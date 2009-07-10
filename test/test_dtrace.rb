@@ -55,6 +55,35 @@ class TestDtrace < Test::Unit::TestCase
     assert probe_count
   end
 
+  def test_list_probes_match_prog
+    t = Dtrace.new
+    
+    progtext = "syscall:::return
+   			{
+                          @calls[execname] = count();
+			  @fcalls[probefunc] = count();
+			}
+
+                syscall:::entry
+                /pid == $1/
+                {
+                   @calls[execname] = count();
+                   @fcalls[probefunc] = count();
+                }"
+    prog = t.compile(progtext, $$.to_s)
+    prog.execute
+
+    probe_count = 0
+    t.each_probe_prog(prog) do |probe|
+      assert probe.provider
+      assert probe.mod
+      assert probe.func
+      assert probe.name
+      probe_count += 1
+    end
+    assert probe_count
+  end
+
   def test_list_probes_match_badpattern
     t = Dtrace.new
     probe_count = 0
