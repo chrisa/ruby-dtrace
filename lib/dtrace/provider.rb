@@ -7,6 +7,7 @@ require 'dtrace'
 require 'dtrace/dof'
 require 'dtrace/probe'
 require 'dtrace/provider/probedef'
+require 'dtrace/provider/klass'
 
 class Dtrace
 
@@ -238,34 +239,11 @@ class Dtrace
 
       f.generate
       Dtrace::Dof.loaddof(f, @module)
+      
+      provider = Dtrace::Provider::Klass.new(f, stubs)
+      Dtrace::Probe.const_set(@class, provider)
 
-      classdef = "
-class Dtrace::Probe::#{@class}
-  def self.dof=(f)
-    @@dof = f
-  end
-  def self.stubs=(s)
-    @@probes = s
-  end
-  def self.method_missing(name, *args, &block)
-    if @@probes[name].nil?
-      raise Dtrace::Exception.new(\"no such probe in \#{self.to_s}: \#{name.to_s}\")
-    else
-      if @@probes[name].is_enabled?
-        block.call @@probes[name]
-      end
-    end
-  end
-end"
-
-      eval classdef
-      eval "Dtrace::Probe::#{@class}.stubs = stubs"
-
-      # must stash a reference to the DOF in the provider:
-      # on OSX at least, freeing the generated DOF removes
-      # the probes from the kernel. 
-      eval "Dtrace::Probe::#{@class}.dof = f"
-
+      provider
     end
 
     private
