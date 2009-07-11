@@ -241,6 +241,9 @@ class Dtrace
 
       classdef = "
 class Dtrace::Probe::#{@class}
+  def self.dof=(f)
+    @@dof = f
+  end
   def self.stubs=(s)
     @@probes = s
   end
@@ -257,6 +260,11 @@ end"
 
       eval classdef
       eval "Dtrace::Probe::#{@class}.stubs = stubs"
+
+      # must stash a reference to the DOF in the provider:
+      # on OSX at least, freeing the generated DOF removes
+      # the probes from the kernel. 
+      eval "Dtrace::Probe::#{@class}.dof = f"
 
     end
 
