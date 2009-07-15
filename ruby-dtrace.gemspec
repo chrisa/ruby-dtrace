@@ -72,6 +72,7 @@ with Ruby.
              "lib/dtrace/probedesc.rb",
              "lib/dtrace/provider",
              "lib/dtrace/provider/probedef.rb",
+             "lib/dtrace/provider/klass.rb",
              "lib/dtrace/provider.rb",
              "lib/dtrace/record.rb",
              "lib/dtrace/stackrecord.rb",
