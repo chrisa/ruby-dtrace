@@ -1,3 +1,11 @@
+== 0.2.8 / 2009-07-23
+
+ * Replace string-eval provider class creation 
+ * Fix GC bug with DOF data on Mac OSX (reported by ecin@copypastel.com)
+ * Add each_probe_prog method to list probes enabled by a program
+ * Fix conversion of 64 bit values in probe data (reported by ecin@copypastel.com)
+ * Add support for SPARC/Solaris and PowerPC/OSX architectures
+
 == 0.2.7 / 2008-08-01
 
  * Fix probes not firing when multiple providers are used.

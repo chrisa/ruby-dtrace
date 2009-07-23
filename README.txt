@@ -4,6 +4,8 @@ with Ruby.
 
 == FEEDBACK
 
+Fork the repository on Github: http://github.com/chrisa/ruby-dtrace
+
 Rubyforge mailing list: http://rubyforge.org/mailman/listinfo/ruby-dtrace-users
 
 == FEATURES
@@ -73,11 +75,11 @@ Probes: see Dtrace::Provider
 
 == INSTALL
 
- $ sudo gem install chrisa-ruby-dtrace --source=http://gems.github.com
+ $ sudo gem install ruby-dtrace
 
 == LICENSE
 
-Copyright (c) 2008 Chris Andrews <chris@nodnol.org>
+Copyright (c) 2008, 2009 Chris Andrews <chris@nodnol.org>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
