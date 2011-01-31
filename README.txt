@@ -63,12 +63,11 @@ Probes: see Dtrace::Provider
 == REQUIREMENTS
 
 * For the consumer API, platform with DTrace support (OpenSolaris, Mac
-  OS X 10.5 Leopard tested, possibly also FreeBSD).
+  OS X 10.5 Leopard and 10.6 Snow Leopard tested, possibly also FreeBSD).
 
 * For the probe API, a platform with DTrace support (as for the
-  consumer API), with a 32 bit Ruby build - i386, PowerPC (for OS X)
-  and SPARC (for Solaris) are all supported. 64 bit builds are not,
-  yet.
+  consumer API), with a 32 bit or 64 bit Ruby build - i386/x86_64,
+  PowerPC (for OS X) and SPARC (for Solaris) are all supported.
   
 * root, or some/all of the dtrace privileges on Solaris: dtrace_user,
   dtrace_proc and dtrace_kernel.
@@ -79,7 +78,7 @@ Probes: see Dtrace::Provider
 
 == LICENSE
 
-Copyright (c) 2008, 2009 Chris Andrews <chris@nodnol.org>
+Copyright (c) 2008, 2009, 2011 Chris Andrews <chris@nodnol.org>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
