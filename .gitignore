@@ -1,0 +1,10 @@
+ext/*.o
+ext/dof/*.o
+*~
+.#*
+*#
+ext/Makefile
+ext/dof/Makefile
+conftest.dSYM
+*.bundle
+ext/mkmf.log
