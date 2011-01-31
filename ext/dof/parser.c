@@ -145,7 +145,7 @@ _dof_parse_dof_probe_t_array(VALUE self, char *dof, dof_sec_t *sec)
     count++;
 
     probe_data = rb_hash_new();
-    sprintf(addr_str, "%p", probe.dofpr_addr);
+    sprintf(addr_str, "%p", (void *)probe.dofpr_addr);
     rb_hash_aset(probe_data, ID2SYM(rb_intern("addr")), rb_str_new2(addr_str));
     rb_hash_aset(probe_data, ID2SYM(rb_intern("func")), rb_hash_aref(strtab, INT2FIX(probe.dofpr_func)));
     rb_hash_aset(probe_data, ID2SYM(rb_intern("name")), rb_hash_aref(strtab, INT2FIX(probe.dofpr_name)));

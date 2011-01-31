@@ -77,7 +77,7 @@ VALUE dtrace_hdl_alloc(VALUE klass)
     return obj;
   }
   else {
-    rb_raise(eDtraceException, "unable to open dtrace (not root?)");
+    rb_raise(eDtraceException, "unable to open dtrace: %s (not root?)", strerror(err));
   }
 }
 
@@ -440,7 +440,10 @@ VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self)
   handlers.rec    = rec_consumer;
   handlers.handle = self;
 
-  status = dtrace_work(handle->hdl, NULL, _probe_consumer, _rec_consumer, &handlers);
+  FILE *devnull = fopen("/dev/null", "w");
+  status = dtrace_work(handle->hdl, devnull, _probe_consumer, _rec_consumer, &handlers);
+  fclose(devnull);
+
   if (status < 0)
     rb_raise(eDtraceException, (dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl))));
 

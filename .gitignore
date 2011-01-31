@@ -4,7 +4,11 @@ ext/dof/*.o
 .#*
 *#
 ext/Makefile
-ext/dof/Makefile
 conftest.dSYM
-*.bundle
 ext/mkmf.log
+ext/conftest.dSYM/
+ext/dof/Makefile
+ext/dtrace_probe.c
+ext/dof/dof_api.bundle
+ext/dtrace_api.bundle
+pkg

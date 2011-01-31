@@ -185,7 +185,7 @@ EOD
     
   end
 
-  def test_all_argcs
+  def test_six_argcs
     Dtrace::Provider.create :foo5 do |p|
       p.probe :bar1, :integer
       p.probe :bar2, :integer, :integer
@@ -195,10 +195,6 @@ EOD
                      :integer
       p.probe :bar6, :integer, :integer, :integer, :integer,
                      :integer, :integer
-      p.probe :bar7, :integer, :integer, :integer, :integer,
-                     :integer, :integer, :integer
-      p.probe :bar8, :integer, :integer, :integer, :integer,
-                     :integer, :integer, :integer, :integer
     end
     
     t = Dtrace.new 
@@ -254,28 +250,6 @@ foo5*:ruby:*:bar6
   trace(arg5);
 }
 
-foo5*:ruby:*:bar7
-{
-  trace(arg0);
-  trace(arg1);
-  trace(arg2);
-  trace(arg3);
-  trace(arg4);
-  trace(arg5);
-  trace(arg6);
-}
-
-foo5*:ruby:*:bar8
-{
-  trace(arg0);
-  trace(arg1);
-  trace(arg2);
-  trace(arg3);
-  trace(arg4);
-  trace(arg5);
-  trace(arg6);
-  trace(arg7);
-}
 EOD
     
     prog = t.compile progtext
@@ -301,19 +275,13 @@ EOD
     Dtrace::Probe::Foo5.bar6 do |p|
       p.fire(61, 62, 63, 64, 65, 66)
     end
-    Dtrace::Probe::Foo5.bar7 do |p|
-      p.fire(71, 72, 73, 74, 75, 76, 77)
-    end
-   Dtrace::Probe::Foo5.bar8 do |p|
-     p.fire(81, 82, 83, 84, 85, 86, 87, 88)
-   end
 
     data = []
     c.consume_once do |d|
       data << d
     end
-
-    assert_equal 8, data.length
+    
+    assert_equal 6, data.length
 
     assert_equal 11, data[0].data[0].value
 
@@ -341,30 +309,13 @@ EOD
     assert_equal 64, data[5].data[3].value
     assert_equal 65, data[5].data[4].value
     assert_equal 66, data[5].data[5].value
-
-    assert_equal 71, data[6].data[0].value
-    assert_equal 72, data[6].data[1].value
-    assert_equal 73, data[6].data[2].value
-    assert_equal 74, data[6].data[3].value
-    assert_equal 75, data[6].data[4].value
-    assert_equal 76, data[6].data[5].value
-    assert_equal 77, data[6].data[6].value
-
-    assert_equal 81, data[7].data[0].value
-    assert_equal 82, data[7].data[1].value
-    assert_equal 83, data[7].data[2].value
-    assert_equal 84, data[7].data[3].value
-    assert_equal 85, data[7].data[4].value
-    assert_equal 86, data[7].data[5].value
-    assert_equal 87, data[7].data[6].value
-    assert_equal 88, data[7].data[7].value
     
   end
 
-  def test_all_eight_args_chars
+  def test_all_six_args_chars
     Dtrace::Provider.create :foo6 do |p|
-      p.probe :bar, :string, :string, :string, :string,
-                    :string, :string, :string, :string
+      p.probe :bar, 
+              :string, :string, :string, :string, :string, :string
     end
     
     t = Dtrace.new 
@@ -379,8 +330,6 @@ foo6*:ruby:*:bar
   trace(copyinstr(arg3));
   trace(copyinstr(arg4));
   trace(copyinstr(arg5));
-  trace(copyinstr(arg6));
-  trace(copyinstr(arg7));
 }
 EOD
     
@@ -390,8 +339,7 @@ EOD
     c = Dtrace::Consumer.new(t)
 
     Dtrace::Probe::Foo6.bar do |p|
-      p.fire('one',  'two', 'three', 'four',
-             'five', 'six', 'seven', 'eight')
+      p.fire('one',  'two', 'three', 'four', 'five', 'six')
     end    
 
     data = []
@@ -406,9 +354,6 @@ EOD
     assert_equal 'four',  data[0].data[3].value
     assert_equal 'five',  data[0].data[4].value
     assert_equal 'six',   data[0].data[5].value
-    assert_equal 'seven', data[0].data[6].value
-    assert_equal 'eight', data[0].data[7].value
-    
   end
-
+  
 end

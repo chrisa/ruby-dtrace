@@ -38,7 +38,9 @@ class TestDofStrtabs < Test::Unit::TestCase
                 :offidx   => 0,
                 :addr     => 0,
                 :nargc    => 0,
-                :xargc    => 0
+                :xargc    => 0,
+                :nargv    => 0,
+                :xargv    => 0
               },
              ]
     f.sections << s

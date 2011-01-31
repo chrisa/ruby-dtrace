@@ -69,12 +69,12 @@ VALUE dof_generate_probes(VALUE self) {
     dof_probe_t p;
     memset(&p, 0, sizeof(p));
     
-    p.dofpr_addr  =     (uint64_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("addr"))));
+    p.dofpr_addr  =     (uint64_t)NUM2LL(rb_hash_aref(probe, ID2SYM(rb_intern("addr"))));
     p.dofpr_func  = (dof_stridx_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("func"))));
     p.dofpr_name  = (dof_stridx_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("name"))));
     p.dofpr_nargv = (dof_stridx_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("nargv"))));
     p.dofpr_xargv = (dof_stridx_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("xargv"))));
-    
+
     p.dofpr_argidx   = (uint32_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("argidx"))));
     p.dofpr_offidx   = (uint32_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("offidx"))));
     p.dofpr_nargc    =  (uint8_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("nargc"))));

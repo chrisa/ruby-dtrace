@@ -47,7 +47,9 @@ class TestDtraceProbe < Test::Unit::TestCase
                 :addr     => addr,
                 :nargc    => 0,
                 :func     => 6,
-                :xargc    => 0
+                :xargc    => 0,
+                :nargv    => 0,
+                :xargv    => 0
               },
              ]
     f.sections << s
@@ -316,7 +318,9 @@ EOD
                 :addr     => addr,
                 :nargc    => 0,
                 :func     => 6,
-                :xargc    => 0
+                :xargc    => 0,
+                :nargv    => 0,
+                :xargv    => 0
               },
              ]
     f.sections << s
