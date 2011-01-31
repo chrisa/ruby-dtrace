@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   
   s.name = 'ruby-dtrace'
-  s.version = '0.2.8'
+  s.version = '0.3.0'
   s.platform = Gem::Platform::RUBY
   s.summary = <<-DESC.strip.gsub(/\n\s+/, " ")
 Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
@@ -31,7 +31,6 @@ with Ruby.
              "ext/dof/generator.c",
              "ext/dof/header.c",
              "ext/dof/Makefile",
-             "ext/dof/mkmf.log",
              "ext/dof/parser.c",
              "ext/dof/parser.h",
              "ext/dof/section.c",

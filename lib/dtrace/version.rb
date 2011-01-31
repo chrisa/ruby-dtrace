@@ -1,9 +1,9 @@
 #
 # Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
+# (c) 2007-2011 Chris Andrews <chris@nodnol.org>
 #
 
 class Dtrace
-  VERSION = '0.2.8'
+  VERSION = '0.3.0'
 end
 

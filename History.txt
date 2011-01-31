@@ -1,3 +1,9 @@
+== 0.3.0 / 2011-01-31
+
+ * Fix build on Ruby 1.8.7 (thanks to Laust Rud Jacobsen)
+ * Add x86_64 ports for Solaris and Mac OS X 10.6
+ * Add Universal build for Mac OS X /usr/bin/ruby
+
 == 0.2.8 / 2009-07-23
 
  * Replace string-eval provider class creation 
