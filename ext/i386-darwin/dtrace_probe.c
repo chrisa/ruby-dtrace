@@ -250,7 +250,7 @@ VALUE dtraceprobe_probe_offset(VALUE self, VALUE file_addr, VALUE argc)
 {
   void *probe_addr;
   int offset;
-  probe_addr = (void *)FIX2INT(rb_funcall(self, rb_intern("addr"), 0));
+  probe_addr = (void *)FIX2UINT(rb_funcall(self, rb_intern("addr"), 0));
   switch (FIX2INT(argc)) {
     case 0:
       offset = 40; /* 32 + 6 + 2 */
@@ -262,7 +262,7 @@ VALUE dtraceprobe_probe_offset(VALUE self, VALUE file_addr, VALUE argc)
       offset = 46 + (FIX2INT(argc)-1) * 7; /* 32 + 6 + 6 + 7 per subsequent arg + 2 */
       break;
     }
-  return INT2FIX((int)probe_addr - (int)FIX2INT(file_addr) + offset);
+  return INT2FIX((uint32_t)probe_addr - (uint32_t)FIX2UINT(file_addr) + offset);
 }
 
 /* 
