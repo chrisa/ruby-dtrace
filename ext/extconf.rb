@@ -2,7 +2,10 @@ require 'mkmf'
 require 'rbconfig'
 
 $CFLAGS += " -D_LONGLONG_TYPE -g"
-have_library("dtrace", "dtrace_open")
+
+# Need to specify full path to dtrace.h or we'll pick up ruby's
+# dtrace.h on Solaris or other builds with the runtime probes included.
+have_library("dtrace", "dtrace_open", "/usr/include/dtrace.h")
 
 # Figure out target platform
 os  = Config::CONFIG['target_os']
