@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
 Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
 DTrace probes to your Ruby programs, and to write D-based programs
 with Ruby.
-	  DESC
+          DESC
   
   s.has_rdoc = true
   s.extra_rdoc_files << 'README.txt'
@@ -50,11 +50,19 @@ with Ruby.
              "ext/dtrace_recdesc.c",
              "ext/dtrace_util.c",
              "ext/extconf.rb",
+             "ext/dtrace_probe.c",
              "ext/i386-solaris",
              "ext/i386-solaris/dtrace_probe.c",
              "ext/i386-darwin",
              "ext/i386-darwin/dtrace_probe.c",
-             "ext/stubs.txt",
+             "ext/powerpc-darwin",
+             "ext/powerpc-darwin/dtrace_probe.c",
+             "ext/x86_64-darwin",
+             "ext/x86_64-darwin/dtrace_probe.c",
+             "ext/x86_64-solaris",
+             "ext/x86_64-solaris/dtrace_probe.c",
+             "ext/sparc-solaris",
+             "ext/sparc-solaris/dtrace_probe.c",
              "lib/dtrace",
              "lib/dtrace/aggregate.rb",
              "lib/dtrace/aggregateset.rb",
@@ -104,10 +112,6 @@ with Ruby.
              "plugin/dtrace/views",
              "plugin/dtrace/views/dtrace",
              "plugin/dtrace/views/dtrace/_report.rhtml",
-             "test/apple-dof",
-             "test/disabled_probe_effect.txt",
-             "test/dof",
-             "test/dof2",
              "test/test_disabled_probe_effect.rb",
              "test/test_dof_generator.rb",
              "test/test_dof_helper.rb",
