@@ -1,4 +1,4 @@
-/* 
+/*
  * Ruby-Dtrace
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
@@ -39,7 +39,7 @@ VALUE dof_generate_comments(VALUE self) {
     rb_raise(eDtraceDofException, "no comments in dof_generate_comments");
     return Qnil;
   }
-  
+
   Check_Type(comments, T_STRING);
 
   dof = rb_str_new(RSTRING(comments)->ptr, RSTRING(comments)->len + 1);
@@ -52,13 +52,13 @@ VALUE dof_generate_probes(VALUE self) {
   VALUE probes = rb_iv_get(self, "@data");
   VALUE probe;
   int i;
-  
+
   if (NIL_P(probes) ) {
     rb_raise(eDtraceDofException, "no probes in dof_generate_probes");
     return Qnil;
   }
   Check_Type(probes, T_ARRAY);
- 
+
   dof = rb_str_new2("");
 
   for (i = 0; i < rb_ary_len(probes); i++) {
@@ -68,7 +68,7 @@ VALUE dof_generate_probes(VALUE self) {
 
     dof_probe_t p;
     memset(&p, 0, sizeof(p));
-    
+
     p.dofpr_addr  =     (uint64_t)NUM2LL(rb_hash_aref(probe, ID2SYM(rb_intern("addr"))));
     p.dofpr_func  = (dof_stridx_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("func"))));
     p.dofpr_name  = (dof_stridx_t)FIX2INT(rb_hash_aref(probe, ID2SYM(rb_intern("name"))));
@@ -96,16 +96,16 @@ VALUE dof_generate_strtab(VALUE self) {
   VALUE strings = rb_iv_get(self, "@data");
   VALUE string;
   int i;
-  
+
   if (NIL_P(strings) ) {
     rb_raise(eDtraceDofException, "no strings in dof_generate_strtab");
     return Qnil;
   }
   Check_Type(strings, T_ARRAY);
- 
+
   dof = rb_str_new("", 0);
   rb_str_concat(dof, rb_str_new("\0", 1));
- 
+
   for (i = 0; i < rb_ary_len(strings); i++) {
     string = rb_ary_entry(strings, i);
 
@@ -113,10 +113,10 @@ VALUE dof_generate_strtab(VALUE self) {
 
     rb_str_concat(dof, rb_str_new(RSTRING(string)->ptr, RSTRING(string)->len + 1));
   }
-  
+
   return dof;
 }
-  
+
 /* :nodoc: */
 VALUE dof_generate_utsname(VALUE self) {
   VALUE dof;
@@ -126,7 +126,7 @@ VALUE dof_generate_utsname(VALUE self) {
     rb_raise(eDtraceDofException, "uname failed: %s", strerror(errno));
     return Qnil;
   }
-  
+
   dof = rb_str_new((const char *)&u, sizeof(struct utsname));
   return dof;
 }
@@ -138,15 +138,15 @@ VALUE dof_generate_prargs(VALUE self) {
   VALUE rarg;
   uint8_t arg;
   int i;
-  
+
   if (NIL_P(args) ) {
     rb_raise(eDtraceDofException, "no args in dof_generate_prargs");
     return Qnil;
   }
   Check_Type(args, T_ARRAY);
- 
+
   dof = rb_str_new("", 0);
- 
+
   for (i = 0; i < rb_ary_len(args); i++) {
     rarg = rb_ary_entry(args, i);
     Check_Type(rarg, T_FIXNUM);
@@ -155,7 +155,7 @@ VALUE dof_generate_prargs(VALUE self) {
       rb_str_concat(dof, rb_str_new((char *)&arg, 1));
     }
   }
-  
+
   return dof;
 }
 
@@ -166,22 +166,22 @@ VALUE dof_generate_proffs(VALUE self) {
   VALUE rarg;
   uint32_t arg;
   int i;
-  
+
   if (NIL_P(args) ) {
     rb_raise(eDtraceDofException, "no args in dof_generate_proffs");
     return Qnil;
   }
   Check_Type(args, T_ARRAY);
- 
+
   dof = rb_str_new("", 0);
- 
+
   for (i = 0; i < rb_ary_len(args); i++) {
     rarg = rb_ary_entry(args, i);
     Check_Type(rarg, T_FIXNUM);
     arg = FIX2INT(rarg);
     rb_str_concat(dof, rb_str_new((char *)&arg, 4));
   }
-  
+
   return dof;
 }
 
@@ -192,22 +192,22 @@ VALUE dof_generate_prenoffs(VALUE self) {
   VALUE rarg;
   uint32_t arg;
   int i;
-  
+
   if (NIL_P(args) ) {
     rb_raise(eDtraceDofException, "no args in dof_generate_prenoffs");
     return Qnil;
   }
   Check_Type(args, T_ARRAY);
- 
+
   dof = rb_str_new("", 0);
- 
+
   for (i = 0; i < rb_ary_len(args); i++) {
     rarg = rb_ary_entry(args, i);
     Check_Type(rarg, T_FIXNUM);
     arg = FIX2INT(rarg);
     rb_str_concat(dof, rb_str_new((char *)&arg, 4));
   }
-  
+
   return dof;
 }
 
@@ -232,13 +232,13 @@ VALUE dof_generate_provider(VALUE self) {
   VALUE dof;
   VALUE provider = rb_iv_get(self, "@data");
   dof_provider_t p;
-  
+
   if (NIL_P(provider) ) {
     rb_raise(eDtraceDofException, "no data in dof_generate_provider");
     return Qnil;
   }
   Check_Type(provider, T_HASH);
-    
+
   p.dofpv_strtab   = (dof_secidx_t)FIX2INT(rb_hash_aref(provider, ID2SYM(rb_intern("strtab"))));
   p.dofpv_probes   = (dof_secidx_t)FIX2INT(rb_hash_aref(provider, ID2SYM(rb_intern("probes"))));
   p.dofpv_prargs   = (dof_secidx_t)FIX2INT(rb_hash_aref(provider, ID2SYM(rb_intern("prargs"))));
@@ -250,7 +250,7 @@ VALUE dof_generate_provider(VALUE self) {
   p.dofpv_nameattr = _dof_generate_dof_attr_t(rb_hash_aref(provider, ID2SYM(rb_intern("nameattr"))));
   p.dofpv_argsattr = _dof_generate_dof_attr_t(rb_hash_aref(provider, ID2SYM(rb_intern("argsattr"))));
   p.dofpv_prenoffs = (dof_secidx_t)FIX2INT(rb_hash_aref(provider, ID2SYM(rb_intern("prenoffs"))));
-  
+
   dof = rb_str_new((const char *)&p, sizeof(p));
   return dof;
 }
@@ -261,13 +261,13 @@ VALUE dof_generate_reltab(VALUE self) {
   VALUE relos = rb_iv_get(self, "@data");
   VALUE relo;
   int i;
-  
+
   if (NIL_P(relos) ) {
     rb_raise(eDtraceDofException, "no relos in dof_generate_reltab");
     return Qnil;
   }
   Check_Type(relos, T_ARRAY);
- 
+
   dof = rb_str_new2("");
 
   for (i = 0; i < rb_ary_len(relos); i++) {
@@ -277,12 +277,12 @@ VALUE dof_generate_reltab(VALUE self) {
 
     dof_relodesc_t r;
     memset(&r, 0, sizeof(r));
-    
+
     r.dofr_name   = (dof_stridx_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("name"))));
     r.dofr_type   =     (uint32_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("type"))));
     r.dofr_offset =     (uint64_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("offset"))));
     r.dofr_data   =     (uint64_t)FIX2INT(rb_hash_aref(relo, ID2SYM(rb_intern("data"))));
-    
+
     VALUE r_dof = rb_str_new((const char *)&r, sizeof(r));
     rb_str_concat(dof, r_dof);
   }
@@ -295,17 +295,17 @@ VALUE dof_generate_relhdr(VALUE self) {
   VALUE dof;
   VALUE relhdr = rb_iv_get(self, "@data");
   dof_relohdr_t r;
-  
+
   if (NIL_P(relhdr) ) {
     rb_raise(eDtraceDofException, "no data in dof_generate_relhdr");
     return Qnil;
   }
   Check_Type(relhdr, T_HASH);
-  
+
   r.dofr_strtab = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("strtab"))));
   r.dofr_relsec = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("relsec"))));
-  r.dofr_tgtsec = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("tgtsec"))));  
-    
+  r.dofr_tgtsec = (dof_secidx_t)FIX2INT(rb_hash_aref(relhdr, ID2SYM(rb_intern("tgtsec"))));
+
   dof = rb_str_new((const char *)&r, sizeof(r));
   return dof;
 }

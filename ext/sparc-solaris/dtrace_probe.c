@@ -39,9 +39,9 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
   /* First initialise the is_enabled tracepoint */
   uint8_t insns[FUNC_SIZE] = {
     /* save        %sp, -104, %sp */
-    0x9d, 0xe3, 0xbf, 0x98, 
+    0x9d, 0xe3, 0xbf, 0x98,
     /* nop */
-    0x01, 0x00, 0x00, 0x00,   
+    0x01, 0x00, 0x00, 0x00,
     /* clr         %o0 */
     0x90, 0x10, 0x00, 0x00,
     /* ba          0x11c */
@@ -53,13 +53,13 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     /* or          %l0, %g0, %i0 */
     0xb0, 0x14, 0x00, 0x00,
     /* ret */
-    0x81, 0xc7, 0xe0, 0x08, 
+    0x81, 0xc7, 0xe0, 0x08,
     /* restore */
     0x81, 0xe8, 0x00, 0x00,
-    
-    0x00, 0x01, 0x00, 0x00,   
-    0x00, 0x01, 0x00, 0x00,   
-    0x00, 0x01, 0x00, 0x00,   
+
+    0x00, 0x01, 0x00, 0x00,
+    0x00, 0x01, 0x00, 0x00,
+    0x00, 0x01, 0x00, 0x00,
   };
 
   /* Now build probe tracepoint */
@@ -69,13 +69,13 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     {
       uint8_t probe_insns[FUNC_SIZE] = {
         /* save        %sp, -96, %sp */
-        0x9d, 0xe3, 0xbf, 0x90, 
+        0x9d, 0xe3, 0xbf, 0x90,
         /* nop */
-        0x01, 0x00, 0x00, 0x00,   
+        0x01, 0x00, 0x00, 0x00,
         /* nop */
-        0x01, 0x00, 0x00, 0x00,   
+        0x01, 0x00, 0x00, 0x00,
         /* ret */
-        0x81, 0xc7, 0xe0, 0x08, 
+        0x81, 0xc7, 0xe0, 0x08,
         /* restore */
         0x81, 0xe8, 0x00, 0x00,
       };
@@ -87,13 +87,13 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     {
       uint8_t probe_insns[FUNC_SIZE] = {
         /* save        %sp, -96, %sp */
-        0x9d, 0xe3, 0xbf, 0xa0, 
+        0x9d, 0xe3, 0xbf, 0xa0,
         /* st          %i0, [%fp + 68] */
         0xf0, 0x27, 0xa0, 0x44,
         /* ld          [%fp + 68], %l0 */
         0xe0, 0x07, 0xa0, 0x44,
         /* nop */
-        0x01, 0x00, 0x00, 0x00,   
+        0x01, 0x00, 0x00, 0x00,
         /* or          %l0, %g0, %o0 */
         0x90, 0x14, 0x00, 0x00,
         /* ret */
@@ -427,7 +427,7 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
         /* ret */
         0x81, 0xc7, 0xe0, 0x08,
         /* restore */
-        0x81, 0xe8, 0x00, 0x00,      
+        0x81, 0xe8, 0x00, 0x00,
       };
       install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 32);
     }
@@ -445,29 +445,29 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((mprotect((void *)probe->func, FUNC_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) < 0) {
     rb_raise(eDtraceException, "mprotect failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((memcpy(probe->func, insns, FUNC_SIZE)) < 0) {
     rb_raise(eDtraceException, "memcpy failed: %s\n", strerror(errno));
     return Qnil;
-  }    
-  
+  }
+
   return self;
 }
 
 VALUE dtraceprobe_free(void *arg)
 {
   dtrace_probe_t *probe = (dtrace_probe_t *)arg;
-  
+
   if (probe) {
     free(probe);
   }
 }
- 
+
 VALUE dtraceprobe_alloc(VALUE klass)
 {
   VALUE obj;
@@ -487,7 +487,7 @@ VALUE dtraceprobe_alloc(VALUE klass)
 VALUE dtraceprobe_addr(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return INT2FIX(probe->func);
 }
@@ -495,7 +495,7 @@ VALUE dtraceprobe_addr(VALUE self)
 VALUE dtraceprobe_is_enabled(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return ((int)(*probe->func)()) ? Qtrue : Qfalse;
 }
@@ -522,7 +522,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
       break;
     }
   }
-  
+
   func = (void (*)())(probe->func + IS_ENABLED_FUNC_LEN);
 
   switch (argc) {
@@ -542,7 +542,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     (void)(*func)(argv[0], argv[1], argv[2], argv[3]);
     break;
   case 5:
-    (void)(*func)(argv[0], argv[1], argv[2], argv[3], 
+    (void)(*func)(argv[0], argv[1], argv[2], argv[3],
                   argv[4]);
     break;
   case 6:
@@ -561,7 +561,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     rb_raise(eDtraceException, "probe argc max is 8");
     break;
   }
-  
+
   return Qnil;
 }
 

@@ -13,7 +13,7 @@ VALUE dtracerecdesc_init(VALUE self)
   return self;
 }
 
-/* 
+/*
  * Returns the type of action which generated this recdesc.
  * (exit, printf, printa or "other" for all other actions).
  */

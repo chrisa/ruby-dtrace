@@ -57,7 +57,7 @@ class TestDtrace < Test::Unit::TestCase
 
   def test_list_probes_match_prog
     t = Dtrace.new
-    
+
     progtext = "syscall:::return
    			{
                           @calls[execname] = count();
@@ -87,7 +87,7 @@ class TestDtrace < Test::Unit::TestCase
   def test_list_probes_match_badpattern
     t = Dtrace.new
     probe_count = 0
-    assert_raises Dtrace::Exception do 
+    assert_raises Dtrace::Exception do
       t.each_probe('syscall') do |probe|
         nil
       end
@@ -114,7 +114,7 @@ class TestDtrace < Test::Unit::TestCase
     assert info.recgens_count
     assert info.matches_count
   end
-  
+
   def test_compile_with_args
     t = Dtrace.new
 
@@ -134,11 +134,11 @@ class TestDtrace < Test::Unit::TestCase
     assert_equal 2,   info.aggregates_count
     assert_equal 0,   info.speculations_count
     assert_equal 4,   info.recgens_count
-    
+
     # matches_count is platform dependent
     assert info.matches_count
   end
-      
+
   def test_run
     t = Dtrace.new
 
@@ -173,5 +173,5 @@ class TestDtrace < Test::Unit::TestCase
     end
     assert_equal "probe description :::blah does not match any probes", e.message
   end
-  
+
 end

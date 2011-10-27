@@ -16,7 +16,7 @@ class TestDtraceProvider < Test::Unit::TestCase
         p.probe "#{i}".to_sym
       end
     end
-    
+
     t = Dtrace.new
     matches = 0
     t.each_probe("test_massive1#{$$}:ruby:test_massive_provider:") do |p|

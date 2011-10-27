@@ -35,7 +35,7 @@ VALUE dtraceaggdata_value(VALUE self)
   aggdata = bufdata->dtbda_aggdata;
   s = bufdata->dtbda_buffered;
   rec = bufdata->dtbda_recdesc;
-  
+
   if (aggdata == NULL) {
     rb_raise(eDtraceException, "null aggdata");
     return Qnil;
@@ -58,7 +58,7 @@ VALUE dtraceaggdata_value(VALUE self)
   act = rec->dtrd_action;
 
   if (bufdata->dtbda_flags & DTRACE_BUFDATA_AGGKEY) {
-  
+
     switch (act) {
     case DTRACEACT_STACK:
     case DTRACEACT_USTACK:
@@ -75,10 +75,10 @@ VALUE dtraceaggdata_value(VALUE self)
     default:
       v = handle_bytedata((aggdata->dtada_data + rec->dtrd_offset), rec->dtrd_size);
     }
-  
-    
+
+
   } else if (bufdata->dtbda_flags & DTRACE_BUFDATA_AGGVAL) {
-    
+
     normal = aggdata->dtada_normal;
     addr = aggdata->dtada_data + rec->dtrd_offset;
 
@@ -139,4 +139,4 @@ VALUE dtraceaggdata_aggtype(VALUE self)
 
   return v;
 }
-  
+

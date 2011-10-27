@@ -58,9 +58,9 @@ disassembly of is_enabled function:
         [21]  805142d:  subl    $8,%esp
     22.         return TEST_TEST_PROBE_ENABLED() ? 1 : 0;
         [22]  8051430:  xorl    %eax,%eax
-        [22]  8051432:  nop     
-        [22]  8051433:  nop     
-        [22]  8051434:  nop     
+        [22]  8051432:  nop
+        [22]  8051433:  nop
+        [22]  8051434:  nop
         [22]  8051435:  movl    %eax,-4(%ebp)
         [22]  8051438:  cmpl    $0,-4(%ebp)
         [22]  805143c:  setne   %al
@@ -68,8 +68,8 @@ disassembly of is_enabled function:
         [22]  8051442:  movl    %eax,-4(%ebp)
         [22]  8051445:  movl    -4(%ebp),%eax
     23. }
-        [23]  8051448:  leave   
-        [23]  8051449:  ret     
+        [23]  8051448:  leave
+        [23]  8051449:  ret
 
 Binary:
 

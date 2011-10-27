@@ -11,7 +11,7 @@ $dof_dir = File.dirname(__FILE__)
 
 class TestDofHelper < Test::Unit::TestCase
   include Dtrace::Dof::Constants
-  
+
   def test_sun_dof
     flunk # platform test for Solaris
 
@@ -28,7 +28,7 @@ class TestDofHelper < Test::Unit::TestCase
     end
     assert_equal 1, matches
   end
-  
+
   def test_file
     f = Dtrace::Dof::File.new
     f.allocate(4096)
@@ -65,7 +65,7 @@ class TestDofHelper < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ 0 ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,

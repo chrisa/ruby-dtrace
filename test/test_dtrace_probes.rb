@@ -13,12 +13,12 @@ class TestDtraceProbes < Test::Unit::TestCase
     Dtrace::Provider.create :foo0 do |p|
       p.probe :bar
     end
-    
+
     data = 'not fired'
     Dtrace::Probe::Foo0.bar do |p|
       data = 'fired'
       p.fire
-    end    
+    end
 
     assert_equal 'not fired', data
   end
@@ -27,8 +27,8 @@ class TestDtraceProbes < Test::Unit::TestCase
     Dtrace::Provider.create :foo1 do |p|
       p.probe :bar
     end
-    
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -37,7 +37,7 @@ foo1*:ruby:test_probe_no_args:bar
   trace("fired");
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -45,7 +45,7 @@ EOD
 
     Dtrace::Probe::Foo1.bar do |p|
       p.fire
-    end    
+    end
 
     data = []
     c.consume_once do |d|
@@ -54,15 +54,15 @@ EOD
 
     assert_equal 1, data.length
     assert_equal 'fired', data[0].data[0].value
-    
+
   end
-  
+
   def test_probe_one_int_arg
     Dtrace::Provider.create :foo2 do |p|
       p.probe :bar, :integer
     end
-    
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -71,7 +71,7 @@ foo2*:ruby:test_probe_one_int_arg:bar
   trace(arg0);
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -79,7 +79,7 @@ EOD
 
     Dtrace::Probe::Foo2.bar do |p|
       p.fire(42)
-    end    
+    end
 
     data = []
     c.consume_once do |d|
@@ -88,7 +88,7 @@ EOD
 
     assert_equal 1, data.length
     assert_equal 42, data[0].data[0].value
-    
+
   end
 
   def test_multiple_probes_w_args
@@ -96,8 +96,8 @@ EOD
       p.probe :bar, :integer
       p.probe :baz, :string
     end
-    
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -111,7 +111,7 @@ foo3*:ruby:*:baz
   trace(copyinstr(arg0));
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -119,11 +119,11 @@ EOD
 
     Dtrace::Probe::Foo3.bar do |p|
       p.fire(42)
-    end    
+    end
 
     Dtrace::Probe::Foo3.baz do |p|
       p.fire('fired!')
-    end    
+    end
 
     data = []
     c.consume_once do |d|
@@ -133,7 +133,7 @@ EOD
     assert_equal 2, data.length
     assert_equal 42, data[0].data[0].value
     assert_equal 'fired!', data[1].data[0].value
-    
+
   end
 
   def test_multiple_probes_w_multiple_args
@@ -141,8 +141,8 @@ EOD
       p.probe :bar, :integer, :integer
       p.probe :baz, :string, :string
     end
-    
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -158,7 +158,7 @@ foo4*:ruby:*:baz
   trace(copyinstr(arg1));
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -166,11 +166,11 @@ EOD
 
     Dtrace::Probe::Foo4.bar do |p|
       p.fire(42, 27)
-    end    
+    end
 
     Dtrace::Probe::Foo4.baz do |p|
       p.fire('fired!', 'again')
-    end    
+    end
 
     data = []
     c.consume_once do |d|
@@ -182,7 +182,7 @@ EOD
     assert_equal 27, data[0].data[1].value
     assert_equal 'fired!', data[1].data[0].value
     assert_equal 'again', data[1].data[1].value
-    
+
   end
 
   def test_six_argcs
@@ -196,8 +196,8 @@ EOD
       p.probe :bar6, :integer, :integer, :integer, :integer,
                      :integer, :integer
     end
-    
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -251,12 +251,12 @@ foo5*:ruby:*:bar6
 }
 
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
     c = Dtrace::Consumer.new(t)
-    
+
     Dtrace::Probe::Foo5.bar1 do |p|
       p.fire(11)
     end
@@ -280,7 +280,7 @@ EOD
     c.consume_once do |d|
       data << d
     end
-    
+
     assert_equal 6, data.length
 
     assert_equal 11, data[0].data[0].value
@@ -309,16 +309,16 @@ EOD
     assert_equal 64, data[5].data[3].value
     assert_equal 65, data[5].data[4].value
     assert_equal 66, data[5].data[5].value
-    
+
   end
 
   def test_all_six_args_chars
     Dtrace::Provider.create :foo6 do |p|
-      p.probe :bar, 
+      p.probe :bar,
               :string, :string, :string, :string, :string, :string
     end
-    
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -332,7 +332,7 @@ foo6*:ruby:*:bar
   trace(copyinstr(arg5));
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -340,7 +340,7 @@ EOD
 
     Dtrace::Probe::Foo6.bar do |p|
       p.fire('one',  'two', 'three', 'four', 'five', 'six')
-    end    
+    end
 
     data = []
     c.consume_once do |d|
@@ -355,5 +355,5 @@ EOD
     assert_equal 'five',  data[0].data[4].value
     assert_equal 'six',   data[0].data[5].value
   end
-  
+
 end

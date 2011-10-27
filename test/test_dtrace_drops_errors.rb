@@ -11,7 +11,7 @@ require 'test/unit'
 class TestDtraceDropsErrors < Test::Unit::TestCase
 
   def test_drops
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "512")
     t.setopt("strsize", "1024")
 
@@ -38,7 +38,7 @@ EOD
     assert c
 
     i = 0
-    c.drophandler do |d| 
+    c.drophandler do |d|
       assert_match(/1 drop on CPU [0-9]+/, d.msg)
       assert_equal "drop to principal buffer", d.kind
       assert_not_nil d.cpu
@@ -55,7 +55,7 @@ EOD
   end
 
   def test_error_handler_too_late
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "512")
     t.setopt("strsize", "1024")
 
@@ -65,10 +65,10 @@ BEGIN
    *(char *)NULL;
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
-    t.go 
+    t.go
 
     c = Dtrace::Consumer.new(t)
     assert c
@@ -84,7 +84,7 @@ EOD
   end
 
   def test_errors
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "512")
     t.setopt("strsize", "1024")
 
@@ -94,7 +94,7 @@ BEGIN
    *(char *)NULL;
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
 
@@ -121,7 +121,7 @@ EOD
 
   def test_error_and_drop_handler
 
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "512")
     t.setopt("strsize", "1024")
 
@@ -144,7 +144,7 @@ ERROR
     exit(0);
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
 
@@ -163,7 +163,7 @@ EOD
     end
 
     drops = 0
-    c.drophandler do |d| 
+    c.drophandler do |d|
       assert_match(/1 drop on CPU [0-9]+/, d.msg)
       assert_equal "drop to principal buffer", d.kind
       assert_not_nil d.cpu

@@ -1,4 +1,4 @@
-/* 
+/*
  * Ruby-Dtrace
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
@@ -104,13 +104,13 @@ _dof_parse_string_table(VALUE self, char *dof, dof_sec_t *sec)
   VALUE strtab = rb_hash_new();
   VALUE ctx = rb_cv_get(self, "@@ctx");
   int i, bool = 0;
-  
+
   for (i = 0; i < sec->dofs_size - 1; ++i) {
     if (*data) {
       if (bool)
 	rb_hash_aset(strtab, INT2FIX(i), rb_str_new2(data));
       bool = 0;
-    } 
+    }
     else if (!bool) {
       bool = 1;
     }
@@ -185,7 +185,7 @@ _dof_parse_dof_relodesc_t_array(VALUE self, char *dof, dof_sec_t *sec)
 
     relodesc_data = rb_hash_new();
     rb_hash_aset(relodesc_data, ID2SYM(rb_intern("name")), rb_hash_aref(strtab, INT2FIX(relodesc.dofr_name)));
-    
+
     switch(relodesc.dofr_type) {
     case DOF_RELO_NONE:
       rb_hash_aset(relodesc_data, ID2SYM(rb_intern("type")), rb_str_new2("none"));
@@ -197,7 +197,7 @@ _dof_parse_dof_relodesc_t_array(VALUE self, char *dof, dof_sec_t *sec)
       rb_hash_aset(relodesc_data, ID2SYM(rb_intern("type")), rb_str_new2("unknown"));
       break;
     }
-    
+
     rb_hash_aset(relodesc_data, ID2SYM(rb_intern("offset")), INT2FIX(relodesc.dofr_offset));
     rb_hash_aset(relodesc_data, ID2SYM(rb_intern("data")),   INT2FIX(relodesc.dofr_data));
 
@@ -231,7 +231,7 @@ _dof_parse_dof_attr_t(dof_attr_t attr)
   rb_hash_aset(attr_data, ID2SYM(rb_intern("name")),  INT2FIX(DOF_ATTR_NAME(attr)));
   rb_hash_aset(attr_data, ID2SYM(rb_intern("data")),  INT2FIX(DOF_ATTR_DATA(attr)));
   rb_hash_aset(attr_data, ID2SYM(rb_intern("class")), INT2FIX(DOF_ATTR_CLASS(attr)));
-  
+
   return attr_data;
 }
 
@@ -312,7 +312,7 @@ _dof_parse_utsname(VALUE self, char *dof, dof_sec_t *sec)
   char *data = (char *)(dof + sec->dofs_offset);
 
   memcpy(&uts, data, sizeof(uts));
-  
+
   rb_hash_aset(uts_data, ID2SYM(rb_intern("sysname")),  rb_str_new2(uts.sysname));
   rb_hash_aset(uts_data, ID2SYM(rb_intern("nodename")), rb_str_new2(uts.nodename));
   rb_hash_aset(uts_data, ID2SYM(rb_intern("release")),  rb_str_new2(uts.release));
@@ -358,9 +358,9 @@ VALUE dof_parse(VALUE self, VALUE rdof)
     return Qnil;
   }
   pos += dof_hdr.dofh_hdrsize;
-  
+
   dof_data = rb_ary_new();
-  
+
   /* Walk section headers, parsing sections */
   for (i = 0; i < dof_hdr.dofh_secnum; i++) {
     memcpy(&dof_sec, pos, sizeof(struct dof_sec));
@@ -396,10 +396,10 @@ VALUE dof_parse(VALUE self, VALUE rdof)
       break;
     case DOF_SECT_UTSNAME:
       sec = _dof_parse_utsname(self, dof, &dof_sec);
-      break;      
+      break;
     case DOF_SECT_COMMENTS:
       sec = _dof_parse_comments(self, dof, &dof_sec);
-      break;      
+      break;
     default:
       sec = _dof_parse_unknown(self, dof, &dof_sec);
       break;

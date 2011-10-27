@@ -5,9 +5,9 @@ namespace :dtrace do
     ['dtracer'].each do |script|
       script_dest = "#{RAILS_ROOT}/script/#{script}"
       script_src = File.dirname(__FILE__) + "/../bin/#{script}.rb"
-      
+
       FileUtils.chmod 0774, script_src
-      
+
       unless File.exists?(script_dest)
         puts "Copying acts_as_encrypted script #{script}.rb to #{script_dest}"
         FileUtils.cp_r(script_src, script_dest)
@@ -17,18 +17,18 @@ namespace :dtrace do
     ['stylesheets/dtrace.css'].each do |asset|
       asset_dest = "#{RAILS_ROOT}/public/#{asset}"
       asset_src = File.dirname(__FILE__) + "/../public/#{asset}"
-      
+
       FileUtils.chmod 0774, asset_src
-      
+
       unless File.exists?(asset_dest)
         puts "Copying acts_as_encrypted asset #{asset} to #{asset_dest}"
         FileUtils.cp_r(asset_src, asset_dest)
       end
     end
   end
-  
+
   desc 'Remove dtrace from your rails application'
-  task :remove do 
+  task :remove do
     ['dtracer'].each do |script|
       script_dest = "#{RAILS_ROOT}/script/#{script}"
 
@@ -49,4 +49,4 @@ namespace :dtrace do
   end
 
 end
-    
+

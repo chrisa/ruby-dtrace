@@ -73,7 +73,7 @@ class Dtrace
 
   # Yields each probe on the system, optionally matching against a
   # probe specification:
-  # 
+  #
   # e.g.
   # syscall:::      -> all probes in the syscall provider
   # pid123:::return -> all return probes in pid 123.

@@ -1,4 +1,4 @@
-/* 
+/*
  * Ruby-Dtrace
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
@@ -31,7 +31,7 @@ VALUE dof_file_alloc(VALUE klass)
   file->dof = NULL;
   file->len = 0;
   file->offset = 0;
-  
+
   obj = Data_Wrap_Struct(klass, NULL, dof_file_free, file);
   return obj;
 }
@@ -63,7 +63,7 @@ VALUE dof_file_append(VALUE self, VALUE data)
 	     (file->offset + RSTRING(data)->len), file->len);
     return Qnil;
   }
-  
+
   memcpy((file->dof + file->offset), RSTRING(data)->ptr, RSTRING(data)->len);
   file->offset += RSTRING(data)->len;
 }
@@ -86,5 +86,5 @@ VALUE dof_file_data(VALUE self)
   dof_file_t *file;
   Data_Get_Struct(self, dof_file_t, file);
   return rb_str_new(file->dof, file->offset);
-}  
+}
 

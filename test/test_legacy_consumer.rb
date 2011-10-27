@@ -10,13 +10,13 @@ require 'test/unit'
 
 class TestLegacyConsumer < Test::Unit::TestCase
   def test_aggregate_group
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
     t.setopt("aggsize", "4m")
 
     progtext =<<EOD
 profile-1000
-{ 
+{
   @a[execname] = count();
   @b[execname] = count();
 }
@@ -27,7 +27,7 @@ profile-1
   printa(@b);
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -41,7 +41,7 @@ EOD
     c.consume_once do |d|
       data << d
     end
-    
+
     assert data.length > 0
     data.each do |d|
       assert d

@@ -9,7 +9,7 @@ require 'test/unit'
 
 class TestDtraceProbe < Test::Unit::TestCase
   include Dtrace::Dof::Constants
-  
+
   def test_probe
     p = Dtrace::Probe.new(0)
   end
@@ -65,7 +65,7 @@ class TestDtraceProbe < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab   => 0,
@@ -84,8 +84,8 @@ class TestDtraceProbe < Test::Unit::TestCase
 
     f.generate
     Dtrace::Dof.loaddof(f, 'testmodule')
-  
-    t = Dtrace.new 
+
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     matches = 0
@@ -158,7 +158,7 @@ EOD
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab   => 0,
@@ -178,7 +178,7 @@ EOD
     f.generate
     Dtrace::Dof.loaddof(f, 'testmodule')
 
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -188,7 +188,7 @@ tes2*:testmodule:main:test
   trace(arg1);
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -247,7 +247,7 @@ EOD
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ probe.is_enabled_offset(f.addr) ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab   => 0,
@@ -267,7 +267,7 @@ EOD
     f.generate
     Dtrace::Dof.loaddof(f, 'testmodule')
 
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -277,7 +277,7 @@ tes3*:testmodule:main:test
   trace(copyinstr(arg1));
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -358,7 +358,7 @@ EOD
 
     assert !probe.is_enabled?
 
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -367,13 +367,13 @@ tes4*:testmodule:main:test
   trace("fired!");
 }
 EOD
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
-    
+
     assert probe.is_enabled?
-    
+
     probe.fire
 
     c = Dtrace::Consumer.new(t)

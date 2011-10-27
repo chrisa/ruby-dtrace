@@ -39,17 +39,17 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
 
   /* First initialise the is_enabled tracepoint */
   uint8_t insns[FUNC_SIZE] = {
-    0x55, 0x48, 0x89, 0xe5, 
-    0x48, 0x33, 0xc0, 0x90, 
+    0x55, 0x48, 0x89, 0xe5,
+    0x48, 0x33, 0xc0, 0x90,
     0x90, 0xc9, 0xc3, 0x00
   };
 
   if (argc <= ARGC_MAX) {
     {
       uint8_t probe_insns[FUNC_SIZE] = {
-	0x55, 0x48, 0x89, 0xe5, 
-	0x90, 0x0f, 0x1f, 0x40, 
-	0x00, 0xc9, 0xc3, 0x0f, 
+	0x55, 0x48, 0x89, 0xe5,
+	0x90, 0x0f, 0x1f, 0x40,
+	0x00, 0xc9, 0xc3, 0x0f,
 	0x1f, 0x44, 0x00, 0x00
       };
       install_insns(probe_insns, &insns[IS_ENABLED_FUNC_LEN], 4);
@@ -66,30 +66,30 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((mprotect((void *)probe->func, FUNC_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) < 0) {
     rb_raise(eDtraceException, "mprotect failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((memcpy(probe->func, insns, FUNC_SIZE)) < 0) {
     rb_raise(eDtraceException, "memcpy failed: %s\n", strerror(errno));
     return Qnil;
-  }    
-  
+  }
+
   return self;
 }
 
 VALUE dtraceprobe_free(void *arg)
 {
   dtrace_probe_t *probe = (dtrace_probe_t *)arg;
-  
+
   if (probe) {
     free(probe->func);
     free(probe);
   }
 }
- 
+
 VALUE dtraceprobe_alloc(VALUE klass)
 {
   VALUE obj;
@@ -109,7 +109,7 @@ VALUE dtraceprobe_alloc(VALUE klass)
 VALUE dtraceprobe_addr(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return LL2NUM((uint64_t)(probe->func));
 }
@@ -117,7 +117,7 @@ VALUE dtraceprobe_addr(VALUE self)
 VALUE dtraceprobe_is_enabled(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return ((int)(*probe->func)()) ? Qtrue : Qfalse;
 }
@@ -144,14 +144,14 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
       break;
     }
   }
-  
+
   func = (void (*)())(probe->func + IS_ENABLED_FUNC_LEN);
   (void)(*func)(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
-  
+
   return Qnil;
 }
 
-/* 
+/*
  * Returns the offset for this probe in the PROFFS section, based on
  * the location of the DOF, and the location of this probe.
  */
@@ -164,7 +164,7 @@ VALUE dtraceprobe_probe_offset(VALUE self, VALUE file_addr, VALUE argc)
   return INT2FIX((uint64_t)probe_addr - (uint64_t)NUM2LL(file_addr) + offset);
 }
 
-/* 
+/*
  * Returns the offset for this probe's is-enabled tracepoint in the
  * PRENOFFS section, based on the location of the DOF, and the
  * location of this probe.

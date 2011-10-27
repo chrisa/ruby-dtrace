@@ -5,7 +5,7 @@
 
 # A record representing the result of a stack() or ustack()
 # action. Its value is a list of symbolic stack frames:
-# 
+#
 #   #<DtraceStackRecord:0x14e24 @value=
 #           ["libSystem.B.dylib`__sysctl+0xa",
 #            "libdtrace.dylib`dt_aggregate_go+0x9a",

@@ -16,7 +16,7 @@ VALUE dtraceprograminfo_init(VALUE self)
 /*
  * Returns the number of aggregates associated with this program.
  */
-VALUE dtraceprograminfo_aggregates_count(VALUE self) 
+VALUE dtraceprograminfo_aggregates_count(VALUE self)
 {
   dtrace_proginfo_t *proginfo;
 

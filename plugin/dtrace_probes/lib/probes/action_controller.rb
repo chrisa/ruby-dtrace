@@ -17,9 +17,9 @@ module Probes
         p.probe :process_start,  :string
         p.probe :process_finish, :string, :integer
       end
-      
+
       base.alias_method_chain :process, :probes
     end
-    
+
   end
 end

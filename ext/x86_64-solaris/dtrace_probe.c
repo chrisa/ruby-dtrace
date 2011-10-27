@@ -63,30 +63,30 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((mprotect((void *)probe->func, FUNC_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) < 0) {
     rb_raise(eDtraceException, "mprotect failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((memcpy(probe->func, insns, FUNC_SIZE)) < 0) {
     rb_raise(eDtraceException, "memcpy failed: %s\n", strerror(errno));
     return Qnil;
-  }    
-  
+  }
+
   return self;
 }
 
 VALUE dtraceprobe_free(void *arg)
 {
   dtrace_probe_t *probe = (dtrace_probe_t *)arg;
-  
+
   if (probe) {
     free(probe->func);
     free(probe);
   }
 }
- 
+
 VALUE dtraceprobe_alloc(VALUE klass)
 {
   VALUE obj;
@@ -106,7 +106,7 @@ VALUE dtraceprobe_alloc(VALUE klass)
 VALUE dtraceprobe_addr(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return LL2NUM((uint64_t)(probe->func));
 }
@@ -114,7 +114,7 @@ VALUE dtraceprobe_addr(VALUE self)
 VALUE dtraceprobe_is_enabled(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return ((int)(*probe->func)()) ? Qtrue : Qfalse;
 }
@@ -141,10 +141,10 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
       break;
     }
   }
-  
+
   func = (void (*)())(probe->func + IS_ENABLED_FUNC_LEN);
   (void)(*func)(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
-  
+
   return Qnil;
 }
 

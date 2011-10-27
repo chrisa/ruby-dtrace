@@ -6,23 +6,23 @@
 require 'dtrace'
 require 'test/unit'
 
-# Tests for trace()d data. 
+# Tests for trace()d data.
 
 class TestDtraceProbedata < Test::Unit::TestCase
 
   def test_longlongs
-    
+
     t = Dtrace.new
     t.setopt('bufsize', '8m')
-    
+
     code = <<D
 profile-100
-{ 
+{
   trace(walltimestamp);
 }
 D
     t.compile(code).execute
-    t.go 
+    t.go
 
     c = Dtrace::Consumer.new(t)
     assert c

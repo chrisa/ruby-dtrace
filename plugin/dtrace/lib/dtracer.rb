@@ -28,7 +28,7 @@ class Dtracer
       @logger.warn("DTrace start compile: #{e.message}")
     end
   end
-  
+
   def end_dtrace
     # Check presence of handle and correct status.
     return [] unless @d && @d.status == Dtrace::STATUS_OKAY
@@ -42,7 +42,7 @@ class Dtracer
     rescue Dtrace::Exception => e
       @logger.warn("DTrace end: #{e.message}")
     end
-    
+
     if dtrace_data
       return dtrace_data.data
     else

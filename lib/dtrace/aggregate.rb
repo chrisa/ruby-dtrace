@@ -20,7 +20,7 @@ class Dtrace
     def initialize
       @tuple = Array.new
     end
-    
+
     # Add a Dtrace::AggData record to this aggregate. Returns nil until it
     # receives a record of aggtype "last", when it returns the complete
     # Dtrace::Aggregate.

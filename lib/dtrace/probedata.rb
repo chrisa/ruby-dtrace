@@ -5,7 +5,7 @@
 
 class Dtrace
   class ProbeData
-    
+
     def records
       records = Array.new
       self.each_record do |rec|

@@ -23,7 +23,7 @@ class Dtrace::Dof::File
       if s.section_type == DOF_SECT_PRENOFFS
         dof_version = 2
       end
-      
+
       length = s.generate
       s.offset = filesz
 
@@ -43,17 +43,17 @@ class Dtrace::Dof::File
       filesz += (s.size + pad)
 
     end
-    
+
     hdr.loadsz = loadsz
     hdr.filesz = filesz
     hdr.dof_version = dof_version
 
     self << hdr.generate
-    
+
     @sections.each do |s|
       self << s.generate_header
     end
-      
+
     @sections.each do |s|
       self << s.pad if s.pad
       self << s.dof
@@ -61,4 +61,4 @@ class Dtrace::Dof::File
 
   end
 end
-  
+

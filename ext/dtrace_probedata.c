@@ -46,7 +46,7 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
   stack = rb_ary_new();
 
   for (i = 0; i < depth; i++) {
-    
+
     switch (size) {
     case sizeof (uint32_t):
       pc = *((uint32_t *)addr);
@@ -76,7 +76,7 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
 	(void) snprintf(c, sizeof (c), "%s`%s",
 			dts.dts_object, dts.dts_name);
       }
-    } 
+    }
     else {
       if (dtrace_lookup_by_addr(handle, pc, NULL, &dts) == 0) {
 	(void) snprintf(c, sizeof (c), "%s`0x%llx",
@@ -104,8 +104,8 @@ VALUE dtraceprobedata_epid(VALUE self)
   return INT2FIX(data->dtpda_edesc->dtepd_epid);
 }
 
-/* 
- * Returns the DtraceProbe for the probe which generated this data 
+/*
+ * Returns the DtraceProbe for the probe which generated this data
  */
 VALUE dtraceprobedata_probe(VALUE self)
 {
@@ -131,7 +131,7 @@ VALUE dtraceprobedata_cpu(VALUE self)
   processorid_t cpu;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
-  
+
   if (data) {
     cpu = data->dtpda_cpu;
     return INT2FIX(cpu);
@@ -167,7 +167,7 @@ VALUE dtraceprobedata_prefix(VALUE self)
   Data_Get_Struct(self, dtrace_probedata_t, data);
   prefix = data->dtpda_prefix;
 
-  if (prefix) 
+  if (prefix)
     return rb_str_new2(prefix);
   else
     return Qnil;
@@ -192,7 +192,7 @@ VALUE dtraceprobedata_flow(VALUE self)
   }
 }
 
-/* 
+/*
  * Yields each record in this DtraceProbedata in turn. Records are
  * yielded as either DtraceRecords or DtraceStackRecords as
  * appropriate for the type of action.
@@ -215,14 +215,14 @@ VALUE dtraceprobedata_each_record(VALUE self)
   Data_Get_Struct(dtrace, dtrace_handle_t, handle);
 
   eprobe = data->dtpda_edesc;
-  
+
   for (i = 0; i < eprobe->dtepd_nrecs; i++) {
     v = 0;
     rec = &eprobe->dtepd_rec[i];
     if (rec->dtrd_size > 0) {
       act = rec->dtrd_action;
       addr = data->dtpda_data + rec->dtrd_offset;
-      
+
       switch (act) {
       case DTRACEACT_STACK:
       case DTRACEACT_USTACK:
@@ -253,7 +253,7 @@ VALUE dtraceprobedata_each_record(VALUE self)
 	  break;
 	}
       }
-	
+
       if (v) {
 	dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("Dtrace::Record"));
 	rb_iv_set(dtracerecord, "@value", v);

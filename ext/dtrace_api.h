@@ -22,7 +22,7 @@ typedef struct dtrace_work_handlers {
 } dtrace_work_handlers_t;
 
 /* Used to keep a reference to a struct ps_prochandle and a reference
-   to the DTrace handle in a DtraceProcess object: we need to be able 
+   to the DTrace handle in a DtraceProcess object: we need to be able
    to call dtrace_proc_release() when the DtraceProcess goes away, and
    that requires the DTrace handle. */
 typedef struct dtrace_process {

@@ -54,7 +54,7 @@ create_makefile("dtrace_api")
 begin
   mfile = open("Makefile", "ab")
   mfile.puts
-  
+
   if apple_universal
     # create i386 .o and x86_64.o
     mfile.print "dtrace_probe_i386-darwin.o:\n\t$(CC) $(INCFLAGS) -arch i386 -o dtrace_probe_i386-darwin.o -c i386-darwin/dtrace_probe.c\n\n"

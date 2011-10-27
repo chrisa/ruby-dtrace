@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  
+
   s.name = 'ruby-dtrace'
   s.version = '0.3.0'
   s.platform = Gem::Platform::RUBY
@@ -8,10 +8,10 @@ Ruby-DTrace is Ruby bindings for Dtrace, which allows you to add
 DTrace probes to your Ruby programs, and to write D-based programs
 with Ruby.
           DESC
-  
+
   s.has_rdoc = true
   s.extra_rdoc_files << 'README.txt'
-  
+
   s.extensions << "ext/extconf.rb"
   s.extensions << "ext/dof/extconf.rb"
   s.require_paths << 'ext'

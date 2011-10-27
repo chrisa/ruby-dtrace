@@ -22,7 +22,7 @@ VALUE dtraceerrdata_cpu(VALUE self)
   processorid_t cpu;
 
   Data_Get_Struct(self, dtrace_errdata_t, data);
-  
+
   if (data) {
     cpu = data->dteda_cpu;
     return INT2FIX(cpu);
@@ -36,9 +36,9 @@ VALUE dtraceerrdata_cpu(VALUE self)
 VALUE dtraceerrdata_action(VALUE self)
 {
   dtrace_errdata_t *data;
-  
+
   Data_Get_Struct(self, dtrace_errdata_t, data);
-  
+
   if (data) {
     return INT2FIX(data->dteda_action);
   }
@@ -51,9 +51,9 @@ VALUE dtraceerrdata_action(VALUE self)
 VALUE dtraceerrdata_offset(VALUE self)
 {
   dtrace_errdata_t *data;
-  
+
   Data_Get_Struct(self, dtrace_errdata_t, data);
-  
+
   if (data) {
     return INT2FIX(data->dteda_offset);
   }
@@ -66,9 +66,9 @@ VALUE dtraceerrdata_offset(VALUE self)
 VALUE dtraceerrdata_fault(VALUE self)
 {
   dtrace_errdata_t *data;
-  
+
   Data_Get_Struct(self, dtrace_errdata_t, data);
-  
+
   if (data) {
     return INT2FIX(data->dteda_fault);
   }
@@ -81,9 +81,9 @@ VALUE dtraceerrdata_fault(VALUE self)
 VALUE dtraceerrdata_addr(VALUE self)
 {
   dtrace_errdata_t *data;
-  
+
   Data_Get_Struct(self, dtrace_errdata_t, data);
-  
+
   if (data) {
     return INT2FIX(data->dteda_addr);
   }
@@ -97,9 +97,9 @@ VALUE dtraceerrdata_addr(VALUE self)
 VALUE dtraceerrdata_msg(VALUE self)
 {
   dtrace_errdata_t *data;
-  
+
   Data_Get_Struct(self, dtrace_errdata_t, data);
-  
+
   if (data) {
     return rb_str_new2(data->dteda_msg);
   }
