@@ -32,7 +32,7 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     0x89, 0x45, 0xfc, 0x83, 0x7d, 0xfc,
     0x00, 0x0f, 0x95, 0xc0, 0x0f, 0xb6,
     0xc0, 0x89, 0x45, 0xfc, 0x8b, 0x45,
-    0xfc, 
+    0xfc,
     0xc9, 0xc3
   };
 
@@ -54,11 +54,11 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     OP_PUSHL_EBP, OP_MOVL_ESP_EBP, OP_SUBL_N_ESP, 0x08, NULL
 
   };
-  
+
   uint8_t func_out[3] = {
     OP_LEAVE, OP_RET, NULL
   };
-  
+
   for (i = 0; func_in[i]; i++)
     *ip++ = func_in[i];
 
@@ -74,7 +74,7 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
   *ip++ = OP_ADDL_ESP_U;
   *ip++ = OP_ADDL_ESP_L;
   *ip++ = argc * 4;
-  
+
   for (i = 0; func_out[i]; i++)
     *ip++ = func_out[i];
 
@@ -84,29 +84,29 @@ VALUE dtraceprobe_init(VALUE self, VALUE rargc)
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((mprotect((void *)probe->func, FUNC_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) < 0) {
     rb_raise(eDtraceException, "mprotect failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((memcpy(probe->func, insns, FUNC_SIZE)) < 0) {
     rb_raise(eDtraceException, "memcpy failed: %s\n", strerror(errno));
     return Qnil;
-  }    
-  
+  }
+
   return self;
 }
 
 VALUE dtraceprobe_free(void *arg)
 {
   dtrace_probe_t *probe = (dtrace_probe_t *)arg;
-  
+
   if (probe) {
     free(probe);
   }
 }
- 
+
 VALUE dtraceprobe_alloc(VALUE klass)
 {
   VALUE obj;
@@ -126,7 +126,7 @@ VALUE dtraceprobe_alloc(VALUE klass)
 VALUE dtraceprobe_addr(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return INT2FIX(probe->func);
 }
@@ -134,7 +134,7 @@ VALUE dtraceprobe_addr(VALUE self)
 VALUE dtraceprobe_is_enabled(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return ((int)(*probe->func)()) ? Qtrue : Qfalse;
 }
@@ -161,7 +161,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
       break;
     }
   }
-  
+
   func = (void (*)())(probe->func + IS_ENABLED_FUNC_LEN);
 
   switch (argc) {
@@ -181,7 +181,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     (void)(*func)(argv[0], argv[1], argv[2], argv[3]);
     break;
   case 5:
-    (void)(*func)(argv[0], argv[1], argv[2], argv[3], 
+    (void)(*func)(argv[0], argv[1], argv[2], argv[3],
 		  argv[4]);
     break;
   case 6:
@@ -200,7 +200,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     rb_raise(eDtraceException, "probe argc max is 8");
     break;
   }
-  
+
   return Qnil;
 }
 

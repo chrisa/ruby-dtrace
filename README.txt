@@ -9,7 +9,7 @@ Fork the repository on Github: http://github.com/chrisa/ruby-dtrace
 Rubyforge mailing list: http://rubyforge.org/mailman/listinfo/ruby-dtrace-users
 
 == FEATURES
-  
+
 Consumer:
 
 * Access to the D API
@@ -29,7 +29,7 @@ Consumer: see Dtrace
 
     require 'Dtrace'
 
-    t = Dtrace.new 
+    t = Dtrace.new
     progtext = 'ruby$1:::function-entry{ @a[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); } END { printa(@a); }'
     prog = t.compile progtext
     prog.execute
@@ -37,7 +37,7 @@ Consumer: see Dtrace
     t.go
 
     [...]
-    
+
     c = DtraceConsumer.new(t)
     c.consume_once do |rec|
       # handle records
@@ -54,11 +54,11 @@ Probes: see Dtrace::Provider
 
     Dtrace::Probe::Rubyprog.foo do |p|
       p.fire('fired!', 'again')
-    end    
+    end
 
     Dtrace::Probe::Rubyprog.bar do |p|
       p.fire(42, 27)
-    end    
+    end
 
 == REQUIREMENTS
 
@@ -68,7 +68,7 @@ Probes: see Dtrace::Provider
 * For the probe API, a platform with DTrace support (as for the
   consumer API), with a 32 bit or 64 bit Ruby build - i386/x86_64,
   PowerPC (for OS X) and SPARC (for Solaris) are all supported.
-  
+
 * root, or some/all of the dtrace privileges on Solaris: dtrace_user,
   dtrace_proc and dtrace_kernel.
 

@@ -5,7 +5,7 @@
 
 # A Dtrace::Consumer provides access to the data produced by the running
 # D program. Having compiled and executed a D program, you typically
-# create a Dtrace::Consumer, and wait for data. 
+# create a Dtrace::Consumer, and wait for data.
 #
 # You can either wait indefinitely for data, or consume all the data
 # waiting and then stop: if your D program consists of only of
@@ -28,7 +28,7 @@
 #   progtext = "..."
 #   prog = t.compile progtext
 #   prog.execute
-#   t.go 
+#   t.go
 #   c = Dtrace::Consumer.new(t)
 #   c.consume_once do |d|
 #     # handle Dtrace::Data objects
@@ -61,11 +61,11 @@ class Dtrace
     # data in the @curr Dtrace::Data based on this:
     #
     # Dtrace::ProbeData (initial callback for a probe firing)
-    # Dtrace::RecDesc 
+    # Dtrace::RecDesc
     # ...
     # Dtrace::RecDesc = nil (end of data)
     #
-    
+
     def rec_consumer(block)
       proc do |rec|
         if rec
@@ -77,7 +77,7 @@ class Dtrace
         end
       end
     end
-    
+
     def probe_consumer
       proc do |probe|
         @curr.add_probedata(probe)
@@ -94,7 +94,7 @@ class Dtrace
       @types = types
       @curr = Dtrace::Data.new(types)
     end
-    
+
     public
 
     # Provide a proc which will be executed when a drop record is
@@ -119,12 +119,12 @@ class Dtrace
                       end)
     end
 
-    # Signals that the client wishes to stop consuming trace data. 
+    # Signals that the client wishes to stop consuming trace data.
     def finish
       @t.stop
       @done = true
     end
-    
+
     # Waits for data from the D program, and yields the records returned
     # to the block given. Returns when the D program exits.
     #
@@ -152,7 +152,7 @@ class Dtrace
         @t.work(probe_consumer)
       end
     end
-    
+
     # Yields the data waiting from the current program, then returns.
     #
     # Pass a list of classes to restrict the types of data returned,
@@ -169,6 +169,6 @@ class Dtrace
       @t.stop
       @t.work(probe_consumer, rec_consumer(block))
     end
-    
+
   end
 end

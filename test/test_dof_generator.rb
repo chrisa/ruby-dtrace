@@ -27,7 +27,7 @@ class TestDofGenerator < Test::Unit::TestCase
     dof = s.generate
     assert dof
   end
-    
+
   def test_generate_section_probes
     s = Dtrace::Dof::Section.new(DOF_SECT_PROBES, 3)
     s.data = [
@@ -56,7 +56,7 @@ class TestDofGenerator < Test::Unit::TestCase
                 :noffs=>1,
                 :xargv=>7},
              ]
-    
+
     dof = s.generate
     assert dof
   end

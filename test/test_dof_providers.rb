@@ -9,7 +9,7 @@ require 'test/unit'
 
 class TestDofProviders < Test::Unit::TestCase
   include Dtrace::Dof::Constants
-  
+
   def test_probe_no_args
     f = Dtrace::Dof::File.new
     f.allocate(4096)
@@ -48,7 +48,7 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ 0 ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
@@ -115,7 +115,7 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ 0 ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
@@ -182,7 +182,7 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ 36 ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
@@ -249,7 +249,7 @@ class TestDofProviders < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ 44 ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :name => 11,

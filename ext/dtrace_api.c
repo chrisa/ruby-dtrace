@@ -75,37 +75,37 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceProgram, "info",               dtraceprogram_info, 0); // in dtrace_program.c
 
   cDtraceProgramInfo = rb_define_class_under(cDtrace, "ProgramInfo", rb_cObject);
-  rb_define_method(cDtraceProgramInfo, "initialize",         dtraceprograminfo_init,               0); // in dtrace_programinfo.c 
+  rb_define_method(cDtraceProgramInfo, "initialize",         dtraceprograminfo_init,               0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "aggregates_count",   dtraceprograminfo_aggregates_count,   0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "recgens_count",      dtraceprograminfo_recgens_count,      0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "matches_count",      dtraceprograminfo_matches_count,      0); // in dtrace_programinfo.c
   rb_define_method(cDtraceProgramInfo, "speculations_count", dtraceprograminfo_speculations_count, 0); // in dtrace_programinfo.c
 
   cDtraceAggData = rb_define_class_under(cDtrace, "AggData", rb_cObject);
-  rb_define_method(cDtraceAggData, "initialize",         dtraceaggdata_init,    0); // in dtrace_aggdata.c 
+  rb_define_method(cDtraceAggData, "initialize",         dtraceaggdata_init,    0); // in dtrace_aggdata.c
   rb_define_method(cDtraceAggData, "value",              dtraceaggdata_value,   0); // in dtrace_aggdata.c
   rb_define_method(cDtraceAggData, "aggtype",            dtraceaggdata_aggtype, 0); // in dtrace_aggdata.c
 
   cDtraceRecDesc = rb_define_class_under(cDtrace, "RecDesc", rb_cObject);
-  rb_define_method(cDtraceRecDesc, "initialize",         dtracerecdesc_init,   0); // in dtrace_recdesc.c 
-  rb_define_method(cDtraceRecDesc, "action",             dtracerecdesc_action, 0); // in dtrace_recdesc.c 
+  rb_define_method(cDtraceRecDesc, "initialize",         dtracerecdesc_init,   0); // in dtrace_recdesc.c
+  rb_define_method(cDtraceRecDesc, "action",             dtracerecdesc_action, 0); // in dtrace_recdesc.c
 
   cDtraceDropData = rb_define_class_under(cDtrace, "DropData", rb_cObject);
-  rb_define_method(cDtraceDropData, "initialize",  dtracedropdata_init,   0); // in dtrace_dropdata.c 
-  rb_define_method(cDtraceDropData, "cpu",         dtracedropdata_cpu,    0); // in dtrace_dropdata.c 
-  rb_define_method(cDtraceDropData, "drops",       dtracedropdata_drops,  0); // in dtrace_dropdata.c 
-  rb_define_method(cDtraceDropData, "total",       dtracedropdata_total,  0); // in dtrace_dropdata.c 
-  rb_define_method(cDtraceDropData, "msg",         dtracedropdata_msg,    0); // in dtrace_dropdata.c 
-  rb_define_method(cDtraceDropData, "kind",        dtracedropdata_kind,   0); // in dtrace_dropdata.c 
+  rb_define_method(cDtraceDropData, "initialize",  dtracedropdata_init,   0); // in dtrace_dropdata.c
+  rb_define_method(cDtraceDropData, "cpu",         dtracedropdata_cpu,    0); // in dtrace_dropdata.c
+  rb_define_method(cDtraceDropData, "drops",       dtracedropdata_drops,  0); // in dtrace_dropdata.c
+  rb_define_method(cDtraceDropData, "total",       dtracedropdata_total,  0); // in dtrace_dropdata.c
+  rb_define_method(cDtraceDropData, "msg",         dtracedropdata_msg,    0); // in dtrace_dropdata.c
+  rb_define_method(cDtraceDropData, "kind",        dtracedropdata_kind,   0); // in dtrace_dropdata.c
 
   cDtraceErrData = rb_define_class_under(cDtrace, "ErrData", rb_cObject);
-  rb_define_method(cDtraceErrData, "initialize",  dtraceerrdata_init,    0); // in dtrace_errdata.c 
-  rb_define_method(cDtraceErrData, "cpu",         dtraceerrdata_cpu,     0); // in dtrace_errdata.c 
-  rb_define_method(cDtraceErrData, "action",      dtraceerrdata_action,  0); // in dtrace_errdata.c 
-  rb_define_method(cDtraceErrData, "offset",      dtraceerrdata_offset,  0); // in dtrace_errdata.c 
-  rb_define_method(cDtraceErrData, "fault",       dtraceerrdata_fault,   0); // in dtrace_errdata.c 
-  rb_define_method(cDtraceErrData, "addr",        dtraceerrdata_addr,    0); // in dtrace_errdata.c 
-  rb_define_method(cDtraceErrData, "msg",         dtraceerrdata_msg,     0); // in dtrace_errdata.c 
+  rb_define_method(cDtraceErrData, "initialize",  dtraceerrdata_init,    0); // in dtrace_errdata.c
+  rb_define_method(cDtraceErrData, "cpu",         dtraceerrdata_cpu,     0); // in dtrace_errdata.c
+  rb_define_method(cDtraceErrData, "action",      dtraceerrdata_action,  0); // in dtrace_errdata.c
+  rb_define_method(cDtraceErrData, "offset",      dtraceerrdata_offset,  0); // in dtrace_errdata.c
+  rb_define_method(cDtraceErrData, "fault",       dtraceerrdata_fault,   0); // in dtrace_errdata.c
+  rb_define_method(cDtraceErrData, "addr",        dtraceerrdata_addr,    0); // in dtrace_errdata.c
+  rb_define_method(cDtraceErrData, "msg",         dtraceerrdata_msg,     0); // in dtrace_errdata.c
 
   cDtraceProbe = rb_define_class_under(cDtrace, "Probe", rb_cObject);
   rb_define_method(cDtraceProbe, "initialize",        dtraceprobe_init,              1); // in dtrace_probe.c
@@ -115,7 +115,7 @@ void Init_dtrace_api() {
   rb_define_method(cDtraceProbe, "probe_offset",      dtraceprobe_probe_offset,      2); // in dtrace_probe.c
   rb_define_method(cDtraceProbe, "is_enabled_offset", dtraceprobe_is_enabled_offset, 1); // in dtrace_probe.c
   rb_define_alloc_func(cDtraceProbe, dtraceprobe_alloc);
-  
+
   eDtraceException = rb_define_class_under(cDtrace, "Exception", rb_eStandardError);
 }
 

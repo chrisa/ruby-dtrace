@@ -10,7 +10,7 @@ class Dtrace::Dof::Section
   attr_writer :entsize
   attr_accessor :flags, :data, :offset, :align, :pad, :size
   attr_reader :section_type, :dof
-  
+
   def initialize(type, index)
     @section_type  = type
     @index         = index
@@ -55,7 +55,7 @@ class Dtrace::Dof::Section
     end
 
     @entsize = compute_entsize
-    
+
     return @dof.length
   end
 

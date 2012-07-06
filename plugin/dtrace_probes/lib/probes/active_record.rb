@@ -22,8 +22,8 @@ module Probes
           p.probe :find_by_sql_start,  :string
           p.probe :find_by_sql_finish, :integer
         end
-        
-        base.class_eval do 
+
+        base.class_eval do
           class << self
             alias_method_chain :find_by_sql, :probes
           end
@@ -50,10 +50,10 @@ module Probes
             p.probe :execute_start,  :string
             p.probe :execute_finish, :string
           end
-          
+
           base.alias_method_chain :execute, :probes
         end
-        
+
       end
     end
 

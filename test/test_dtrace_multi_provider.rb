@@ -8,7 +8,7 @@ require 'dtrace/provider'
 require 'test/unit'
 
 class TestDtraceMultiProvider < Test::Unit::TestCase
-  
+
   def test_multiple_providers_and_list
     Dtrace::Provider.create :multi1 do |p|
       p.probe :test1, :integer, :integer
@@ -57,7 +57,7 @@ multi4*:ruby::test4
   trace("fired 2");
 }
 EOD
-    
+
     t = Dtrace.new
     t.setopt("bufsize", "4m")
     prog = t.compile progtext
@@ -80,7 +80,7 @@ EOD
 
     assert_equal 2, data.length
     assert_equal 'fired 1', data[0].data[0].value
-    assert_equal 'fired 2', data[1].data[0].value    
+    assert_equal 'fired 2', data[1].data[0].value
   end
 
 end

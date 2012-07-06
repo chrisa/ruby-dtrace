@@ -6,7 +6,7 @@
 
 == 0.2.8 / 2009-07-23
 
- * Replace string-eval provider class creation 
+ * Replace string-eval provider class creation
  * Fix GC bug with DOF data on Mac OSX (reported by ecin@copypastel.com)
  * Add each_probe_prog method to list probes enabled by a program
  * Fix conversion of 64 bit values in probe data (reported by ecin@copypastel.com)
@@ -22,7 +22,7 @@
 
 == 0.2.5 / 2008-06-14
 
- * Rework Dtrace::Provider to directly create USDT providers by 
+ * Rework Dtrace::Provider to directly create USDT providers by
    generating DOF and stub functions.
 
 == 0.0.6 / 2008-02-17
@@ -32,7 +32,7 @@
 
 == 0.0.5 / 2008-01-24
 
- * Add DtraceErrData and DtraceDropData for access to error 
+ * Add DtraceErrData and DtraceDropData for access to error
    and drop information
  * Fix interaction with Ruby's GC
 
@@ -43,8 +43,8 @@
 == 0.0.3 / 2008-01-06
 
  * Add a DtraceData class which consumers return, containing
-   the data returned from each probe firing, rather than 
-   returning the raw records directly from DTrace. 
+   the data returned from each probe firing, rather than
+   returning the raw records directly from DTrace.
  * Provide access to probe, CPU and flow information.
  * Allow creation and grabbing of processes.
  * Add an example script: a port of scsi.d.

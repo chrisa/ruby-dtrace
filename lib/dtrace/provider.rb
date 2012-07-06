@@ -20,12 +20,12 @@ class Dtrace
   class Provider
     include Dtrace::Dof::Constants
 
-    Typemap = { :string => 'char *', :integer => 'int' } 
+    Typemap = { :string => 'char *', :integer => 'int' }
 
     # Creates a DTrace provider.
     #
     # Example:
-    # 
+    #
     #   Dtrace::Provider.create :action_controller do |p|
     #     p.probe :process_start,  :string
     #     p.probe :process_finish, :string, :integer
@@ -34,10 +34,10 @@ class Dtrace
     # The symbol passed to create becomes the name of the provider,
     # and the class exposed under Dtrace::Probe in Ruby (camelized, so
     # the above statement creates Dtrace::Probe::ActionController).
-    # 
+    #
     # create yields a Provider for the current platform, on which you
-    # can call probe, to create the individual probes. 
-    # 
+    # can call probe, to create the individual probes.
+    #
     # You can override the module name in the created probes, by
     # passing in an hash:
     #
@@ -64,7 +64,7 @@ class Dtrace
     #
     #   p.probe :foo, { :function => 'somefunction' }, :int, ...
     #
-    def probe(name, *types) 
+    def probe(name, *types)
       options = {}
       if types[0].respond_to? :keys
         options = types.shift
@@ -100,7 +100,7 @@ class Dtrace
     def dof_size
       probes = @probe_defs.length
       args = (@probe_defs.inject(0) {|sum, pd| sum + pd.args.length }) + 1
-      
+
       size = 0
       [
        DOF_DOFHDR_SIZE,
@@ -135,13 +135,13 @@ class Dtrace
       offidx = 0
       @probe_defs.each do |pd|
         argc = pd.argc
-        
+
         argv = 0
         pd.args.each do |type|
           i = @strtab.add(type)
           argv = i if argv == 0
         end
-        
+
         probe = Dtrace::Probe.new(argc)
         probes <<
           {
@@ -158,7 +158,7 @@ class Dtrace
           :nargv    => argv,
           :xargv    => argv,
         }
-        
+
         stubs[pd.name] = probe
         argidx += argc
         offidx += 1
@@ -177,7 +177,7 @@ class Dtrace
         s.data = [ 0 ]
       end
       f.sections << s
-      
+
       # After last addition to strtab, but before first offset!
       f.allocate(self.dof_size)
 
@@ -200,7 +200,7 @@ class Dtrace
         s.data = [ 0 ]
       end
       f.sections << s
-      
+
       s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
       s.data = {
         :strtab => 0,
@@ -209,22 +209,22 @@ class Dtrace
         :proffs => 3,
         :prenoffs => 4,
         :name => provider_name_idx,
-        :provattr => { 
+        :provattr => {
           :name  => DTRACE_STABILITY_EVOLVING,
           :data  => DTRACE_STABILITY_EVOLVING,
-          :class => DTRACE_STABILITY_EVOLVING 
+          :class => DTRACE_STABILITY_EVOLVING
         },
-        :modattr  => { 
-          :name => DTRACE_STABILITY_PRIVATE,
-          :data => DTRACE_STABILITY_PRIVATE,
-          :class => DTRACE_STABILITY_EVOLVING 
-        },
-        :funcattr => { 
+        :modattr  => {
           :name => DTRACE_STABILITY_PRIVATE,
           :data => DTRACE_STABILITY_PRIVATE,
           :class => DTRACE_STABILITY_EVOLVING
         },
-        :nameattr => { 
+        :funcattr => {
+          :name => DTRACE_STABILITY_PRIVATE,
+          :data => DTRACE_STABILITY_PRIVATE,
+          :class => DTRACE_STABILITY_EVOLVING
+        },
+        :nameattr => {
           :name => DTRACE_STABILITY_EVOLVING,
           :data => DTRACE_STABILITY_EVOLVING,
           :class => DTRACE_STABILITY_EVOLVING
@@ -239,7 +239,7 @@ class Dtrace
 
       f.generate
       Dtrace::Dof.loaddof(f, @module)
-      
+
       provider = Dtrace::Provider::Klass.new(f, stubs)
       Dtrace::Probe.const_set(@class, provider)
 
@@ -252,6 +252,6 @@ class Dtrace
       # Pinched from ActiveSupport's Inflector
       lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
     end
-    
+
   end
 end

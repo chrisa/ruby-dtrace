@@ -1,4 +1,4 @@
-/* 
+/*
  * Ruby-Dtrace
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
@@ -17,7 +17,7 @@ void Init_dof_api() {
   VALUE dof    = rb_define_class_under(dtrace, "Dof", rb_cObject);
 
   rb_define_singleton_method(dof, "loaddof", dof_loaddof, 2); // in dof_helper.c
-  
+
   eDtraceDofException = rb_define_class_under(dof, "Exception", rb_eStandardError);
 
   cDtraceDofParser    = rb_define_class_under(dof, "Parser",    rb_cObject);

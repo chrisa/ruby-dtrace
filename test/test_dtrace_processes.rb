@@ -12,7 +12,7 @@ class TestDtraceProcesses < Test::Unit::TestCase
 
   def test_createprocess
 
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "8m")
     t.setopt("aggsize", "4m")
     t.setopt("stackframes", "5")
@@ -47,7 +47,7 @@ EOD
 
   def test_grabprocess
 
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "8m")
     t.setopt("aggsize", "4m")
     t.setopt("stackframes", "5")

@@ -15,7 +15,7 @@ RUBY_EXTERN VALUE eDtraceException;
 #define IS_ENABLED_FUNC_LEN 32
 
 /* :nodoc: */
-VALUE 
+VALUE
 dtraceprobe_init(VALUE self, VALUE rargc)
 {
   dtrace_probe_t *probe;
@@ -79,7 +79,7 @@ dtraceprobe_init(VALUE self, VALUE rargc)
     /* mov 0xN(%ebp),%eax */
     *ip++ = OP_MOVL_EAX_U;
     *ip++ = OP_MOVL_EAX_L;
-    *ip++ = i + 8; 
+    *ip++ = i + 8;
     /* mov %eax,N(%esp) */
     *ip++ = OP_MOVL_ESP;
     if (i > 0) {
@@ -92,7 +92,7 @@ dtraceprobe_init(VALUE self, VALUE rargc)
       *ip++ = 0x24;
     }
   }
-  
+
   /* tracepoint */
   *ip++ = 0x90;
   *ip++ = 0x0f;
@@ -110,30 +110,30 @@ dtraceprobe_init(VALUE self, VALUE rargc)
     rb_raise(eDtraceException, "malloc failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((mprotect((void *)probe->func, FUNC_SIZE, PROT_READ | PROT_WRITE | PROT_EXEC)) < 0) {
     rb_raise(eDtraceException, "mprotect failed: %s\n", strerror(errno));
     return Qnil;
   }
-  
+
   if ((memcpy(probe->func, insns, FUNC_SIZE)) < 0) {
     rb_raise(eDtraceException, "memcpy failed: %s\n", strerror(errno));
     return Qnil;
-  }    
-  
+  }
+
   return self;
 }
 
 VALUE dtraceprobe_free(void *arg)
 {
   dtrace_probe_t *probe = (dtrace_probe_t *)arg;
-  
+
   if (probe) {
     free(probe->func);
     free(probe);
   }
 }
- 
+
 VALUE dtraceprobe_alloc(VALUE klass)
 {
   VALUE obj;
@@ -156,7 +156,7 @@ VALUE dtraceprobe_alloc(VALUE klass)
 VALUE dtraceprobe_addr(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return INT2FIX(probe->func);
 }
@@ -168,7 +168,7 @@ VALUE dtraceprobe_addr(VALUE self)
 VALUE dtraceprobe_is_enabled(VALUE self)
 {
   dtrace_probe_t *probe;
-  
+
   Data_Get_Struct(self, dtrace_probe_t, probe);
   return ((int)(*probe->func)()) ? Qtrue : Qfalse;
 }
@@ -199,7 +199,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
       break;
     }
   }
-  
+
   func = (void (*)())(probe->func + IS_ENABLED_FUNC_LEN);
 
   switch (argc) {
@@ -219,7 +219,7 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     (void)(*func)(argv[0], argv[1], argv[2], argv[3]);
     break;
   case 5:
-    (void)(*func)(argv[0], argv[1], argv[2], argv[3], 
+    (void)(*func)(argv[0], argv[1], argv[2], argv[3],
 		  argv[4]);
     break;
   case 6:
@@ -238,11 +238,11 @@ VALUE dtraceprobe_fire(int argc, VALUE *ruby_argv, VALUE self) {
     rb_raise(eDtraceException, "probe argc max is 8");
     break;
   }
-  
+
   return Qnil;
 }
 
-/* 
+/*
  * Returns the offset for this probe in the PROFFS section, based on
  * the location of the DOF, and the location of this probe.
  */
@@ -265,7 +265,7 @@ VALUE dtraceprobe_probe_offset(VALUE self, VALUE file_addr, VALUE argc)
   return INT2FIX((uint32_t)probe_addr - (uint32_t)FIX2UINT(file_addr) + offset);
 }
 
-/* 
+/*
  * Returns the offset for this probe's is-enabled tracepoint in the
  * PRENOFFS section, based on the location of the DOF, and the
  * location of this probe.

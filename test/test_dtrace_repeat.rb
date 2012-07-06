@@ -12,19 +12,19 @@ require 'test/unit'
 # the end).
 
 class TestDtraceRepeat < Test::Unit::TestCase
-  
+
   def test_repeats
     (0..9).each do |i|
-      t = Dtrace.new 
+      t = Dtrace.new
       t.setopt("bufsize", "4m")
       t.setopt("aggsize", "4m")
 
       progtext = 'syscall:::entry { trace("foo"); }'
-      
+
       prog = t.compile progtext
       prog.execute
       t.go
-      
+
       # Let some activity happen.
       sleep 1
 

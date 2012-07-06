@@ -1,11 +1,11 @@
-/* 
+/*
  * Ruby-Dtrace
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dof.h"
 
-void 
+void
 _init_constants(VALUE dtrace_dof)
 {
   VALUE c = rb_define_module_under(dtrace_dof, "Constants");

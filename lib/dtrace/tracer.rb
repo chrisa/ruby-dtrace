@@ -7,7 +7,7 @@
 
 class Dtrace
   class Tracer
-    
+
     class NullTracer
       def self.fire(arg0, arg1)
         puts "NullTracer: #{arg0} #{arg1}"
@@ -30,6 +30,6 @@ class Dtrace
       end
       @@tracer.fire(*args)
     end
-          
+
   end
 end

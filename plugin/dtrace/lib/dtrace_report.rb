@@ -50,7 +50,7 @@ module DtraceReport
   end
 
   def append_dtrace_report
-    if @@tracer 
+    if @@tracer
       @dtrace_script = @@tracer.script
       @dtrace_report = @@tracer.end_dtrace
       # yuck!
@@ -63,5 +63,5 @@ module DtraceReport
       end
     end
   end
-  
+
 end

@@ -22,7 +22,7 @@ VALUE dtracedropdata_cpu(VALUE self)
   processorid_t cpu;
 
   Data_Get_Struct(self, dtrace_dropdata_t, data);
-  
+
   if (data) {
     cpu = data->dtdda_cpu;
     return INT2FIX(cpu);
@@ -38,7 +38,7 @@ VALUE dtracedropdata_drops(VALUE self)
   dtrace_dropdata_t *data;
 
   Data_Get_Struct(self, dtrace_dropdata_t, data);
-  
+
   if (data) {
     return INT2FIX(data->dtdda_drops);
   }
@@ -53,7 +53,7 @@ VALUE dtracedropdata_total(VALUE self)
   dtrace_dropdata_t *data;
 
   Data_Get_Struct(self, dtrace_dropdata_t, data);
-  
+
   if (data) {
     return INT2FIX(data->dtdda_total);
   }
@@ -67,9 +67,9 @@ VALUE dtracedropdata_total(VALUE self)
 VALUE dtracedropdata_msg(VALUE self)
 {
   dtrace_dropdata_t *data;
-  
+
   Data_Get_Struct(self, dtrace_dropdata_t, data);
-  
+
   if (data) {
     return rb_str_new2(data->dtdda_msg);
   }
@@ -85,7 +85,7 @@ VALUE dtracedropdata_kind(VALUE self)
   VALUE kind;
 
   Data_Get_Struct(self, dtrace_dropdata_t, data);
-  
+
   if (data) {
     switch (data->dtdda_kind) {
     case DTRACEDROP_PRINCIPAL:
@@ -94,10 +94,10 @@ VALUE dtracedropdata_kind(VALUE self)
     case DTRACEDROP_AGGREGATION:
       kind = rb_str_new2("drop to aggregation buffer");
       break;
-    case DTRACEDROP_DYNAMIC:			
+    case DTRACEDROP_DYNAMIC:
       kind = rb_str_new2("dynamic drop");
       break;
-    case DTRACEDROP_DYNRINSE:			
+    case DTRACEDROP_DYNRINSE:
       kind = rb_str_new2("dyn drop due to rinsing");
       break;
     case DTRACEDROP_DYNDIRTY:
@@ -128,4 +128,4 @@ VALUE dtracedropdata_kind(VALUE self)
     return Qnil;
   }
 }
-  
+

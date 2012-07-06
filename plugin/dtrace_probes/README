@@ -1,6 +1,6 @@
 DtraceProbes
 ============
 
-This is "Dynamic USDT Probes" for Rails, using ruby-dtrace. 
+This is "Dynamic USDT Probes" for Rails, using ruby-dtrace.
 
 Copyright (c) 2008 Chris Andrews <chris@nodnol.org>, released under the MIT license

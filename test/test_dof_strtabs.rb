@@ -9,11 +9,11 @@ require 'test/unit'
 
 class TestDofStrtabs < Test::Unit::TestCase
   include Dtrace::Dof::Constants
-  
+
   def test_strtab_stridxs
     sec = Dtrace::Dof::Section::Strtab.new(1)
     assert sec
-    
+
     assert_equal 1, sec.add('foo')
     assert_equal 5, sec.add('bar')
     assert_equal 9, sec.add('baz')
@@ -56,7 +56,7 @@ class TestDofStrtabs < Test::Unit::TestCase
     s = Dtrace::Dof::Section.new(DOF_SECT_PRENOFFS, 4)
     s.data = [ 36 ]
     f.sections << s
-    
+
     s = Dtrace::Dof::Section.new(DOF_SECT_PROVIDER, 5)
     s.data = {
       :strtab => 0,
@@ -65,22 +65,22 @@ class TestDofStrtabs < Test::Unit::TestCase
       :proffs => 3,
       :prenoffs => 4,
       :name => strtab.add('teststrtabs'),
-      :provattr => { 
+      :provattr => {
         :name  => DTRACE_STABILITY_EVOLVING,
         :data  => DTRACE_STABILITY_EVOLVING,
-        :class => DTRACE_STABILITY_EVOLVING 
+        :class => DTRACE_STABILITY_EVOLVING
       },
-      :modattr  => { 
-        :name => DTRACE_STABILITY_PRIVATE,
-        :data => DTRACE_STABILITY_PRIVATE,
-        :class => DTRACE_STABILITY_EVOLVING 
-      },
-      :funcattr => { 
+      :modattr  => {
         :name => DTRACE_STABILITY_PRIVATE,
         :data => DTRACE_STABILITY_PRIVATE,
         :class => DTRACE_STABILITY_EVOLVING
       },
-      :nameattr => { 
+      :funcattr => {
+        :name => DTRACE_STABILITY_PRIVATE,
+        :data => DTRACE_STABILITY_PRIVATE,
+        :class => DTRACE_STABILITY_EVOLVING
+      },
+      :nameattr => {
         :name => DTRACE_STABILITY_EVOLVING,
         :data => DTRACE_STABILITY_EVOLVING,
         :class => DTRACE_STABILITY_EVOLVING

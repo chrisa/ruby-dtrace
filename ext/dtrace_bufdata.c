@@ -26,7 +26,7 @@ VALUE dtracebufdata_epid(VALUE self)
   dtrace_bufdata_t *bufdata;
 
   Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
-  
+
   if (bufdata->dtbda_probe) {
     return INT2FIX(bufdata->dtbda_probe->dtpda_edesc->dtepd_epid);
   }
@@ -35,8 +35,8 @@ VALUE dtracebufdata_epid(VALUE self)
 }
 
 
-/* 
- * Returns the DtraceProbe for the probe which generated this data 
+/*
+ * Returns the DtraceProbe for the probe which generated this data
  */
 VALUE dtracebufdata_probe(VALUE self)
 {
@@ -44,7 +44,7 @@ VALUE dtracebufdata_probe(VALUE self)
   VALUE dtraceprobe;
 
   Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
-  
+
   if (bufdata->dtbda_probe) {
     dtraceprobe = Data_Wrap_Struct(cDtraceProbe, 0, NULL, (dtrace_probedesc_t *)bufdata->dtbda_probe->dtpda_pdesc);
     return dtraceprobe;
@@ -53,7 +53,7 @@ VALUE dtracebufdata_probe(VALUE self)
   return Qnil;
 }
 
-/* 
+/*
  * Returns the record in this DtraceBufdata. Records are returned as
  * either DtraceRecords or DtraceStackRecords as appropriate for the
  * type of action.
@@ -70,7 +70,7 @@ VALUE dtracebufdata_record(VALUE self)
   VALUE dtracerecdesc;
 
   Data_Get_Struct(self, dtrace_bufdata_t, bufdata);
-  
+
   if (bufdata->dtbda_aggdata) {
     dtraceaggdata = Data_Wrap_Struct(cDtraceAggData, 0, NULL, (dtrace_bufdata_t *)bufdata);
     return dtraceaggdata;
@@ -80,12 +80,12 @@ VALUE dtracebufdata_record(VALUE self)
   if (s == NULL) {
     return Qnil;
   }
-  
+
   rec = bufdata->dtbda_recdesc;
   if (rec) {
     act = rec->dtrd_action;
   }
-  
+
   switch (act) {
   case DTRACEACT_DIFEXPR:
     /* trace() action */

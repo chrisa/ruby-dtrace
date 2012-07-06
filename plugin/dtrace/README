@@ -1,20 +1,20 @@
 Dtrace
 ======
 
-A simple plugin to run a DTrace script while your Rails app runs. 
+A simple plugin to run a DTrace script while your Rails app runs.
 
 Installation:
 
   script/plugin install http://ruby-dtrace.rubyforge.org/svn/trunk/plugin/dtrace
 
 Or copy the plugin/dtrace directory from the installed ruby-dtrace gem
-to your app's vendor/plugins directory. 
+to your app's vendor/plugins directory.
 
 Choose a mode of operation:
 
 The process running DTrace needs additional privileges: on Solaris,
 you can grant the dtrace_* privileges, and on both Leopard and Solaris
-you can run the process as root. 
+you can run the process as root.
 
 This plugin can run in two modes: you can run the whole app with
 DTrace privileges, or you can run a helper process with the
@@ -22,7 +22,7 @@ privileges, and the app will use DRb to communicate with it.
 
 If you choose to run the app as root, you need to set the :tracer
 option to the dtrace macro to :self, and if you choose to run the
-helper as root, you need to set the :tracer option to :helper. 
+helper as root, you need to set the :tracer option to :helper.
 
 Configuring the plugin:
 
@@ -32,7 +32,7 @@ applied to every controller in your app:
 
   dtrace :on, :tracer => :self
 
-  or 
+  or
 
   dtrace :on, :tracer => :helper
 
@@ -41,9 +41,9 @@ vendor/plugins/dtrace/scripts/ directory with the :script option:
 
   dtrace :on, :tracer => :self, :script => 'rails_mysql.d'
 
-There are two scripts in the distribution: 
+There are two scripts in the distribution:
  * default.d
-    - a very simple script to log system calls, which doesn't require 
+    - a very simple script to log system calls, which doesn't require
       a DTrace-enabled ruby.
 
  * rails_mysql.d

@@ -1,4 +1,4 @@
-/* 
+/*
  * Ruby-Dtrace
  * (c) 2008 Chris Andrews <chris@nodnol.org>
  */
@@ -35,9 +35,9 @@ VALUE dof_generate_header(VALUE self) {
     dof_version = DOF_VERSION;
   }
 #endif
-  
+
   memset(&hdr, 0, sizeof(hdr));
-  
+
   hdr.dofh_ident[DOF_ID_MAG0] = DOF_MAG_MAG0;
   hdr.dofh_ident[DOF_ID_MAG1] = DOF_MAG_MAG1;
   hdr.dofh_ident[DOF_ID_MAG2] = DOF_MAG_MAG2;
@@ -49,16 +49,16 @@ VALUE dof_generate_header(VALUE self) {
   hdr.dofh_ident[DOF_ID_DIFVERS]  = DIF_VERSION;
   hdr.dofh_ident[DOF_ID_DIFIREG]  = DIF_DIR_NREGS;
   hdr.dofh_ident[DOF_ID_DIFTREG]  = DIF_DTR_NREGS;
-  
+
   hdr.dofh_hdrsize = sizeof(dof_hdr_t);
   hdr.dofh_secsize = sizeof(dof_sec_t);
-  
+
   secnum = FIX2INT(rb_iv_get(self, "@secnum"));
   hdr.dofh_secnum = secnum;
 
   hdr.dofh_loadsz = FIX2INT(rb_iv_get(self, "@loadsz"));
   hdr.dofh_filesz = FIX2INT(rb_iv_get(self, "@filesz"));
-  
+
   hdrlen = (sizeof(dof_hdr_t) + secnum * sizeof(dof_sec_t));
   rb_iv_set(self, "@hdrlen", INT2FIX(hdrlen));
   hdr.dofh_secoff = sizeof(dof_hdr_t);
@@ -74,6 +74,6 @@ VALUE dof_header_len(VALUE self) {
 
   secnum = FIX2INT(rb_iv_get(self, "@secnum"));
   hdrlen = (sizeof(dof_hdr_t) + secnum * sizeof(dof_sec_t));
-  
+
   return INT2FIX(hdrlen);
 }

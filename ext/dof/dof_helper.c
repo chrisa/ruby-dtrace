@@ -24,7 +24,7 @@ int _loaddof(int fd, dof_helper_t *dh)
 
   user_addr_t val = (user_addr_t)(unsigned long)ioctlData;
   ret = ioctl(fd, DTRACEHIOC_ADDDOF, &val);
-  
+
   return ret;
 }
 
@@ -66,7 +66,7 @@ VALUE dof_loaddof(VALUE self, VALUE dof_file, VALUE module_name)
   (void) snprintf(dh.dofhp_mod, sizeof (dh.dofhp_mod), RSTRING(module_name)->ptr);
 
   if ((fd = open(helper, O_RDWR)) < 0) {
-    rb_raise(eDtraceDofException, "failed to open helper device %s: %s", 
+    rb_raise(eDtraceDofException, "failed to open helper device %s: %s",
 	     helper, strerror(errno));
     return Qnil;
   }
@@ -79,4 +79,4 @@ VALUE dof_loaddof(VALUE self, VALUE dof_file, VALUE module_name)
 
   return Qnil;
 }
-  
+

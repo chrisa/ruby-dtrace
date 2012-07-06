@@ -89,4 +89,4 @@ VALUE handle_bytedata(caddr_t addr, uint32_t nbytes)
     rb_ary_push(robj, INT2FIX(addr[i]));
 
   return (robj);
-}  
+}
