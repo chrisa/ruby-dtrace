@@ -19,7 +19,7 @@ RUBY_EXTERN VALUE cDtraceErrData;
 static void dtrace_hdl_free(void *arg)
 {
   dtrace_handle_t *handle = (dtrace_handle_t *)arg;
-  
+
   if (handle) {
     dtrace_close(handle->hdl);
     free(handle);
@@ -45,14 +45,14 @@ VALUE dtrace_hdl_alloc(VALUE klass)
   dtrace_handle_t *handle;
   int err;
   VALUE obj;
-  
+
   hdl = dtrace_open(DTRACE_VERSION, 0, &err);
-  
+
   if (hdl) {
     /*
-     * Leopard's DTrace requires symbol resolution to be 
-     * switched on explicitly 
-     */ 
+     * Leopard's DTrace requires symbol resolution to be
+     * switched on explicitly
+     */
 #ifdef __APPLE__
     (void) dtrace_setopt(hdl, "stacksymbols", "enabled");
 #endif
@@ -78,6 +78,7 @@ VALUE dtrace_hdl_alloc(VALUE klass)
   }
   else {
     rb_raise(eDtraceException, "unable to open dtrace: %s (not root?)", strerror(err));
+    return Qnil;
   }
 }
 
@@ -105,7 +106,7 @@ int _dtrace_next_probe(dtrace_hdl_t *hdl, const dtrace_probedesc_t *pdp, void *a
 }
 
 /*
- * Yields each probe found on the system. 
+ * Yields each probe found on the system.
  * (equivalent to dtrace -l)
  *
  * Each probe is represented by a DtraceProbe object
@@ -121,7 +122,7 @@ VALUE dtrace_each_probe_all(VALUE self)
 }
 
 /*
- * Yields each probe found on the system, matching against a 
+ * Yields each probe found on the system, matching against a
  * partial name.
  * (equivalent to dtrace -l -n 'probe:::spec')
  *
@@ -133,10 +134,10 @@ VALUE dtrace_each_probe_match(VALUE self, VALUE provider, VALUE mod, VALUE func,
 
   dtrace_probedesc_t desc;
   desc.dtpd_id = 0;
-  strcpy(desc.dtpd_provider, RSTRING(provider)->ptr);
-  strcpy(desc.dtpd_mod,      RSTRING(mod)->ptr);
-  strcpy(desc.dtpd_func,     RSTRING(func)->ptr);
-  strcpy(desc.dtpd_name,     RSTRING(name)->ptr);
+  strcpy(desc.dtpd_provider, RSTRING_PTR(provider));
+  strcpy(desc.dtpd_mod,      RSTRING_PTR(mod));
+  strcpy(desc.dtpd_func,     RSTRING_PTR(func));
+  strcpy(desc.dtpd_name,     RSTRING_PTR(name));
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
   (void) dtrace_probe_iter(handle->hdl, &desc, _dtrace_next_probe, NULL);
@@ -149,7 +150,7 @@ _dtrace_next_stmt(dtrace_hdl_t *hdl, dtrace_prog_t *program,
 		  dtrace_stmtdesc_t *stp, dtrace_ecbdesc_t **last)
 {
   dtrace_ecbdesc_t *edp = stp->dtsd_ecbdesc;
-  
+
   if (edp == *last)
     return 0;
 
@@ -158,13 +159,13 @@ _dtrace_next_stmt(dtrace_hdl_t *hdl, dtrace_prog_t *program,
 	     edp->dted_probe.dtpd_provider, edp->dted_probe.dtpd_mod,
 	     edp->dted_probe.dtpd_func, edp->dted_probe.dtpd_name,
 	     dtrace_errmsg(hdl, dtrace_errno(hdl)));
-  
+
   }
-  
+
   *last = edp;
   return 0;
 }
- 
+
 /*
  * Yields each probe enabled by the given D program.
  * (equivalent to dtrace -n -s program.d)
@@ -174,16 +175,16 @@ VALUE dtrace_each_probe_prog(VALUE self, VALUE program)
   dtrace_handle_t *handle;
   dtrace_prog_t *prog;
   dtrace_ecbdesc_t *last = NULL;
-  
+
   Data_Get_Struct(self, dtrace_handle_t, handle);
   Data_Get_Struct(program, dtrace_prog_t, prog);
- 
+
   (void) dtrace_stmt_iter(handle->hdl, prog, (dtrace_stmt_f *)_dtrace_next_stmt, &last);
   return Qnil;
-} 
+}
 
 /*
- * Compile a D program. 
+ * Compile a D program.
  *
  * Arguments:
  * * The program text to compile
@@ -212,21 +213,23 @@ VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self)
     rb_raise(eDtraceException, "alloc failed");
     return Qnil;
   }
-  
+
   for (i = 0; i < dtrace_argc; i++) {
-    dtrace_argv[i + 1] = STR2CSTR(rb_ary_entry(dtrace_argv_array, i));
+    dtrace_argv[i + 1] = strdup(RSTRING_PTR(rb_ary_entry(dtrace_argv_array, i)));
   }
 
   dtrace_argv[0] = "ruby";
   dtrace_argc++;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
-  program = dtrace_program_strcompile(handle->hdl, STR2CSTR(dtrace_text),
-				      DTRACE_PROBESPEC_NAME, DTRACE_C_PSPEC, 
-				      dtrace_argc, dtrace_argv);
+  program = dtrace_program_strcompile(
+    handle->hdl, RSTRING_PTR(dtrace_text),
+    DTRACE_PROBESPEC_NAME, DTRACE_C_PSPEC,
+    dtrace_argc, dtrace_argv
+  );
 
   if (!program) {
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+    rb_raise(eDtraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
     return Qnil;
   }
   else {
@@ -239,7 +242,7 @@ VALUE dtrace_strcompile(int argc, VALUE *argv, VALUE self)
 /*
  * Start tracing. Must be called once a program has been successfully
  * compiled and executed.
- * 
+ *
  * Raises a DtraceException on any error.
  */
 VALUE dtrace_hdl_go(VALUE self)
@@ -247,17 +250,17 @@ VALUE dtrace_hdl_go(VALUE self)
   dtrace_handle_t *handle;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
-  if (dtrace_go(handle->hdl) < 0) 
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
-    
+  if (dtrace_go(handle->hdl) < 0)
+    rb_raise(eDtraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+
   return Qnil;
 }
 
-/* 
+/*
  * Returns the status of the DTrace handle.
  *
  * Status values are defined as:
- * 
+ *
  * * 0 - none
  * * 1 - ok
  * * 4 - stopped
@@ -268,17 +271,17 @@ VALUE dtrace_hdl_status(VALUE self)
   int status;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
-  if ((status = dtrace_status(handle->hdl)) < 0) 
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
-    
+  if ((status = dtrace_status(handle->hdl)) < 0)
+    rb_raise(eDtraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+
   return INT2FIX(status);
 }
 
-/* 
- * Set an option on the DTrace handle. 
- * 
+/*
+ * Set an option on the DTrace handle.
+ *
  * Options which may be set:
- * 
+ *
  * * aggsize
  * * bufsize
  */
@@ -290,19 +293,19 @@ VALUE dtrace_hdl_setopt(VALUE self, VALUE key, VALUE value)
   Data_Get_Struct(self, dtrace_handle_t, handle);
 
   if (NIL_P(value)) {
-    ret = dtrace_setopt(handle->hdl, STR2CSTR(key), 0);
+    ret = dtrace_setopt(handle->hdl, RSTRING_PTR(key), 0);
   }
   else {
-    ret = dtrace_setopt(handle->hdl, STR2CSTR(key), STR2CSTR(value));
+    ret = dtrace_setopt(handle->hdl, RSTRING_PTR(key), RSTRING_PTR(value));
   }
 
-  if (ret < 0) 
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
-    
+  if (ret < 0)
+    rb_raise(eDtraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+
   return Qnil;
 }
 
-/* Stop tracing. 
+/* Stop tracing.
  *
  * Must be called after go has been called to start tracing.
  */
@@ -311,13 +314,14 @@ VALUE dtrace_hdl_stop(VALUE self)
   dtrace_handle_t *handle;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
-  if (dtrace_stop(handle->hdl) < 0) 
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
-    
+  if (dtrace_stop(handle->hdl) < 0)
+    rb_raise(eDtraceException, "%s",
+             dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+
   return Qnil;
 }
 
-/* 
+/*
  * Return the most recent DTrace error.
  */
 VALUE dtrace_hdl_error(VALUE self)
@@ -353,7 +357,9 @@ static int _probe_consumer(const dtrace_probedata_t *data, void *arg)
   proc = handlers.probe;
 
   if (!NIL_P(proc)) {
-    probedata = Data_Wrap_Struct(cDtraceProbeData, 0, NULL, (dtrace_probedata_t *)data);
+    probedata = Data_Wrap_Struct(cDtraceProbeData, 0, NULL,
+                                 (dtrace_probedata_t *)data);
+
     rb_iv_set(probedata, "@handle", handlers.handle);
     rb_funcall(proc, rb_intern("call"), 1, probedata);
   }
@@ -410,7 +416,7 @@ static int _buf_consumer(const dtrace_bufdata_t *bufdata, void *arg)
 
 /*
  * Process any data waiting from the D program.
- * 
+ *
  * Takes a Proc to which DtraceProbeData objects will be yielded, and
  * an optional second Proc to which DtraceRecDesc objects will be
  * yielded.
@@ -423,7 +429,7 @@ VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self)
   dtrace_work_handlers_t handlers;
   VALUE probe_consumer;
   VALUE rec_consumer;
-  
+
   Data_Get_Struct(self, dtrace_handle_t, handle);
 
   /* handle args - probe_consumer_proc is mandatory, rec_consumer_proc
@@ -445,10 +451,10 @@ VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self)
   fclose(devnull);
 
   if (status < 0)
-    rb_raise(eDtraceException, (dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl))));
+    rb_raise(eDtraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
 
   return INT2FIX(status);
-}  
+}
 
 /*
  * Set up the buffered output handler for this handle.
@@ -463,7 +469,7 @@ VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer)
 
   /* attach the buffered output handler */
   if (dtrace_handle_buffered(handle->hdl, &_buf_consumer, (void *)buf_consumer) == -1) {
-    rb_raise(eDtraceException, "failed to establish buffered handler: %s", 
+    rb_raise(eDtraceException, "failed to establish buffered handler: %s",
 	     (dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl))));
   }
 
@@ -515,12 +521,14 @@ static int _err_consumer(const dtrace_errdata_t *errdata, void *arg)
 
   /* guard against bad invocations where arg is not what we provided... */
   if (TYPE(proc) == T_DATA) {
-    dtraceerrdata = Data_Wrap_Struct(cDtraceErrData, 0, NULL, (dtrace_errdata_t *)errdata);
+    dtraceerrdata = Data_Wrap_Struct(cDtraceErrData, 0, NULL,
+                                     (dtrace_errdata_t *)errdata);
     rb_funcall(proc, rb_intern("call"), 1, dtraceerrdata);
   }
   else {
     /* arg looked bad, throw an exception */
-    rb_raise(eDtraceException, "bad argument to _err_consumer: %p -> 0x%x type 0x%x\n", arg, proc, TYPE(proc));
+    rb_raise(eDtraceException,
+             "bad argument to _err_consumer: %p -> type 0x%x\n", arg, TYPE(proc));
   }
 
   return (DTRACE_HANDLE_OK);
@@ -529,7 +537,7 @@ static int _err_consumer(const dtrace_errdata_t *errdata, void *arg)
 /*
  * Set up the err-record handler for this handle. Takes a block, which
  * will be called with any error records returned by DTrace,
- * represented by DTraceErrData records. 
+ * represented by DTraceErrData records.
  */
 VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer)
 {
@@ -541,7 +549,7 @@ VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer)
     rb_raise(eDtraceException, "too late to add error handler");
     return Qnil;
   }
-  
+
   /* to mark during GC */
   handle->err = err_consumer;
 
@@ -554,17 +562,17 @@ VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer)
   return Qnil;
 }
 
-/* 
+/*
  * Start a process which will be traced. The pid of the started
  * process will be available in D as $target.
- * 
+ *
  * Pass an array, where the first element is the full path to the
  * program to start, and subsequent elements are its arguments.
- * 
+ *
  * Returns a DtraceProcess object which is used to start the process
  * once tracing is set up.
  */
-VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
+VALUE dtrace_hdl_createprocess(VALUE self, VALUE rbargv)
 {
   dtrace_handle_t *handle;
   struct ps_prochandle *P;
@@ -576,25 +584,29 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
 
-  len = rb_ary_len(rb_argv);
+  Check_Type(rbargv, T_ARRAY);
+  len = rb_ary_len(rbargv);
+
   argv = ALLOC_N(char *, len + 1);
   if (!argv) {
     rb_raise(eDtraceException, "alloc failed");
     return Qnil;
   }
 
-  for (i = 0; i < len; i++) {
-    argv[i] = STR2CSTR(rb_ary_entry(rb_argv, i));
-  }
+  for (i = 0; i < len; i++)
+    argv[i] = strdup(RSTRING_PTR(rb_ary_entry(rbargv, i)));
   argv[len] = NULL;
 
   P = dtrace_proc_create(handle->hdl, argv[0], argv);
+
+  for (i = 0; i < len; i++)
+    free(argv[i]);
   free(argv);
-  
-  if (P == NULL) {
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
-  }
-  
+
+  if (P == NULL)
+    rb_raise(eDtraceException, "%s",
+             dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+
   process = ALLOC(dtrace_process_t);
   if (!process) {
     rb_raise(eDtraceException, "alloc failed");
@@ -604,12 +616,13 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rb_argv)
   process->handle = handle->hdl;
   process->proc   = P;
 
-  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release, (dtrace_process_t *)process);
+  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release,
+                                   (dtrace_process_t *)process);
   return dtraceprocess;
 }
 
-/* 
- * Grab a currently-running process by pid. 
+/*
+ * Grab a currently-running process by pid.
  *
  * Returns a DtraceProcess object which is used to start the process
  * once tracing is set up.
@@ -624,11 +637,12 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
   Data_Get_Struct(self, dtrace_handle_t, handle);
 
   P = dtrace_proc_grab(handle->hdl, FIX2INT(pid), 0);
-  
+
   if (P == NULL) {
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+    rb_raise(eDtraceException, "%s",
+             dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
   }
-  
+
   process = ALLOC(dtrace_process_t);
   if (!process) {
     rb_raise(eDtraceException, "alloc failed");
@@ -638,6 +652,7 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
   process->handle = handle->hdl;
   process->proc   = P;
 
-  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release, (dtrace_process_t *)process);
+  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release,
+                                   (dtrace_process_t *)process);
   return dtraceprocess;
 }

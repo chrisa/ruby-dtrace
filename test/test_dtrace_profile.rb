@@ -9,14 +9,14 @@ require 'test/unit'
 # Tests using the DTrace profile provider.
 
 class TestDtraceProfile < Test::Unit::TestCase
-  
+
   def test_dprogram_run
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
     t.setopt("aggsize", "4m")
 
     progtext = 'profile:::profile-1 { trace("foo"); }'
-    
+
     prog = t.compile progtext
     prog.execute
     t.go
@@ -42,16 +42,16 @@ class TestDtraceProfile < Test::Unit::TestCase
     end
     assert i > 0
   end
-    
+
   def test_dprogram_aggregate
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
     t.setopt("aggsize", "4m")
 
     progtext = <<EOD
 profile-1000
-{ 
-  @a[execname] = count(); 
+{
+  @a[execname] = count();
 }
 
 profile-10
@@ -91,13 +91,13 @@ EOD
   end
 
   def test_dprogram_printf
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
     t.setopt("aggsize", "4m")
 
     progtext = <<EOD
 profile-1
-{ 
+{
   printf("execname: %s %s", execname, "foo")
 }
 EOD
@@ -106,7 +106,7 @@ EOD
     prog.execute
     t.go
     sleep 2
-    
+
     c = Dtrace::Consumer.new(t)
 
     i = 0
@@ -124,14 +124,14 @@ EOD
   end
 
   def test_dprogram_aggregate_once
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
     t.setopt("aggsize", "4m")
 
     progtext = <<EOD
 profile-1000hz
-{ 
-  @a[execname] = count(); 
+{
+  @a[execname] = count();
 }
 
 END
@@ -144,7 +144,7 @@ EOD
     prog.execute
     t.go
     sleep 2
-    
+
     i = 0
     c = Dtrace::Consumer.new(t)
     c.consume_once do |d|
@@ -152,7 +152,7 @@ EOD
       assert d
       assert_not_nil d.cpu
       assert_equal "dtrace:::END", d.probe.to_s
-      
+
       d.data.each do |r|
         assert_equal Dtrace::AggregateSet, r.class
         r.data.each do |a|
@@ -162,11 +162,11 @@ EOD
         end
       end
     end
-    assert i > 0    
+    assert i > 0
   end
-  
+
   def test_stack
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "8m")
     t.setopt("aggsize", "4m")
     t.setopt("stackframes", "5")
@@ -188,7 +188,7 @@ EOD
       assert_equal 2, d.data.length
       assert_equal Dtrace::Record, d.data[0].class
       assert_equal Dtrace::StackRecord, d.data[1].class
-      
+
       i = i + 1
       if i > 10
         c.finish
@@ -198,7 +198,7 @@ EOD
   end
 
   def test_ustack
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "8m")
     t.setopt("aggsize", "4m")
     t.setopt("stackframes", "5")
@@ -229,4 +229,4 @@ EOD
     assert i > 0
   end
 
-end  
+end

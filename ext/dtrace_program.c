@@ -32,7 +32,7 @@ VALUE dtraceprogram_exec(VALUE self)
   Data_Get_Struct(self, dtrace_prog_t, prog);
   dtrace = rb_iv_get(self, "@handle");
   Data_Get_Struct(dtrace, dtrace_handle_t, handle);
-  
+
   proginfo = ALLOC(dtrace_proginfo_t);
   if (!proginfo) {
     rb_raise(eDtraceException, "alloc failed");
@@ -47,8 +47,8 @@ VALUE dtraceprogram_exec(VALUE self)
   }
 
   if (ret < 0)
-    rb_raise(eDtraceException, dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
-  
+          rb_raise(eDtraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+
   return Qnil;
 }
 

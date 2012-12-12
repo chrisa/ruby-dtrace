@@ -52,9 +52,12 @@ class Dtrace
       @prefix = probedata.prefix
       @flow   = probedata.flow
     end
-    
+
     def add_bufdata(buf)
       r = buf.record
+
+      p r
+
       # buf records can be empty (trace();)
       if r
         case r.class.to_s
@@ -77,6 +80,6 @@ class Dtrace
         end
       end
     end
-    
+
   end
 end

@@ -8,9 +8,7 @@ require 'test/unit'
 
 class TestDtrace < Test::Unit::TestCase
   def test_rubyprobe
-    flunk # platform test for Joyent patched Ruby
-
-    t = Dtrace.new 
+    t = Dtrace.new
     t.setopt("bufsize", "4m")
 
     progtext = <<EOD
@@ -20,8 +18,12 @@ ruby*:::ruby-probe
   trace(copyinstr(arg1));
 }
 EOD
-    
-    prog = t.compile progtext
+
+    begin
+      prog = t.compile progtext
+    rescue Dtrace::Exception
+      flunk "no ruby probe"
+    end
     prog.execute
     t.go
 
@@ -31,7 +33,11 @@ EOD
     begin
       trace_module = DTracer
     rescue NameError
-      trace_module = Tracer
+      begin
+        trace_module = Tracer
+      rescue NameError
+        flunk "no DTracer or Tracer module"
+      end
     end
 
     (0..9).each do |i|
@@ -42,7 +48,7 @@ EOD
     c.consume_once do |d|
       data << d
     end
-    
+
     (0..9).each do |i|
       d = data.shift
       assert_equal("foo", d.data[0].value)
@@ -50,5 +56,5 @@ EOD
     end
 
   end
-    
+
 end

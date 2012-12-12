@@ -18,10 +18,8 @@ VALUE dtraceprobedata_init(VALUE self)
 
 static VALUE _handle_ustack_record(dtrace_hdl_t *handle, caddr_t addr, const dtrace_recdesc_t *rec)
 {
-  VALUE stack;
-  stack = rb_ary_new();
-
   /* TODO, apple and solaris ustack */
+  VALUE stack = rb_ary_new();
   return stack;
 }
 
@@ -33,6 +31,7 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
   uint64_t pc;
   dtrace_syminfo_t dts;
   char c[PATH_MAX * 2];
+  int ret;
 
 #ifdef __APPLE__
   __GElf_Sym sym;
@@ -43,10 +42,10 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
   size = rec->dtrd_size / rec->dtrd_arg;
   depth = rec->dtrd_arg;
 
-  stack = rb_ary_new();
+  stack = rb_ary_new2(depth);
 
   for (i = 0; i < depth; i++) {
-    
+
     switch (size) {
     case sizeof (uint32_t):
       pc = *((uint32_t *)addr);
@@ -64,30 +63,40 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
     if (pc == (uint64_t)NULL)
       break;
 
-    addr += size;
+#ifdef __APPLE__
+    ret = dtrace_lookup_by_addr(handle, pc, NULL, 0, &sym, &dts);
+#else
+    ret = dtrace_lookup_by_addr(handle, pc, &sym, &dts);
+#endif
 
-    if (dtrace_lookup_by_addr(handle, pc, &sym, &dts) == 0) {
-      if (pc > sym.st_value) {
+    if (ret == 0) {
+
+      if (pc > sym.st_value)
 	(void) snprintf(c, sizeof (c), "%s`%s+0x%llx",
 			dts.dts_object, dts.dts_name,
 			pc - sym.st_value);
-      }
-      else {
+      else
 	(void) snprintf(c, sizeof (c), "%s`%s",
 			dts.dts_object, dts.dts_name);
-      }
-    } 
+
+    }
     else {
-      if (dtrace_lookup_by_addr(handle, pc, NULL, &dts) == 0) {
-	(void) snprintf(c, sizeof (c), "%s`0x%llx",
-			dts.dts_object, pc);
-      }
-      else {
+
+#ifdef __APPLE__
+      ret = dtrace_lookup_by_addr(handle, pc, NULL, 0, NULL, &dts);
+#else
+      ret = dtrace_lookup_by_addr(handle, pc, NULL, &dts);
+#endif
+
+      if (ret == 0)
+	(void) snprintf(c, sizeof (c), "%s`0x%llx", dts.dts_object, pc);
+      else
 	(void) snprintf(c, sizeof (c), "0x%llx", pc);
-      }
+
     }
 
     rb_ary_push(stack, rb_str_new2(c));
+    addr += size;
   }
 
   return stack;
@@ -104,8 +113,8 @@ VALUE dtraceprobedata_epid(VALUE self)
   return INT2FIX(data->dtpda_edesc->dtepd_epid);
 }
 
-/* 
- * Returns the DtraceProbe for the probe which generated this data 
+/*
+ * Returns the DtraceProbe for the probe which generated this data
  */
 VALUE dtraceprobedata_probe(VALUE self)
 {
@@ -131,7 +140,7 @@ VALUE dtraceprobedata_cpu(VALUE self)
   processorid_t cpu;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
-  
+
   if (data) {
     cpu = data->dtpda_cpu;
     return INT2FIX(cpu);
@@ -167,7 +176,7 @@ VALUE dtraceprobedata_prefix(VALUE self)
   Data_Get_Struct(self, dtrace_probedata_t, data);
   prefix = data->dtpda_prefix;
 
-  if (prefix) 
+  if (prefix)
     return rb_str_new2(prefix);
   else
     return Qnil;
@@ -192,7 +201,7 @@ VALUE dtraceprobedata_flow(VALUE self)
   }
 }
 
-/* 
+/*
  * Yields each record in this DtraceProbedata in turn. Records are
  * yielded as either DtraceRecords or DtraceStackRecords as
  * appropriate for the type of action.
@@ -209,32 +218,38 @@ VALUE dtraceprobedata_each_record(VALUE self)
   VALUE dtracerecord;
   VALUE dtrace;
   VALUE v;
+  VALUE class;
 
   Data_Get_Struct(self, dtrace_probedata_t, data);
   dtrace = rb_iv_get(self, "@handle");
   Data_Get_Struct(dtrace, dtrace_handle_t, handle);
 
   eprobe = data->dtpda_edesc;
-  
+
   for (i = 0; i < eprobe->dtepd_nrecs; i++) {
     v = 0;
     rec = &eprobe->dtepd_rec[i];
     if (rec->dtrd_size > 0) {
       act = rec->dtrd_action;
       addr = data->dtpda_data + rec->dtrd_offset;
-      
+
       switch (act) {
       case DTRACEACT_STACK:
+	v = _handle_stack_record(handle->hdl, addr, rec);
+        class = rb_path2class("Dtrace::StackRecord");
+        break;
       case DTRACEACT_USTACK:
+	v = _handle_ustack_record(handle->hdl, addr, rec);
+        class = rb_path2class("Dtrace::StackRecord");
+        break;
       case DTRACEACT_JSTACK:
-	/* Stack records come from bufdata */
-	/* v = _handle_stack_record(handle->hdl, addr, rec); */
-	/* v = _handle_ustack_record(handle->hdl, addr, rec); */
-	break;
+        /* not sure how to handle jstack */
+        break;
       case DTRACEACT_PRINTA:
 	/* don't want the probedata record for a printa() action */
 	break;
       default:
+        class = rb_path2class("Dtrace::Record");
 	switch (rec->dtrd_size) {
 	case 1:
 	  v = INT2FIX((int)(*((uint8_t *)addr)));
@@ -253,9 +268,9 @@ VALUE dtraceprobedata_each_record(VALUE self)
 	  break;
 	}
       }
-	
+
       if (v) {
-	dtracerecord = rb_class_new_instance(0, NULL, rb_path2class("Dtrace::Record"));
+	dtracerecord = rb_class_new_instance(0, NULL, class);
 	rb_iv_set(dtracerecord, "@value", v);
 	rb_iv_set(dtracerecord, "@from", rb_str_new2("probedata"));
 	rb_iv_set(dtracerecord, "@index", INT2FIX(i));
@@ -264,4 +279,5 @@ VALUE dtraceprobedata_each_record(VALUE self)
       }
     }
   }
+  return Qnil;
 }

@@ -91,7 +91,7 @@ VALUE dtrace_hdl_work(int argc, VALUE *argv, VALUE self);
 VALUE dtrace_hdl_buf_consumer(VALUE self, VALUE buf_consumer_proc);
 VALUE dtrace_hdl_drop_consumer(VALUE self, VALUE drop_consumer_proc);
 VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer_proc);
-VALUE dtrace_hdl_createprocess(VALUE self, VALUE argv);
+VALUE dtrace_hdl_createprocess(VALUE self, VALUE rbargv);
 VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid);
 
 VALUE dtraceprobedesc_init(VALUE self);
