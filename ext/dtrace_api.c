@@ -23,6 +23,7 @@ void Init_dtrace_api() {
 
   cDtrace = rb_define_class("Dtrace", rb_cObject);
   rb_define_method(cDtrace, "initialize", dtrace_init, 0);
+  rb_define_method(cDtrace, "close", dtrace_hdl_close, 0);
   rb_define_method(cDtrace, "each_probe_all", dtrace_each_probe_all, 0);
   rb_define_method(cDtrace, "each_probe_match", dtrace_each_probe_match, 4);
   rb_define_method(cDtrace, "each_probe_prog", dtrace_each_probe_prog, 1);
@@ -43,6 +44,7 @@ void Init_dtrace_api() {
 
   cDtraceProcess = rb_define_class_under(cDtrace, "Process", rb_cObject);
   rb_define_method(cDtraceProcess, "initialize", dtrace_process_init, 0);
+  rb_define_method(cDtraceProcess, "release", dtrace_process_release, 0);
   rb_define_method(cDtraceProcess, "continue", dtrace_process_continue, 0);
 
   cDtraceProbeDesc = rb_define_class_under(cDtrace, "ProbeDesc", rb_cObject);

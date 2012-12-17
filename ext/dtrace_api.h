@@ -21,15 +21,6 @@ typedef struct dtrace_work_handlers {
   VALUE rec;
 } dtrace_work_handlers_t;
 
-/* Used to keep a reference to a struct ps_prochandle and a reference
-   to the DTrace handle in a DtraceProcess object: we need to be able 
-   to call dtrace_proc_release() when the DtraceProcess goes away, and
-   that requires the DTrace handle. */
-typedef struct dtrace_process {
-  dtrace_hdl_t *handle;
-  struct ps_prochandle *proc;
-} dtrace_process_t;
-
 /* Used to wrap up the DTrace handle, so we can keep references to the
    various callbacks: we must mark them from the dtrace_hdl_mark
    routine, which only gets a pointer to this structure. */
@@ -40,7 +31,17 @@ typedef struct dtrace_handle {
   VALUE buf;
   VALUE err;
   VALUE drop;
+  VALUE procs;
 } dtrace_handle_t;
+
+/* Used to keep a reference to a struct ps_prochandle and a reference
+   to the DTrace handle in a DtraceProcess object: we need to be able 
+   to call dtrace_proc_release() when the DtraceProcess goes away, and
+   that requires the DTrace handle. */
+typedef struct dtrace_process {
+  dtrace_handle_t *handle;
+  struct ps_prochandle *proc;
+} dtrace_process_t;
 
 /* Struct wrapping a probe, a handcrafted function created to be a
    probe trigger point, and its corresponding is_enabled tracepoint.
@@ -68,7 +69,8 @@ static inline VALUE *rb_ary_ptr(VALUE s) {return  RARRAY(s)->ptr;}
 VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
 
 VALUE dtrace_process_init(VALUE self);
-void dtrace_process_release(dtrace_process_t *process);
+void dtrace_process_free(dtrace_process_t *process);
+VALUE dtrace_process_release(VALUE self);
 VALUE dtrace_process_continue(VALUE self);
 
 VALUE dtraceaggdata_init(VALUE self);
@@ -77,6 +79,7 @@ VALUE dtraceaggdata_aggtype(VALUE self);
 
 VALUE dtrace_init(VALUE self);
 VALUE dtrace_hdl_alloc(VALUE klass);
+VALUE dtrace_hdl_close(VALUE self);
 VALUE dtrace_each_probe_all(VALUE self);
 VALUE dtrace_each_probe_match(VALUE self, VALUE provider, VALUE mod, VALUE func, VALUE name);
 VALUE dtrace_each_probe_prog(VALUE self, VALUE program);

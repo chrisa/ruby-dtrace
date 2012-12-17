@@ -16,11 +16,29 @@ VALUE dtrace_process_init(VALUE self)
     return Qnil;
 }
 
-/* :nodoc: */
-void dtrace_process_release(dtrace_process_t *process)
+static void _release_process(dtrace_process_t *process)
 {
-  //dtrace_proc_release(process->handle, process->proc);
+  if (process->handle->hdl != NULL && process->proc != NULL) {
+    dtrace_proc_release(process->handle->hdl, process->proc);
+    process->proc = NULL;
+  }
+}
+
+/* :nodoc: */
+void dtrace_process_free(dtrace_process_t *process)
+{
+  _release_process(process);
   free(process);
+}
+
+/* Release the traced process. */
+VALUE dtrace_process_release(VALUE self)
+{
+  dtrace_process_t *process;
+
+  Data_Get_Struct(self, dtrace_process_t, process);
+  _release_process(process);
+  return Qnil;
 }
 
 /*
@@ -32,7 +50,7 @@ VALUE dtrace_process_continue(VALUE self)
   dtrace_process_t *process;
 
   Data_Get_Struct(self, dtrace_process_t, process);
-  dtrace_proc_continue(process->handle, process->proc);
+  dtrace_proc_continue(process->handle->hdl, process->proc);
 
   return Qnil;
 }

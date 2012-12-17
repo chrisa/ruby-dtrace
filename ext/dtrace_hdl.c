@@ -19,11 +19,17 @@ RUBY_EXTERN VALUE cDtraceErrData;
 static void dtrace_hdl_free(void *arg)
 {
   dtrace_handle_t *handle = (dtrace_handle_t *)arg;
+  VALUE proc;
 
-  if (handle) {
+  if (handle->hdl != NULL) {
+    if (handle->procs != Qnil) {
+      while ((proc = rb_ary_pop(handle->procs)) != Qnil) {
+        dtrace_process_release(proc);
+      }
+    }
     dtrace_close(handle->hdl);
-    free(handle);
   }
+  free(handle);
 }
 
 static void dtrace_hdl_mark(void *arg)
@@ -36,6 +42,7 @@ static void dtrace_hdl_mark(void *arg)
     rb_gc_mark(handle->buf);
     rb_gc_mark(handle->err);
     rb_gc_mark(handle->drop);
+    rb_gc_mark(handle->procs);
   }
 }
 
@@ -72,6 +79,7 @@ VALUE dtrace_hdl_alloc(VALUE klass)
     handle->buf   = Qnil;
     handle->err   = Qnil;
     handle->drop  = Qnil;
+    handle->procs = Qnil;
 
     obj = Data_Wrap_Struct(klass, dtrace_hdl_mark, dtrace_hdl_free, handle);
     return obj;
@@ -92,6 +100,17 @@ VALUE dtrace_init(VALUE self)
     return self;
   else
     return Qnil;
+}
+
+VALUE dtrace_hdl_close(VALUE self)
+{
+  dtrace_handle_t *handle;
+
+  Data_Get_Struct(self, dtrace_handle_t, handle);
+  dtrace_close(handle->hdl);
+  handle->hdl = NULL;
+
+  return Qnil;
 }
 
 static
@@ -562,6 +581,14 @@ VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer)
   return Qnil;
 }
 
+static void _push_proc(dtrace_handle_t *handle, VALUE proc)
+{
+  if (handle->procs == Qnil)
+    handle->procs = rb_ary_new();
+
+  rb_ary_push(handle->procs, proc);
+}
+
 /*
  * Start a process which will be traced. The pid of the started
  * process will be available in D as $target.
@@ -579,8 +606,8 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rbargv)
   char **argv;
   long len;
   int i;
-  VALUE dtraceprocess;
   dtrace_process_t *process;
+  VALUE rb_process;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
 
@@ -613,18 +640,20 @@ VALUE dtrace_hdl_createprocess(VALUE self, VALUE rbargv)
     return Qnil;
   }
 
-  process->handle = handle->hdl;
+  process->handle = handle;
   process->proc   = P;
 
-  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release,
-                                   (dtrace_process_t *)process);
-  return dtraceprocess;
+  rb_process = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_free,
+                                (dtrace_process_t *)process);
+
+  _push_proc(handle, rb_process);
+  return rb_process;
 }
 
 /*
  * Grab a currently-running process by pid.
  *
- * Returns a DtraceProcess object which is used to start the process
+ * Returns a Rb_Process object which is used to start the process
  * once tracing is set up.
  */
 VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
@@ -632,7 +661,7 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
   dtrace_handle_t *handle;
   struct ps_prochandle *P;
   dtrace_process_t *process;
-  VALUE dtraceprocess;
+  VALUE rb_process;
 
   Data_Get_Struct(self, dtrace_handle_t, handle);
 
@@ -649,10 +678,12 @@ VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid)
     return Qnil;
   }
 
-  process->handle = handle->hdl;
+  process->handle = handle;
   process->proc   = P;
 
-  dtraceprocess = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_release,
-                                   (dtrace_process_t *)process);
-  return dtraceprocess;
+  rb_process = Data_Wrap_Struct(cDtraceProcess, 0, dtrace_process_free,
+                                (dtrace_process_t *)process);
+
+  _push_proc(handle, rb_process);
+  return rb_process;
 }
