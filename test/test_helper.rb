@@ -13,4 +13,8 @@ class DTraceTest < Test::Unit::TestCase
     @dtp.close unless @dtp.nil?
   end
 
+  def test_nothing
+    assert(1)
+  end
+
 end
