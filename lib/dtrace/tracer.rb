@@ -1,11 +1,11 @@
 #
-# Ruby-Dtrace
+# Ruby-DTrace
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
 
 # Leopard's ruby-probe is DTracer, Solaris's is Tracer.
 
-class Dtrace
+class DTrace
   class Tracer
     
     class NullTracer
@@ -24,7 +24,7 @@ class Dtrace
           begin
             @@tracer = DTracer
           rescue NameError
-            @@tracer = Dtrace::Tracer::NullTracer
+            @@tracer = DTrace::Tracer::NullTracer
           end
         end
       end

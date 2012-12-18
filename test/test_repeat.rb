@@ -12,7 +12,7 @@ class TestRepeat < DTraceTest
     @dtp = nil
 
     (0..9).each do |i|
-      t = Dtrace.new
+      t = DTrace.new
       t.setopt("bufsize", "4m")
       t.setopt("aggsize", "4m")
 
@@ -25,7 +25,7 @@ class TestRepeat < DTraceTest
       # Let some activity happen.
       sleep 1
 
-      c = Dtrace::Consumer.new(t)
+      c = DTrace::Consumer.new(t)
       assert c
 
       i = 0

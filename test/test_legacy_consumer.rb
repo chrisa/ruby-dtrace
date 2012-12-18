@@ -25,7 +25,7 @@ EOD
 
     sleep 3
 
-    c = DtraceConsumer.new(@dtp)
+    c = DTraceConsumer.new(@dtp)
     assert c
 
     data = []
@@ -36,9 +36,9 @@ EOD
     assert data.length > 0
     data.each do |d|
       assert d
-      assert_equal Dtrace::Data, d.class
+      assert_equal DTrace::Data, d.class
       d.data.each do |agg|
-        assert_equal Dtrace::AggregateSet, agg.class
+        assert_equal DTrace::AggregateSet, agg.class
       end
     end
 

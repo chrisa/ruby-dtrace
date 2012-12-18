@@ -2,7 +2,7 @@ require 'test_helper'
 
 # Tests for creating and grabbing processes.
 
-class TestDtraceProcesses < DTraceTest
+class TestDTraceProcesses < DTraceTest
 
   def test_createprocess
     progtext = <<EOD
@@ -20,7 +20,7 @@ EOD
     p.continue
 
     i = 0
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     c.consume do |d|
       assert d
       assert_equal "pid#{d.data[0].value}", d.probe.provider
@@ -52,7 +52,7 @@ EOD
     p.continue
 
     records = 0
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     c.consume do |d|
       assert d
       assert_equal "pid#{pid}", d.probe.provider

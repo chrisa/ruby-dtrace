@@ -1,11 +1,11 @@
 #
-# Ruby-Dtrace
+# Ruby-DTrace
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
 
-# A Dtrace::Consumer provides access to the data produced by the running
+# A DTrace::Consumer provides access to the data produced by the running
 # D program. Having compiled and executed a D program, you typically
-# create a Dtrace::Consumer, and wait for data.
+# create a DTrace::Consumer, and wait for data.
 #
 # You can either wait indefinitely for data, or consume all the data
 # waiting and then stop: if your D program consists of only of
@@ -19,25 +19,25 @@
 # +consume_once+ methods.
 #
 # The +consume+ and +consume_once+ methods accept a block to which is
-# yielded complete Dtrace::Data objects, one for each probe which fires.
+# yielded complete DTrace::Data objects, one for each probe which fires.
 #
 # You must have already started tracing when you call +consume+ or
 # +consume_once+, so the general structure will look like:
 #
-#   t = Dtrace.new
+#   t = DTrace.new
 #   progtext = "..."
 #   prog = t.compile progtext
 #   prog.execute
 #   t.go
-#   c = Dtrace::Consumer.new(t)
+#   c = DTrace::Consumer.new(t)
 #   c.consume_once do |d|
-#     # handle Dtrace::Data objects
+#     # handle DTrace::Data objects
 #     # ...
 #     # get bored:
 #     c.finish
 #   end
 
-class Dtrace
+class DTrace
   class Consumer
 
     def initialize(t)
@@ -53,17 +53,17 @@ class Dtrace
 
     # The consumer callbacks:
     #
-    # DtraceRecDesc   -> rec_consumer
-    # DtraceProbeData -> probe_consumer
-    # DtraceBufData   -> buf_consumer
+    # DTraceRecDesc   -> rec_consumer
+    # DTraceProbeData -> probe_consumer
+    # DTraceBufData   -> buf_consumer
     #
     # We expect a sequence of calls to these procs, and we accumulate
-    # data in the @curr Dtrace::Data based on this:
+    # data in the @curr DTrace::Data based on this:
     #
-    # Dtrace::ProbeData (initial callback for a probe firing)
-    # Dtrace::RecDesc
+    # DTrace::ProbeData (initial callback for a probe firing)
+    # DTrace::RecDesc
     # ...
-    # Dtrace::RecDesc = nil (end of data)
+    # DTrace::RecDesc = nil (end of data)
     #
 
     def rec_consumer(block)
@@ -73,7 +73,7 @@ class Dtrace
         else
           @curr.finish
           block.call(@curr)
-          @curr = Dtrace::Data.new(@types)
+          @curr = DTrace::Data.new(@types)
         end
       end
     end
@@ -92,7 +92,7 @@ class Dtrace
 
     def filter_types(types)
       @types = types
-      @curr = Dtrace::Data.new(types)
+      @curr = DTrace::Data.new(types)
     end
 
     public
@@ -131,10 +131,10 @@ class Dtrace
     # Pass a list of classes to restrict the types of data returned,
     # from:
     #
-    # * DtraceRecord
-    # * DtracePrintfRecord
-    # * DtraceAggregateSet
-    # * DtraceStackRecord
+    # * DTraceRecord
+    # * DTracePrintfRecord
+    # * DTraceAggregateSet
+    # * DTraceStackRecord
     #
     def consume(*types, &block)
       filter_types(types)
@@ -158,10 +158,10 @@ class Dtrace
     # Pass a list of classes to restrict the types of data returned,
     # from:
     #
-    # * DtraceRecord
-    # * DtracePrintfRecord
-    # * DtraceAggregateSet
-    # * DtraceStackRecord
+    # * DTraceRecord
+    # * DTracePrintfRecord
+    # * DTraceAggregateSet
+    # * DTraceStackRecord
     #
     def consume_once(*types, &block)
       filter_types(types)

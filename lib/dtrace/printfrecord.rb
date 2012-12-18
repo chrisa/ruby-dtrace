@@ -1,9 +1,9 @@
 #
-# Ruby-Dtrace
+# Ruby-DTrace
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
 # A DTrace record for the formatted part of a printf() action. 
-class Dtrace
+class DTrace
   class PrintfRecord
     attr_accessor :value
   end

@@ -4,7 +4,7 @@ require 'test/unit'
 class DTraceTest < Test::Unit::TestCase
 
   def setup
-    @dtp = Dtrace.new
+    @dtp = DTrace.new
     @dtp.setopt("bufsize", "4m")
     @dtp.setopt("aggsize", "4m")
   end

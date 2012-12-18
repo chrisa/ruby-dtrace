@@ -1,6 +1,6 @@
 require 'test_helper'
 
-# Tests for the feature allowing you to filter DtraceData types
+# Tests for the feature allowing you to filter DTraceData types
 
 class TestTypefilter < DTraceTest
   def test_filter
@@ -26,20 +26,20 @@ EOD
 
     sleep 1
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     assert c
 
     data = []
-    c.consume_once(Dtrace::AggregateSet) do |d|
+    c.consume_once(DTrace::AggregateSet) do |d|
       data << d
     end
 
     assert data.length > 0
     data.each do |d|
       assert d
-      assert_equal Dtrace::Data, d.class
+      assert_equal DTrace::Data, d.class
       d.data.each do |agg|
-        assert_equal Dtrace::AggregateSet, agg.class
+        assert_equal DTrace::AggregateSet, agg.class
       end
     end
 
@@ -68,23 +68,23 @@ EOD
 
     sleep 1
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     assert c
 
     data = []
-    c.consume_once(Dtrace::AggregateSet, Dtrace::PrintfRecord) do |d|
+    c.consume_once(DTrace::AggregateSet, DTrace::PrintfRecord) do |d|
       data << d
     end
 
     assert data.length > 0
     data.each do |d|
       assert d
-      assert_equal Dtrace::Data, d.class
+      assert_equal DTrace::Data, d.class
       d.data.each do |r|
         if r.respond_to?(:add_aggregate)
-          assert_equal Dtrace::AggregateSet, r.class
+          assert_equal DTrace::AggregateSet, r.class
         else
-          assert_equal Dtrace::PrintfRecord, r.class
+          assert_equal DTrace::PrintfRecord, r.class
         end
       end
     end

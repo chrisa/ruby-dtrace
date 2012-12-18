@@ -1,10 +1,10 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 
-RUBY_EXTERN VALUE eDtraceException;
+RUBY_EXTERN VALUE eDTraceException;
 
 /* :nodoc: */
 VALUE dtracedropdata_init(VALUE self)

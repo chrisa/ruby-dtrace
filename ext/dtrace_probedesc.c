@@ -1,4 +1,4 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 

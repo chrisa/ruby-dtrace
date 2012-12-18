@@ -14,7 +14,7 @@ D
     @dtp.compile(code).execute
     @dtp.go
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     assert c
 
     i = 0

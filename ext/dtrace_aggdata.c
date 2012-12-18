@@ -1,10 +1,10 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 
-RUBY_EXTERN VALUE eDtraceException;
+RUBY_EXTERN VALUE eDTraceException;
 
 /* :nodoc: */
 VALUE dtraceaggdata_init(VALUE self)
@@ -37,21 +37,21 @@ VALUE dtraceaggdata_value(VALUE self)
   rec = bufdata->dtbda_recdesc;
 
   if (aggdata == NULL) {
-    rb_raise(eDtraceException, "null aggdata");
+    rb_raise(eDTraceException, "null aggdata");
     return Qnil;
   }
 
   aggdesc = aggdata->dtada_desc;
 
   if (aggdesc == NULL) {
-    rb_raise(eDtraceException, "null aggdesc");
+    rb_raise(eDTraceException, "null aggdesc");
     return Qnil;
   }
 
   aggid = *((int64_t *)(aggdata->dtada_data +
 			aggdesc->dtagd_rec[0].dtrd_offset));
   if (aggid < 0) {
-    rb_raise(eDtraceException, "negative aggregation ID");
+    rb_raise(eDTraceException, "negative aggregation ID");
     return Qnil;
   }
 
@@ -95,7 +95,7 @@ VALUE dtraceaggdata_value(VALUE self)
       switch (act) {
       case DTRACEAGG_COUNT:
 	if (value < 0)
-	  rb_raise(eDtraceException, "count value is negative");
+	  rb_raise(eDTraceException, "count value is negative");
 	v = LL2NUM(value);
 	break;
       case DTRACEAGG_AVG:
@@ -106,7 +106,7 @@ VALUE dtraceaggdata_value(VALUE self)
 	break;
       default:
 	v = Qnil;
-	rb_raise(eDtraceException, "unexpected aggregation action: %d", act);
+	rb_raise(eDTraceException, "unexpected aggregation action: %d", act);
       }
     }
 
@@ -119,8 +119,8 @@ VALUE dtraceaggdata_value(VALUE self)
   return v;
 }
 
-/* Return the type of this DtraceAggData: tuple, value or last. Used
-   to form tuples and values into DtraceAggregate objects. */
+/* Return the type of this DTraceAggData: tuple, value or last. Used
+   to form tuples and values into DTraceAggregate objects. */
 VALUE dtraceaggdata_aggtype(VALUE self)
 {
   dtrace_bufdata_t *bufdata;

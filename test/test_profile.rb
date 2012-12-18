@@ -12,7 +12,7 @@ class TestProfile < DTraceTest
     @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     assert c
 
     i = 0
@@ -51,7 +51,7 @@ EOD
     @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
 
     i = 0
     c.consume do |d|
@@ -60,7 +60,7 @@ EOD
       assert_equal "profile:::profile-10", d.probe.to_s
 
       d.data.each do |r|
-        assert_equal Dtrace::AggregateSet, r.class
+        assert_equal DTrace::AggregateSet, r.class
         r.data.each do |a|
           assert_not_nil a.value
           assert_not_nil a.tuple
@@ -89,7 +89,7 @@ EOD
     @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
 
     i = 0
     c.consume do |d|
@@ -124,7 +124,7 @@ EOD
     sleep 2
 
     i = 0
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     c.consume_once do |d|
       i = i + 1
       assert d
@@ -132,7 +132,7 @@ EOD
       assert_equal "dtrace:::END", d.probe.to_s
 
       d.data.each do |r|
-        assert_equal Dtrace::AggregateSet, r.class
+        assert_equal DTrace::AggregateSet, r.class
         r.data.each do |a|
           assert_not_nil a.value
           assert_not_nil a.tuple
@@ -150,7 +150,7 @@ EOD
     @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     i = 0
     c.consume do |d|
       assert d
@@ -158,8 +158,8 @@ EOD
       assert_equal "profile:::profile-1", d.probe.to_s
 
       assert_equal 2, d.data.length
-      assert_equal Dtrace::Record, d.data[0].class
-      assert_equal Dtrace::StackRecord, d.data[1].class
+      assert_equal DTrace::Record, d.data[0].class
+      assert_equal DTrace::StackRecord, d.data[1].class
 
       i = i + 1
       if i > 10
@@ -176,7 +176,7 @@ EOD
     @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     i = 0
     c.consume do |d|
       assert d
@@ -184,8 +184,8 @@ EOD
       assert_equal "profile:::profile-1", d.probe.to_s
 
       assert_equal 2, d.data.length
-      assert_equal Dtrace::Record, d.data[0].class
-      assert_equal Dtrace::StackRecord, d.data[1].class
+      assert_equal DTrace::Record, d.data[0].class
+      assert_equal DTrace::StackRecord, d.data[1].class
 
       i = i + 1
       if i > 10

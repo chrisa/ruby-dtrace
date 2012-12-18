@@ -1,4 +1,4 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
@@ -35,8 +35,8 @@ typedef struct dtrace_handle {
 } dtrace_handle_t;
 
 /* Used to keep a reference to a struct ps_prochandle and a reference
-   to the DTrace handle in a DtraceProcess object: we need to be able 
-   to call dtrace_proc_release() when the DtraceProcess goes away, and
+   to the DTrace handle in a DTraceProcess object: we need to be able 
+   to call dtrace_proc_release() when the DTraceProcess goes away, and
    that requires the DTrace handle. */
 typedef struct dtrace_process {
   dtrace_handle_t *handle;

@@ -1,11 +1,11 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 #include <ctype.h>
 
-RUBY_EXTERN VALUE eDtraceException;
+RUBY_EXTERN VALUE eDTraceException;
 
 /*
  * Most of this function lifted from libdtrace/common/dt_consume.c
@@ -73,7 +73,7 @@ VALUE handle_bytedata(caddr_t addr, uint32_t nbytes)
      */
     char *s = malloc(nbytes + 1);
     if (!s) {
-      rb_raise(eDtraceException, "out of memory: failed to allocate string value");
+      rb_raise(eDTraceException, "out of memory: failed to allocate string value");
       return (Qnil);
     }
     (void) strncpy(s, c, nbytes);

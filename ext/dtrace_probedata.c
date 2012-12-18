@@ -1,11 +1,11 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 
-RUBY_EXTERN VALUE eDtraceException;
-RUBY_EXTERN VALUE cDtraceProbeDesc;
+RUBY_EXTERN VALUE eDTraceException;
+RUBY_EXTERN VALUE cDTraceProbeDesc;
 
 /* :nodoc: */
 VALUE dtraceprobedata_init(VALUE self)
@@ -56,7 +56,7 @@ static VALUE _handle_stack_record(dtrace_hdl_t *handle, caddr_t addr, const dtra
       break;
 
     default:
-      rb_raise(eDtraceException, "bad stack pc");
+      rb_raise(eDTraceException, "bad stack pc");
       return Qnil;
     }
 
@@ -114,7 +114,7 @@ VALUE dtraceprobedata_epid(VALUE self)
 }
 
 /*
- * Returns the DtraceProbe for the probe which generated this data
+ * Returns the DTraceProbe for the probe which generated this data
  */
 VALUE dtraceprobedata_probe(VALUE self)
 {
@@ -126,7 +126,7 @@ VALUE dtraceprobedata_probe(VALUE self)
   pd = data->dtpda_pdesc;
 
   if (pd) {
-    dtraceprobe = Data_Wrap_Struct(cDtraceProbeDesc, 0, NULL, (dtrace_probedesc_t *)pd);
+    dtraceprobe = Data_Wrap_Struct(cDTraceProbeDesc, 0, NULL, (dtrace_probedesc_t *)pd);
     return dtraceprobe;
   }
 
@@ -202,8 +202,8 @@ VALUE dtraceprobedata_flow(VALUE self)
 }
 
 /*
- * Yields each record in this DtraceProbedata in turn. Records are
- * yielded as either DtraceRecords or DtraceStackRecords as
+ * Yields each record in this DTraceProbedata in turn. Records are
+ * yielded as either DTraceRecords or DTraceStackRecords as
  * appropriate for the type of action.
  */
 VALUE dtraceprobedata_each_record(VALUE self)
@@ -236,11 +236,11 @@ VALUE dtraceprobedata_each_record(VALUE self)
       switch (act) {
       case DTRACEACT_STACK:
 	v = _handle_stack_record(handle->hdl, addr, rec);
-        class = rb_path2class("Dtrace::StackRecord");
+        class = rb_path2class("DTrace::StackRecord");
         break;
       case DTRACEACT_USTACK:
 	v = _handle_ustack_record(handle->hdl, addr, rec);
-        class = rb_path2class("Dtrace::StackRecord");
+        class = rb_path2class("DTrace::StackRecord");
         break;
       case DTRACEACT_JSTACK:
         /* not sure how to handle jstack */
@@ -249,7 +249,7 @@ VALUE dtraceprobedata_each_record(VALUE self)
 	/* don't want the probedata record for a printa() action */
 	break;
       default:
-        class = rb_path2class("Dtrace::Record");
+        class = rb_path2class("DTrace::Record");
 	switch (rec->dtrd_size) {
 	case 1:
 	  v = INT2FIX((int)(*((uint8_t *)addr)));

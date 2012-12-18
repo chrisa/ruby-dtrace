@@ -1,5 +1,5 @@
 #
-# Ruby-Dtrace
+# Ruby-DTrace
 # (c) 2008 Chris Andrews <chris@nodnol.org>
 #
 

@@ -13,13 +13,13 @@ EOD
 
     begin
       prog = @dtp.compile progtext
-    rescue Dtrace::Exception
+    rescue DTrace::Exception
       flunk "no ruby probe"
     end
     prog.execute
     @dtp.go
 
-    c = Dtrace::Consumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
 
     # Leopard's ruby-probe is DTracer, Solaris's is Tracer.
     begin

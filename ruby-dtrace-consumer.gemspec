@@ -5,7 +5,7 @@ require 'dtrace/version'
 
 Gem::Specification.new do |s|
   s.name = 'ruby-dtrace-consumer'
-  s.version = Dtrace::VERSION
+  s.version = DTrace::VERSION
   s.platform = Gem::Platform::RUBY
   s.summary = "DTrace Consumer library for Ruby"
   s.has_rdoc = true

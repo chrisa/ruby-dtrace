@@ -1,12 +1,12 @@
 require 'test_helper'
 
-# Tests for the Dtrace handle class
+# Tests for the DTrace handle class
 
-class TestDtrace < DTraceTest
+class TestDTrace < DTraceTest
 
   def test_dtrace
-    assert_equal Object, Dtrace.superclass
-    assert_equal Dtrace, @dtp.class
+    assert_equal Object, DTrace.superclass
+    assert_equal DTrace, @dtp.class
   end
 
   def test_list_probes
@@ -75,7 +75,7 @@ class TestDtrace < DTraceTest
 
   def test_list_probes_match_badpattern
     probe_count = 0
-    assert_raises Dtrace::Exception do
+    assert_raises DTrace::Exception do
       @dtp.each_probe('syscall') do |probe|
         nil
       end
@@ -146,7 +146,7 @@ class TestDtrace < DTraceTest
 
   def test_bad_program
     progtext = "blah blahb albhacasfas"
-    e = assert_raise Dtrace::Exception do
+    e = assert_raise DTrace::Exception do
       prog = @dtp.compile progtext
     end
     assert_equal "probe description :::blah does not match any probes", e.message
