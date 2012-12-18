@@ -1,4 +1,4 @@
-ruby-dtrace-consumer is Ruby bindings for Dtrace, which allows you to
+ruby-dtrace-consumer is Ruby bindings for DTrace, which allows you to
 write D-based programs with Ruby.
 
 == FEEDBACK
@@ -17,11 +17,9 @@ Consumer:
 
 == SYNOPSIS
 
-Consumer:
-
     require 'dtrace'
 
-    t = Dtrace.new 
+    t = DTrace.new 
     progtext = 'ruby$1:::function-entry{ @a[strjoin(strjoin(copyinstr(arg0),"."),copyinstr(arg1))] = count(); } END { printa(@a); }'
     prog = t.compile progtext
     prog.execute
@@ -30,7 +28,7 @@ Consumer:
 
     [...]
     
-    c = DtraceConsumer.new(t)
+    c = DTraceConsumer.new(t)
     c.consume_once do |rec|
       # handle records
     end
