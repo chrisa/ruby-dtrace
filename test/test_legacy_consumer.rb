@@ -1,22 +1,13 @@
-#
-# Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
-#
-
-require 'dtrace'
-require 'test/unit'
+require 'test_helper'
 
 # Tests using the DTrace profile provider.
 
-class TestLegacyConsumer < Test::Unit::TestCase
-  def test_aggregate_group
-    t = Dtrace.new 
-    t.setopt("bufsize", "4m")
-    t.setopt("aggsize", "4m")
+class TestLegacyConsumer < DTraceTest
 
+  def test_aggregate_group
     progtext =<<EOD
 profile-1000
-{ 
+{
   @a[execname] = count();
   @b[execname] = count();
 }
@@ -27,21 +18,21 @@ profile-1
   printa(@b);
 }
 EOD
-    
-    prog = t.compile progtext
+
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
 
     sleep 3
 
-    c = DtraceConsumer.new(t)
+    c = DtraceConsumer.new(@dtp)
     assert c
 
     data = []
     c.consume_once do |d|
       data << d
     end
-    
+
     assert data.length > 0
     data.each do |d|
       assert d

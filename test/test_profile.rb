@@ -1,28 +1,18 @@
-#
-# Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
-#
-
-require 'dtrace'
-require 'test/unit'
+require 'test_helper'
 
 # Tests using the DTrace profile provider.
 
-class TestDtraceProfile < Test::Unit::TestCase
+class TestProfile < DTraceTest
 
   def test_dprogram_run
-    t = Dtrace.new
-    t.setopt("bufsize", "4m")
-    t.setopt("aggsize", "4m")
-
     progtext = 'profile:::profile-1 { trace("foo"); }'
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     assert c
 
     i = 0
@@ -44,10 +34,6 @@ class TestDtraceProfile < Test::Unit::TestCase
   end
 
   def test_dprogram_aggregate
-    t = Dtrace.new
-    t.setopt("bufsize", "4m")
-    t.setopt("aggsize", "4m")
-
     progtext = <<EOD
 profile-1000
 {
@@ -60,12 +46,12 @@ profile-10
 }
 EOD
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
 
     i = 0
     c.consume do |d|
@@ -91,10 +77,6 @@ EOD
   end
 
   def test_dprogram_printf
-    t = Dtrace.new
-    t.setopt("bufsize", "4m")
-    t.setopt("aggsize", "4m")
-
     progtext = <<EOD
 profile-1
 {
@@ -102,12 +84,12 @@ profile-1
 }
 EOD
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
 
     i = 0
     c.consume do |d|
@@ -124,10 +106,6 @@ EOD
   end
 
   def test_dprogram_aggregate_once
-    t = Dtrace.new
-    t.setopt("bufsize", "4m")
-    t.setopt("aggsize", "4m")
-
     progtext = <<EOD
 profile-1000hz
 {
@@ -140,13 +118,13 @@ END
 }
 EOD
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
     sleep 2
 
     i = 0
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     c.consume_once do |d|
       i = i + 1
       assert d
@@ -166,19 +144,13 @@ EOD
   end
 
   def test_stack
-    t = Dtrace.new
-    t.setopt("bufsize", "8m")
-    t.setopt("aggsize", "4m")
-    t.setopt("stackframes", "5")
-    t.setopt("strsize", "131072")
-
     progtext = "profile-1 { trace(execname); stack(); }"
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     i = 0
     c.consume do |d|
       assert d
@@ -198,19 +170,13 @@ EOD
   end
 
   def test_ustack
-    t = Dtrace.new
-    t.setopt("bufsize", "8m")
-    t.setopt("aggsize", "4m")
-    t.setopt("stackframes", "5")
-    t.setopt("strsize", "131072")
-
     progtext = "profile-1 { trace(execname); ustack(); }"
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
-    t.go
+    @dtp.go
     sleep 2
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     i = 0
     c.consume do |d|
       assert d

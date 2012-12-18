@@ -1,16 +1,8 @@
-#
-# Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
-#
+require 'test_helper'
 
-require 'dtrace'
-require 'test/unit'
+class TestRubyprobe < DTraceTest
 
-class TestDtrace < Test::Unit::TestCase
   def test_rubyprobe
-    t = Dtrace.new
-    t.setopt("bufsize", "4m")
-
     progtext = <<EOD
 ruby*:::ruby-probe
 {
@@ -20,14 +12,14 @@ ruby*:::ruby-probe
 EOD
 
     begin
-      prog = t.compile progtext
+      prog = @dtp.compile progtext
     rescue Dtrace::Exception
       flunk "no ruby probe"
     end
     prog.execute
-    t.go
+    @dtp.go
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
 
     # Leopard's ruby-probe is DTracer, Solaris's is Tracer.
     begin

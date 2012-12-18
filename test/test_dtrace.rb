@@ -1,24 +1,17 @@
-#
-# Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
-#
-
-require 'dtrace'
-require 'test/unit'
+require 'test_helper'
 
 # Tests for the Dtrace handle class
 
-class TestDtrace < Test::Unit::TestCase
+class TestDtrace < DTraceTest
+
   def test_dtrace
-    t = Dtrace.new
     assert_equal Object, Dtrace.superclass
-    assert_equal Dtrace, t.class
+    assert_equal Dtrace, @dtp.class
   end
 
   def test_list_probes
-    t = Dtrace.new
     probe_count = 0
-    t.each_probe do |probe|
+    @dtp.each_probe do |probe|
       assert probe.provider
       assert probe.mod
       assert probe.func
@@ -29,9 +22,8 @@ class TestDtrace < Test::Unit::TestCase
   end
 
   def test_list_probes_match
-    t = Dtrace.new
     probe_count = 0
-    t.each_probe('syscall:::') do |probe|
+    @dtp.each_probe('syscall:::') do |probe|
       assert probe.provider
       assert probe.mod
       assert probe.func
@@ -42,9 +34,8 @@ class TestDtrace < Test::Unit::TestCase
   end
 
   def test_list_probes_match_usdt
-    t = Dtrace.new
     probe_count = 0
-    t.each_probe("pid#{$$}:::return") do |probe|
+    @dtp.each_probe("pid#{$$}:::return") do |probe|
       puts probe
       assert probe.provider
       assert probe.mod
@@ -56,8 +47,6 @@ class TestDtrace < Test::Unit::TestCase
   end
 
   def test_list_probes_match_prog
-    t = Dtrace.new
-    
     progtext = "syscall:::return
    			{
                           @calls[execname] = count();
@@ -70,11 +59,11 @@ class TestDtrace < Test::Unit::TestCase
                    @calls[execname] = count();
                    @fcalls[probefunc] = count();
                 }"
-    prog = t.compile(progtext, $$.to_s)
+    prog = @dtp.compile(progtext, $$.to_s)
     prog.execute
 
     probe_count = 0
-    t.each_probe_prog(prog) do |probe|
+    @dtp.each_probe_prog(prog) do |probe|
       assert probe.provider
       assert probe.mod
       assert probe.func
@@ -85,25 +74,22 @@ class TestDtrace < Test::Unit::TestCase
   end
 
   def test_list_probes_match_badpattern
-    t = Dtrace.new
     probe_count = 0
-    assert_raises Dtrace::Exception do 
-      t.each_probe('syscall') do |probe|
+    assert_raises Dtrace::Exception do
+      @dtp.each_probe('syscall') do |probe|
         nil
       end
     end
   end
 
   def test_compile
-    t = Dtrace.new
-
     progtext = "syscall:::entry
    			{
                           @calls[execname] = count();
 			  @fcalls[probefunc] = count();
 			}"
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     assert prog
     prog.execute
 
@@ -114,10 +100,8 @@ class TestDtrace < Test::Unit::TestCase
     assert info.recgens_count
     assert info.matches_count
   end
-  
-  def test_compile_with_args
-    t = Dtrace.new
 
+  def test_compile_with_args
     progtext = "syscall:::entry
                 /pid == $1/
                 {
@@ -125,7 +109,7 @@ class TestDtrace < Test::Unit::TestCase
                    @fcalls[probefunc] = count();
                 }"
 
-    prog = t.compile(progtext, $$.to_s)
+    prog = @dtp.compile(progtext, $$.to_s)
     assert prog
     prog.execute
 
@@ -134,44 +118,38 @@ class TestDtrace < Test::Unit::TestCase
     assert_equal 2,   info.aggregates_count
     assert_equal 0,   info.speculations_count
     assert_equal 4,   info.recgens_count
-    
+
     # matches_count is platform dependent
     assert info.matches_count
   end
-      
+
   def test_run
-    t = Dtrace.new
-
-    t.setopt("aggsize", "4m")
-    t.setopt("bufsize", "4m")
-
     progtext = "syscall:::entry
    			{
                           @calls[execname] = count();
 			  @fcalls[probefunc] = count();
 			}"
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     assert prog
     prog.execute
-    assert_equal 0, t.status # none
+    assert_equal 0, @dtp.status # none
 
-    t.go
+    @dtp.go
 
-    assert_equal 1, t.status # ok
+    assert_equal 1, @dtp.status # ok
     sleep 1
-    assert_equal 1, t.status # ok
-    t.stop
-    assert_equal 4, t.status # stopped
+    assert_equal 1, @dtp.status # ok
+    @dtp.stop
+    assert_equal 4, @dtp.status # stopped
   end
 
   def test_bad_program
-    t = Dtrace.new
     progtext = "blah blahb albhacasfas"
     e = assert_raise Dtrace::Exception do
-      prog = t.compile progtext
+      prog = @dtp.compile progtext
     end
     assert_equal "probe description :::blah does not match any probes", e.message
   end
-  
+
 end

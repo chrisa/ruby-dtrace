@@ -1,30 +1,27 @@
-#
-# Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
-#
-
-require 'dtrace'
-require 'test/unit'
+require 'test_helper'
 
 # Test repeatedly using DTrace in the same process.  Show that we can
 # reopen the DTrace handle multiple times, without explictly closing
 # it (that happens in GC, so in this script that's probably right at
 # the end).
 
-class TestDtraceRepeat < Test::Unit::TestCase
-  
+class TestRepeat < DTraceTest
+
   def test_repeats
+    @dtp.close
+    @dtp = nil
+
     (0..9).each do |i|
-      t = Dtrace.new 
+      t = Dtrace.new
       t.setopt("bufsize", "4m")
       t.setopt("aggsize", "4m")
 
       progtext = 'syscall:::entry { trace("foo"); }'
-      
+
       prog = t.compile progtext
       prog.execute
       t.go
-      
+
       # Let some activity happen.
       sleep 1
 
@@ -46,6 +43,8 @@ class TestDtraceRepeat < Test::Unit::TestCase
         i = i + 1
       end
       assert i > 0
+
+      t.close
     end
   end
 end

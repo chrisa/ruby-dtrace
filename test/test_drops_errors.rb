@@ -1,19 +1,12 @@
-#
-# Ruby-Dtrace
-# (c) 2007 Chris Andrews <chris@nodnol.org>
-#
-
-require 'dtrace'
-require 'test/unit'
+require 'test_helper'
 
 # Tests for the DropData record.
 
-class TestDtraceDropsErrors < Test::Unit::TestCase
+class TestDropsErrors < DTraceTest
 
   def test_drops
-    t = Dtrace.new 
-    t.setopt("bufsize", "512")
-    t.setopt("strsize", "1024")
+    @dtp.setopt("bufsize", "512")
+    @dtp.setopt("strsize", "1024")
 
     # drp.DTRACEDROP_PRINCIPAL.d
     progtext = <<EOD
@@ -31,14 +24,14 @@ BEGIN
 }
 EOD
 
-    prog = t.compile progtext
+    prog = @dtp.compile progtext
     prog.execute
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     assert c
 
     i = 0
-    c.drophandler do |d| 
+    c.drophandler do |d|
       assert_match(/1 drop on CPU [0-9]+/, d.msg)
       assert_equal "drop to principal buffer", d.kind
       assert_not_nil d.cpu
@@ -47,7 +40,7 @@ EOD
       i = 1
     end
 
-    t.go
+    @dtp.go
     c.consume do |d|
     end
 
@@ -55,22 +48,18 @@ EOD
   end
 
   def test_error_handler_too_late
-    t = Dtrace.new 
-    t.setopt("bufsize", "512")
-    t.setopt("strsize", "1024")
-
     progtext = <<EOD
 BEGIN
 {
    *(char *)NULL;
 }
 EOD
-    
-    prog = t.compile progtext
-    prog.execute
-    t.go 
 
-    c = Dtrace::Consumer.new(t)
+    prog = @dtp.compile progtext
+    prog.execute
+    @dtp.go
+
+    c = Dtrace::Consumer.new(@dtp)
     assert c
 
     # since we've already said "go", we now can't apply an error
@@ -84,21 +73,17 @@ EOD
   end
 
   def test_errors
-    t = Dtrace.new 
-    t.setopt("bufsize", "512")
-    t.setopt("strsize", "1024")
-
     progtext = <<EOD
 BEGIN
 {
    *(char *)NULL;
 }
 EOD
-    
-    prog = t.compile progtext
+
+    prog = @dtp.compile progtext
     prog.execute
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     assert c
 
     i = 0
@@ -112,7 +97,7 @@ EOD
       i = 1
     end
 
-    t.go
+    @dtp.go
     c.consume_once do |d|
     end
 
@@ -120,10 +105,8 @@ EOD
   end
 
   def test_error_and_drop_handler
-
-    t = Dtrace.new 
-    t.setopt("bufsize", "512")
-    t.setopt("strsize", "1024")
+    @dtp.setopt("bufsize", "512")
+    @dtp.setopt("strsize", "1024")
 
     progtext = <<EOD
 BEGIN
@@ -144,11 +127,11 @@ ERROR
     exit(0);
 }
 EOD
-    
-    prog = t.compile progtext
+
+    prog = @dtp.compile progtext
     prog.execute
 
-    c = Dtrace::Consumer.new(t)
+    c = Dtrace::Consumer.new(@dtp)
     assert c
 
     errors = 0
@@ -163,7 +146,7 @@ EOD
     end
 
     drops = 0
-    c.drophandler do |d| 
+    c.drophandler do |d|
       assert_match(/1 drop on CPU [0-9]+/, d.msg)
       assert_equal "drop to principal buffer", d.kind
       assert_not_nil d.cpu
@@ -172,7 +155,7 @@ EOD
       drops = 1
     end
 
-    t.go
+    @dtp.go
     c.consume do |d|
     end
 
