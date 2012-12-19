@@ -5,16 +5,6 @@
 #include "dtrace_api.h"
 
 RUBY_EXTERN VALUE eDTraceException;
-RUBY_EXTERN VALUE cDTraceProgramInfo;
-
-/* :nodoc: */
-VALUE dtraceprogram_init(VALUE self)
-{
-  dtrace_prog_t *prog;
-
-  Data_Get_Struct(self, dtrace_prog_t, prog);
-  return self;
-}
 
 /*
  * Execute the D program. Returns a DTraceProgramInfo object if
@@ -42,12 +32,12 @@ VALUE dtraceprogram_exec(VALUE self)
   ret = dtrace_program_exec(handle->hdl, prog, proginfo);
 
   if (ret == 0) {
-    dtraceprograminfo = Data_Wrap_Struct(cDTraceProgramInfo, 0, NULL, proginfo);
+    dtraceprograminfo = dtraceprograminfo_init(proginfo);
     rb_iv_set(self, "@proginfo", dtraceprograminfo);
   }
 
   if (ret < 0)
-          rb_raise(eDTraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
+    rb_raise(eDTraceException, "%s", dtrace_errmsg(handle->hdl, dtrace_errno(handle->hdl)));
 
   return Qnil;
 }

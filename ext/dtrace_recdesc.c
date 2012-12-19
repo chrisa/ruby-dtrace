@@ -4,15 +4,6 @@
 
 #include "dtrace_api.h"
 
-/* :nodoc: */
-VALUE dtracerecdesc_init(VALUE self)
-{
-  dtrace_recdesc_t *recdesc;
-
-  Data_Get_Struct(self, dtrace_recdesc_t, recdesc);
-  return self;
-}
-
 /*
  * Returns the type of action which generated this recdesc.
  * (exit, printf, printa or "other" for all other actions).

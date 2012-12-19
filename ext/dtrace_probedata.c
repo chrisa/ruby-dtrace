@@ -5,16 +5,6 @@
 #include "dtrace_api.h"
 
 RUBY_EXTERN VALUE eDTraceException;
-RUBY_EXTERN VALUE cDTraceProbeDesc;
-
-/* :nodoc: */
-VALUE dtraceprobedata_init(VALUE self)
-{
-  dtrace_probedata_t *data;
-
-  Data_Get_Struct(self, dtrace_probedata_t, data);
-  return self;
-}
 
 static VALUE _handle_ustack_record(dtrace_hdl_t *handle, caddr_t addr, const dtrace_recdesc_t *rec)
 {
@@ -126,7 +116,7 @@ VALUE dtraceprobedata_probe(VALUE self)
   pd = data->dtpda_pdesc;
 
   if (pd) {
-    dtraceprobe = Data_Wrap_Struct(cDTraceProbeDesc, 0, NULL, (dtrace_probedesc_t *)pd);
+    dtraceprobe = dtraceprobedesc_init(pd);
     return dtraceprobe;
   }
 

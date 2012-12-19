@@ -68,16 +68,13 @@ static inline VALUE *rb_ary_ptr(VALUE s) {return  RARRAY(s)->ptr;}
 
 VALUE handle_bytedata(caddr_t addr, uint32_t nbytes);
 
-VALUE dtrace_process_init(VALUE self);
 void dtrace_process_free(dtrace_process_t *process);
 VALUE dtrace_process_release(VALUE self);
 VALUE dtrace_process_continue(VALUE self);
 
-VALUE dtraceaggdata_init(VALUE self);
 VALUE dtraceaggdata_value(VALUE self);
 VALUE dtraceaggdata_aggtype(VALUE self);
 
-VALUE dtrace_init(VALUE self);
 VALUE dtrace_hdl_alloc(VALUE klass);
 VALUE dtrace_hdl_close(VALUE self);
 VALUE dtrace_each_probe_all(VALUE self);
@@ -97,14 +94,13 @@ VALUE dtrace_hdl_err_consumer(VALUE self, VALUE err_consumer_proc);
 VALUE dtrace_hdl_createprocess(VALUE self, VALUE rbargv);
 VALUE dtrace_hdl_grabprocess(VALUE self, VALUE pid);
 
-VALUE dtraceprobedesc_init(VALUE self);
+VALUE dtraceprobedesc_init(dtrace_probedesc_t *p);
 VALUE dtraceprobedesc_probe_id(VALUE self);
 VALUE dtraceprobedesc_provider(VALUE self);
 VALUE dtraceprobedesc_mod(VALUE self);
 VALUE dtraceprobedesc_func(VALUE self);
 VALUE dtraceprobedesc_name(VALUE self);
 
-VALUE dtraceprobedata_init(VALUE self);
 VALUE dtraceprobedata_epid(VALUE self);
 VALUE dtraceprobedata_probe(VALUE self);
 VALUE dtraceprobedata_cpu(VALUE self);
@@ -113,43 +109,30 @@ VALUE dtraceprobedata_prefix(VALUE self);
 VALUE dtraceprobedata_flow(VALUE self);
 VALUE dtraceprobedata_each_record(VALUE self);
 
-VALUE dtracebufdata_init(VALUE self);
 VALUE dtracebufdata_epid(VALUE self);
 VALUE dtracebufdata_probe(VALUE self);
 VALUE dtracebufdata_record(VALUE self);
 
-VALUE dtraceprogram_init(VALUE self);
 VALUE dtraceprogram_exec(VALUE self);
 VALUE dtraceprogram_info(VALUE self);
 
-VALUE dtraceprograminfo_init(VALUE self);
+VALUE dtraceprograminfo_init(dtrace_proginfo_t *proginfo);
 VALUE dtraceprograminfo_aggregates_count(VALUE self);
 VALUE dtraceprograminfo_recgens_count(VALUE self);
 VALUE dtraceprograminfo_matches_count(VALUE self);
 VALUE dtraceprograminfo_speculations_count(VALUE self);
 
-VALUE dtracerecdesc_init(VALUE self);
 VALUE dtracerecdesc_action(VALUE self);
 
-VALUE dtracedropdata_init(VALUE self);
 VALUE dtracedropdata_cpu(VALUE self);
 VALUE dtracedropdata_drops(VALUE self);
 VALUE dtracedropdata_total(VALUE self);
 VALUE dtracedropdata_msg(VALUE self);
 VALUE dtracedropdata_kind(VALUE self);
 
-VALUE dtraceerrdata_init(VALUE self);
 VALUE dtraceerrdata_cpu(VALUE self);
 VALUE dtraceerrdata_action(VALUE self);
 VALUE dtraceerrdata_offset(VALUE self);
 VALUE dtraceerrdata_fault(VALUE self);
 VALUE dtraceerrdata_addr(VALUE self);
 VALUE dtraceerrdata_msg(VALUE self);
-
-VALUE dtraceprobe_alloc(VALUE klass);
-VALUE dtraceprobe_init(VALUE self, VALUE argc);
-VALUE dtraceprobe_addr(VALUE self);
-VALUE dtraceprobe_fire(int argc, VALUE *argv, VALUE self);
-VALUE dtraceprobe_is_enabled(VALUE self);
-VALUE dtraceprobe_probe_offset(VALUE self, VALUE rfile, VALUE argc);
-VALUE dtraceprobe_is_enabled_offset(VALUE self, VALUE rfile);

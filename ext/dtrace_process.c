@@ -4,18 +4,6 @@
 
 #include "dtrace_api.h"
 
-/* :nodoc: */
-VALUE dtrace_process_init(VALUE self)
-{
-  dtrace_process_t *process;
-
-  Data_Get_Struct(self, dtrace_process_t, process);
-  if (process)
-    return self;
-  else
-    return Qnil;
-}
-
 static void _release_process(dtrace_process_t *process)
 {
   if (process->handle->hdl != NULL && process->proc != NULL) {

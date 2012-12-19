@@ -90,18 +90,6 @@ VALUE dtrace_hdl_alloc(VALUE klass)
   }
 }
 
-/* :nodoc: */
-VALUE dtrace_init(VALUE self)
-{
-  dtrace_handle_t *handle;
-
-  Data_Get_Struct(self, dtrace_handle_t, handle);
-  if (handle)
-    return self;
-  else
-    return Qnil;
-}
-
 VALUE dtrace_hdl_close(VALUE self)
 {
   dtrace_handle_t *handle;

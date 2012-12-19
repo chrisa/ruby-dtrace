@@ -6,15 +6,6 @@
 
 RUBY_EXTERN VALUE eDTraceException;
 
-/* :nodoc: */
-VALUE dtraceaggdata_init(VALUE self)
-{
-  dtrace_bufdata_t *data;
-
-  Data_Get_Struct(self, dtrace_bufdata_t, data);
-  return self;
-}
-
 /* Returns the value of this aggregate, be it the aggregation value,
    or a member of an aggregation key tuple. */
 VALUE dtraceaggdata_value(VALUE self)

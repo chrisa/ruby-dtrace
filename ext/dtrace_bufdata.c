@@ -9,15 +9,6 @@ RUBY_EXTERN VALUE cDTraceAggData;
 RUBY_EXTERN VALUE cDTraceRecDesc;
 RUBY_EXTERN VALUE cDTraceProbe;
 
-/* :nodoc: */
-VALUE dtracebufdata_init(VALUE self)
-{
-  dtrace_bufdata_t *data;
-
-  Data_Get_Struct(self, dtrace_bufdata_t, data);
-  return self;
-}
-
 /*
  * Returns the enabled probe id which generated this data
  */
