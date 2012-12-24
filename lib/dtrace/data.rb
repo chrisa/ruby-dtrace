@@ -1,10 +1,10 @@
 #
-# Ruby-Dtrace
+# Ruby-DTrace
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
 # The object returned from a consumer when a probe fires.  Accumulates
 # records from the callbacks, and is yielded when the data is complete.
-class Dtrace
+class DTrace
   class Data
     attr_reader :data
     attr_reader :probe
@@ -36,7 +36,7 @@ class Dtrace
         @curraggset = nil
       end
       if rec.action == "printa"
-        @curraggset = Dtrace::AggregateSet.new
+        @curraggset = DTrace::AggregateSet.new
       end
     end
 
@@ -52,21 +52,24 @@ class Dtrace
       @prefix = probedata.prefix
       @flow   = probedata.flow
     end
-    
+
     def add_bufdata(buf)
       r = buf.record
+
+      p r
+
       # buf records can be empty (trace();)
       if r
         case r.class.to_s
-        when Dtrace::StackRecord.to_s
+        when DTrace::StackRecord.to_s
           add_data(r)
-        when Dtrace::Record.to_s
+        when DTrace::Record.to_s
           add_data(r)
-        when Dtrace::PrintfRecord.to_s
+        when DTrace::PrintfRecord.to_s
           add_data(r)
-        when Dtrace::AggData.to_s
+        when DTrace::AggData.to_s
           if @curragg == nil
-            @curragg = Dtrace::Aggregate.new
+            @curragg = DTrace::Aggregate.new
           end
           if agg = @curragg.add_record(r)
             if @curraggset
@@ -77,6 +80,6 @@ class Dtrace
         end
       end
     end
-    
+
   end
 end

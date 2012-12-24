@@ -1,5 +1,5 @@
 #
-# Ruby-Dtrace
+# Ruby-DTrace
 # (c) 2007 Chris Andrews <chris@nodnol.org>
 #
 
@@ -20,14 +20,14 @@ require 'dtrace/version'
 # compiling and running programs, and for setting up callbacks to
 # receive trace data.
 #
-# The general structure of a Dtrace-based program is:
+# The general structure of a DTrace-based program is:
 #
-# * Create a handle with Dtrace.new
+# * Create a handle with DTrace.new
 # * Set options
-# * Compile the program, possibly inspecting the return Dtrace::ProgramInfo
+# * Compile the program, possibly inspecting the return DTrace::ProgramInfo
 # * Execute the program
 # * Start tracing
-# * Consume data, either directly by setting up callbacks, or using a Dtrace::Consumer.
+# * Consume data, either directly by setting up callbacks, or using a DTrace::Consumer.
 # * Stop tracing
 #
 # === Listing probes
@@ -59,12 +59,12 @@ require 'dtrace/version'
 #   t.go
 #   p.continue
 #
-#   c = Dtrace::Consumer.new(t)
+#   c = DTrace::Consumer.new(t)
 #   c.consume do |d|
 #     ..
 #   end
 
-class Dtrace
+class DTrace
   STATUS_NONE    = 0
   STATUS_OKAY    = 1
   STATUS_EXITED  = 2
@@ -84,7 +84,7 @@ class Dtrace
       begin
         each_probe_match(*parts, &block)
       rescue ArgumentError => e
-        raise Dtrace::Exception.new("each_probe: probe specification expected (e.g. 'provider:::')")
+        raise DTrace::Exception.new("each_probe: probe specification expected (e.g. 'provider:::')")
       end
     else
       each_probe_all(&block)

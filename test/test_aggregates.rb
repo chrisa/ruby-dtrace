@@ -1,8 +1,6 @@
 require 'test_helper'
 
-# Tests using the DTrace profile provider.
-
-class TestLegacyConsumer < DTraceTest
+class TestAggregates < DTraceTest
 
   def test_aggregate_group
     progtext =<<EOD
@@ -25,7 +23,7 @@ EOD
 
     sleep 3
 
-    c = DTraceConsumer.new(@dtp)
+    c = DTrace::Consumer.new(@dtp)
     assert c
 
     data = []

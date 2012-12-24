@@ -1,15 +1,23 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 
+RUBY_EXTERN VALUE cDTraceProbeDesc;
+
+static void free_probedesc(void *p);
+
 /* :nodoc: */
-VALUE dtraceprobedesc_init(VALUE self)
+VALUE dtraceprobedesc_init(dtrace_probedesc_t *p)
 {
   dtrace_probedesc_t *pdp;
+  VALUE self;
 
-  Data_Get_Struct(self, dtrace_probedesc_t, pdp);
+  pdp = ALLOC(dtrace_probedesc_t);
+  memcpy(pdp, p, sizeof(dtrace_probedesc_t));
+
+  self = Data_Wrap_Struct(cDTraceProbeDesc, 0, free_probedesc, pdp);
   return self;
 }
 
@@ -76,3 +84,10 @@ VALUE dtraceprobedesc_name(VALUE self)
   string = rb_str_new2(pdp->dtpd_name);
   return string;
 }
+
+static void free_probedesc(void *p)
+{
+  dtrace_probedesc_t *pdp = p;
+  free(pdp);
+}
+

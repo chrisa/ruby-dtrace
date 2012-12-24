@@ -1,15 +1,19 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 
-/* :nodoc: */
-VALUE dtraceprograminfo_init(VALUE self)
-{
-  dtrace_proginfo_t *proginfo;
+RUBY_EXTERN VALUE cDTraceProgramInfo;
 
-  Data_Get_Struct(self, dtrace_proginfo_t, proginfo);
+static void free_proginfo(void *p);
+
+/* :nodoc: */
+VALUE dtraceprograminfo_init(dtrace_proginfo_t *proginfo)
+{
+  VALUE self;
+
+  self = Data_Wrap_Struct(cDTraceProgramInfo, 0, free_proginfo, proginfo);
   return self;
 }
 
@@ -56,5 +60,11 @@ VALUE dtraceprograminfo_speculations_count(VALUE self)
 
   Data_Get_Struct(self, dtrace_proginfo_t, proginfo);
   return INT2NUM(proginfo->dpi_speculations);
+}
+
+static void free_proginfo(void *p)
+{
+  dtrace_proginfo_t *proginfo = p;
+  free(proginfo);
 }
 

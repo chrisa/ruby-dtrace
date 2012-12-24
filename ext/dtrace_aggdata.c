@@ -1,19 +1,10 @@
-/* Ruby-Dtrace
+/* Ruby-DTrace
  * (c) 2007 Chris Andrews <chris@nodnol.org>
  */
 
 #include "dtrace_api.h"
 
-RUBY_EXTERN VALUE eDtraceException;
-
-/* :nodoc: */
-VALUE dtraceaggdata_init(VALUE self)
-{
-  dtrace_bufdata_t *data;
-
-  Data_Get_Struct(self, dtrace_bufdata_t, data);
-  return self;
-}
+RUBY_EXTERN VALUE eDTraceException;
 
 /* Returns the value of this aggregate, be it the aggregation value,
    or a member of an aggregation key tuple. */
@@ -35,30 +26,30 @@ VALUE dtraceaggdata_value(VALUE self)
   aggdata = bufdata->dtbda_aggdata;
   s = bufdata->dtbda_buffered;
   rec = bufdata->dtbda_recdesc;
-  
+
   if (aggdata == NULL) {
-    rb_raise(eDtraceException, "null aggdata");
+    rb_raise(eDTraceException, "null aggdata");
     return Qnil;
   }
 
   aggdesc = aggdata->dtada_desc;
 
   if (aggdesc == NULL) {
-    rb_raise(eDtraceException, "null aggdesc");
+    rb_raise(eDTraceException, "null aggdesc");
     return Qnil;
   }
 
   aggid = *((int64_t *)(aggdata->dtada_data +
 			aggdesc->dtagd_rec[0].dtrd_offset));
   if (aggid < 0) {
-    rb_raise(eDtraceException, "negative aggregation ID");
+    rb_raise(eDTraceException, "negative aggregation ID");
     return Qnil;
   }
 
   act = rec->dtrd_action;
 
   if (bufdata->dtbda_flags & DTRACE_BUFDATA_AGGKEY) {
-  
+
     switch (act) {
     case DTRACEACT_STACK:
     case DTRACEACT_USTACK:
@@ -75,10 +66,10 @@ VALUE dtraceaggdata_value(VALUE self)
     default:
       v = handle_bytedata((aggdata->dtada_data + rec->dtrd_offset), rec->dtrd_size);
     }
-  
-    
+
+
   } else if (bufdata->dtbda_flags & DTRACE_BUFDATA_AGGVAL) {
-    
+
     normal = aggdata->dtada_normal;
     addr = aggdata->dtada_data + rec->dtrd_offset;
 
@@ -95,7 +86,7 @@ VALUE dtraceaggdata_value(VALUE self)
       switch (act) {
       case DTRACEAGG_COUNT:
 	if (value < 0)
-	  rb_raise(eDtraceException, "count value is negative");
+	  rb_raise(eDTraceException, "count value is negative");
 	v = LL2NUM(value);
 	break;
       case DTRACEAGG_AVG:
@@ -106,7 +97,7 @@ VALUE dtraceaggdata_value(VALUE self)
 	break;
       default:
 	v = Qnil;
-	rb_raise(eDtraceException, "unexpected aggregation action: %d", act);
+	rb_raise(eDTraceException, "unexpected aggregation action: %d", act);
       }
     }
 
@@ -119,8 +110,8 @@ VALUE dtraceaggdata_value(VALUE self)
   return v;
 }
 
-/* Return the type of this DtraceAggData: tuple, value or last. Used
-   to form tuples and values into DtraceAggregate objects. */
+/* Return the type of this DTraceAggData: tuple, value or last. Used
+   to form tuples and values into DTraceAggregate objects. */
 VALUE dtraceaggdata_aggtype(VALUE self)
 {
   dtrace_bufdata_t *bufdata;
@@ -139,4 +130,3 @@ VALUE dtraceaggdata_aggtype(VALUE self)
 
   return v;
 }
-  

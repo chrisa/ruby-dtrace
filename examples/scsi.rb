@@ -5,7 +5,7 @@ require 'getoptlong'
 
 # scsi.rb: part of ruby-dtrace, (c) Chris Andrews, 2007
 #
-# This is a ruby reimplementation of Chris Gerhard's "scsi.d" script, 
+# This is a ruby reimplementation of Chris Gerhard's "scsi.d" script,
 # obtained from here:
 #   http://blogs.sun.com/chrisg/resource/scsi_d/scsi.d-1.12
 #
@@ -44,14 +44,14 @@ class ScsiCdb
       @control = @bytes[9]
       @sa      = 0
       @cdblen  = 10
-      
+
     when 2
       @lba     = int32(@bytes[2..5])
       @lbalen  = 8
       @len     = int16(@bytes[7..8])
       @control = @bytes[9]
       @sa      = 0
-      @cdblen  = 10      
+      @cdblen  = 10
 
     when 3
       @lba     = int64(@bytes[12..19])
@@ -76,7 +76,7 @@ class ScsiCdb
       @control = @bytes[11]
       @sa      = 0
       @cdblen  = 12
-      
+
     when 6 .. 7
       @lba     = 0
       @lbalen  = 0
@@ -101,7 +101,7 @@ class ScsiCdb
   def int32(bytes)
     return (int16(bytes[0..1]) << 16) + int16(bytes[2..3])
   end
-  
+
   def int64(bytes)
     return (int32(bytes[0..3]) << 32) + int32(bytes[4..7])
   end
@@ -374,34 +374,34 @@ fbt:scsi:scsi_destroy_pkt:entry
 EOD
 #`
 
-t = Dtrace.new 
+t = DTrace.new
 t.setopt("bufsize", "4m")
 prog = t.compile progtext
 prog.execute
 t.go
 
 begin
-  c = Dtrace::Consumer.new(t)
-  
+  c = DTrace::Consumer.new(t)
+
   c.consume do |d|
     records = d.data
-    
+
     # D exit at timeout
     if records.length == 1 && records[0].value == 0
       exit 0
     end
-    
+
     # first two elements are timestamp
     t = sprintf("%05.5d.%09.9d", records.shift.value, records.shift.value)
 
     # next two elements are devname/devinst
     dev = sprintf('%s%d', records.shift.value, records.shift.value)
-    
+
     # next is CBDP, group, then 32 bytes of CDB
     cdbp = records.shift.value
     group = records.shift.value
     cdb_bytes = records.shift.value
-    
+
     # then dir flag
     dir = (records.shift.value == 1) ? '->' : '<-'
 
@@ -415,7 +415,7 @@ begin
     # execname and pid
     execname = records.shift.value
     pid      = records.shift.value
-    
+
     # reason, state, request time
     reason   = records.shift.value
     state    = records.shift.value
@@ -423,9 +423,9 @@ begin
 
     # parse the CDB
     cdb = ScsiCdb.new(group, cdb_bytes)
-    
-    printf "%s %s:%s 0x%2.2x %9s address %2.2d:%2.2d, lba 0x%08x, len 0x%6.6x, control 0x%2.2x timeout %d CDBP 0x%x", 
-    t, dev, dir, cdb_bytes[0], cdb.op, address_target, address_lun, 
+
+    printf "%s %s:%s 0x%2.2x %9s address %2.2d:%2.2d, lba 0x%08x, len 0x%6.6x, control 0x%2.2x timeout %d CDBP 0x%x",
+    t, dev, dir, cdb_bytes[0], cdb.op, address_target, address_lun,
     cdb.lba, cdb.len, cdb.control, timeout, cdbp, execname, pid
 
     case dir
@@ -435,8 +435,7 @@ begin
       printf ", reason 0x%x (%s) state 0x%x Time %dus\n", reason, scsi_reason(reason), state, req_time
     end
   end
-  
+
 rescue Interrupt => e
   exit
 end
-
